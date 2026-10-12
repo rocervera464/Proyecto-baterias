@@ -6,7 +6,31 @@ Plataforma web para estimar el Estado de Salud (SoH) y la evolución futura de b
 
 Integrar un modelo predictivo XGBoost dentro de una aplicación web que permita procesar datos de telemetría de baterías y generar predicciones sobre su estado de salud.
 
-## Arquitectura
+## Ejecutar en Windows
+
+Desde la raíz `Proyecto-baterias`, ejecuta sin activar el entorno virtual:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --reload
+```
+
+Abre http://127.0.0.1:8000/docs para probar la API y
+`POST /telemetry/features`. El estado del servicio está en `/health`.
+
+Si deseas activar el entorno desde la raíz:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\backend\.venv\Scripts\Activate.ps1
+```
+
+Para ejecutar las pruebas desde la raíz:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m pytest -q
+```
+
+## Estructura
 
 El proyecto está dividido en:
 
