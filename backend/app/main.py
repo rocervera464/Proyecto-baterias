@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.api.routes.prediction import router as prediction_router
 from app.api.routes.telemetry import router as telemetry_router
 
 
@@ -12,6 +13,7 @@ app = FastAPI(
 )
 
 app.include_router(telemetry_router)
+app.include_router(prediction_router)
 
 
 @app.get("/")
