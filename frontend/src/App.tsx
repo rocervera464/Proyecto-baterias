@@ -1,11 +1,15 @@
 import PredictionPage from "./pages/PredictionPage";
+import PredictionHeader from "./components/PredictionHeader";
 
 import "./App.css";
 
 
 function App() {
   return (
-    <PredictionPage />
+    <main className="prediction-page">
+      <PredictionHeader />
+      <PredictionPage />
+    </main>
   );
 }
 

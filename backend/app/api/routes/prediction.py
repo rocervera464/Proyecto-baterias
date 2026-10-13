@@ -1,4 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import (
+    APIRouter,
+    HTTPException,
+)
 
 from app.schemas.prediction import (
     FuturePrediction,
@@ -18,11 +21,19 @@ from app.services.model_service import (
 )
 
 
+# ============================================================
+# ROUTER
+# ============================================================
+
 router = APIRouter(
     prefix="/api/v1",
     tags=["prediction"],
 )
 
+
+# ============================================================
+# PREDICCIÓN
+# ============================================================
 
 @router.post(
     "/predict",
@@ -32,13 +43,20 @@ def predict_battery_health(
     request: TelemetryRequest,
 ):
     """
-    Recibe telemetría, genera las 29 features
-    y ejecuta los modelos XGBoost.
+    Flujo de predicción:
+
+    1. Recibe la telemetría.
+    2. Genera las 29 features.
+    3. Carga los modelos XGBoost.
+    4. Predice el SoH actual.
+    5. Predice el SoH futuro.
+    6. Devuelve los resultados.
     """
 
-    # ======================================================
-    # FEATURE ENGINEERING
-    # ======================================================
+
+    # ========================================================
+    # 1. FEATURE ENGINEERING
+    # ========================================================
 
     try:
         features, _ = extract_features(
@@ -52,9 +70,9 @@ def predict_battery_health(
         ) from error
 
 
-    # ======================================================
-    # CARGAR MODELOS
-    # ======================================================
+    # ========================================================
+    # 2. CARGAR MODELOS XGBOOST
+    # ========================================================
 
     try:
         model_service = (
@@ -75,14 +93,13 @@ def predict_battery_health(
         ) from error
 
 
-    # ======================================================
-    # REALIZAR PREDICCIONES
-    # ======================================================
+    # ========================================================
+    # 3. EJECUTAR PREDICCIONES
+    # ========================================================
 
     try:
         predictions = (
-            model_service
-            .predict_all(
+            model_service.predict_all(
                 features
             )
         )
@@ -101,11 +118,14 @@ def predict_battery_health(
         ) from error
 
 
-    # ======================================================
-    # CONSTRUIR RESPUESTA FUTURA
-    # ======================================================
+    # ========================================================
+    # 4. CONSTRUIR PREDICCIONES FUTURAS
+    # ========================================================
 
-    future_predictions = []
+    future_predictions: list[
+        FuturePrediction
+    ] = []
+
 
     for horizon in [
         5,
@@ -116,7 +136,8 @@ def predict_battery_health(
 
         future_predictions.append(
             FuturePrediction(
-                horizon_cycles=horizon,
+                horizon_cycles=
+                    horizon,
 
                 target_cycle=(
                     request.cycle
@@ -136,18 +157,24 @@ def predict_battery_health(
         )
 
 
+    # ========================================================
+    # 5. RESPUESTA
+    # ========================================================
+
     return PredictionResponse(
-        status="success",
+        status=
+            "success",
 
-        model_family="XGBoost",
+        model_family=
+            "XGBoost",
 
-        current_cycle=request.cycle,
+        current_cycle=
+            request.cycle,
 
         current_soh_percent=(
             predictions[0]
         ),
 
-        future_predictions=(
-            future_predictions
-        ),
+        future_predictions=
+            future_predictions,
     )

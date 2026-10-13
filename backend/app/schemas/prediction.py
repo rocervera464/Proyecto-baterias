@@ -1,9 +1,7 @@
 from pydantic import BaseModel
 
 
-class FuturePrediction(
-    BaseModel
-):
+class FuturePrediction(BaseModel):
     horizon_cycles: int
 
     target_cycle: int
@@ -13,9 +11,7 @@ class FuturePrediction(
     experimental: bool = False
 
 
-class PredictionResponse(
-    BaseModel
-):
+class PredictionResponse(BaseModel):
     status: str
 
     model_family: str

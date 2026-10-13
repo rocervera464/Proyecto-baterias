@@ -2,9 +2,11 @@ import {
   useState,
 } from "react";
 
-import PredictionChart from "../components/PredictionChart";
+import PredictionChart
+  from "../components/PredictionChart";
 
-import TelemetryForm from "../components/TelemetryForm";
+import TelemetryForm
+  from "../components/TelemetryForm";
 
 import {
   predictBattery,
@@ -21,6 +23,10 @@ import type {
 
 export default function PredictionPage() {
 
+  // ==========================================================
+  // ESTADO DE LA PREDICCIÓN
+  // ==========================================================
+
   const [
     prediction,
     setPrediction,
@@ -31,6 +37,10 @@ export default function PredictionPage() {
   );
 
 
+  // ==========================================================
+  // ESTADO DE CARGA
+  // ==========================================================
+
   const [
     loading,
     setLoading,
@@ -38,6 +48,10 @@ export default function PredictionPage() {
     false,
   );
 
+
+  // ==========================================================
+  // ESTADO DE ERROR
+  // ==========================================================
 
   const [
     error,
@@ -49,9 +63,12 @@ export default function PredictionPage() {
   );
 
 
+  // ==========================================================
+  // EJECUTAR PREDICCIÓN
+  // ==========================================================
+
   async function handlePrediction(
-    telemetry:
-      TelemetryRequest,
+    telemetry: TelemetryRequest,
   ) {
 
     setLoading(
@@ -107,43 +124,18 @@ export default function PredictionPage() {
   }
 
 
+  // ==========================================================
+  // INTERFAZ
+  // ==========================================================
+
   return (
-    <main className="prediction-page">
+    <div className="prediction-content">
 
-      {/* =====================================================
-          ENCABEZADO PRINCIPAL
-      ===================================================== */}
 
-      <header className="hero">
-
-        <h1>
-          Predictor del estado de salud de baterías
-        </h1>
-
-        <p>
-          Carga la telemetría de una
-          descarga para estimar el
-          Estado de Salud actual y su
-          evolución futura mediante
-          XGBoost.
-        </p>
-
-        <img
-          className="hero-image"
-          src="/battery-header.jpg"
-          alt="Vehículo eléctrico, baterías y gráficos de análisis en una ciudad futurista"
-          width={1376}
-          height={768}
-          onError={(event) => {
-            event.currentTarget.hidden = true;
-          }}
-        />
-
-      </header>
 
 
       {/* =====================================================
-          FORMULARIO DE TELEMETRÍA
+          FORMULARIO
       ===================================================== */}
 
       <section className="card">
@@ -174,6 +166,7 @@ export default function PredictionPage() {
               No fue posible realizar
               la predicción
             </strong>
+
 
             <p>
               {error}
@@ -209,6 +202,7 @@ export default function PredictionPage() {
                 Estado de salud actual
               </span>
 
+
               <strong>
 
                 {
@@ -218,6 +212,7 @@ export default function PredictionPage() {
                 }%
 
               </strong>
+
 
               <small>
                 SoH
@@ -256,11 +251,14 @@ export default function PredictionPage() {
                         <span>
 
                           +
+
                           {
                             item
                               .horizon_cycles
                           }
+
                           {" "}
+
                           ciclos
 
                         </span>
@@ -280,6 +278,7 @@ export default function PredictionPage() {
                         <small>
 
                           Ciclo{" "}
+
                           {
                             item
                               .target_cycle
@@ -309,7 +308,7 @@ export default function PredictionPage() {
 
 
             {/* ===============================================
-                GRÁFICA DE EVOLUCIÓN DEL SOH
+                GRÁFICA
             =============================================== */}
 
             <PredictionChart
@@ -322,6 +321,6 @@ export default function PredictionPage() {
         )
       }
 
-    </main>
+    </div>
   );
 }

@@ -3,6 +3,10 @@
 }
 
 
+/* ============================================================
+   PÁGINA PRINCIPAL
+============================================================ */
+
 .prediction-page {
   width: min(
     1100px,
@@ -17,6 +21,10 @@
     96px;
 }
 
+
+/* ============================================================
+   HERO
+============================================================ */
 
 .hero {
   margin-bottom: 48px;
@@ -62,6 +70,10 @@
 }
 
 
+/* ============================================================
+   TARJETAS GENERALES
+============================================================ */
+
 .card,
 .results,
 .error-card {
@@ -88,6 +100,15 @@
     );
 }
 
+
+.results {
+  margin-top: 28px;
+}
+
+
+/* ============================================================
+   BOTONES
+============================================================ */
 
 .card button {
   margin-top: 20px;
@@ -117,138 +138,9 @@
 }
 
 
-.results {
-  margin-top: 28px;
-}
-
-
-.current-soh {
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-  justify-content: center;
-
-  min-height: 230px;
-
-  margin:
-    24px
-    0
-    36px;
-
-  border-radius: 18px;
-
-  background: #f8fafc;
-}
-
-
-.current-soh strong {
-  font-size: 4rem;
-
-  line-height: 1;
-}
-
-
-.current-soh span,
-.current-soh small {
-  color: #667085;
-}
-
-
-.prediction-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      4,
-      1fr
-    );
-
-  gap: 16px;
-
-  margin-top: 20px;
-}
-
-
-.prediction-card {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 8px;
-
-  padding: 20px;
-
-  border-radius: 16px;
-
-  background: #f8fafc;
-}
-
-
-.prediction-card strong {
-  font-size: 1.8rem;
-}
-
-
-.prediction-card span,
-.prediction-card small {
-  color: #667085;
-}
-
-
-.prediction-card em {
-  width: fit-content;
-
-  padding:
-    4px
-    8px;
-
-  border-radius: 999px;
-
-  background: #fff3cd;
-
-  color: #7a5d00;
-
-  font-size: 0.72rem;
-}
-
-
-.error-card {
-  margin-top: 28px;
-
-  border-color: #fecaca;
-
-  background: #fff7f7;
-}
-
-
-@media (
-  max-width: 800px
-) {
-
-  .prediction-grid {
-    grid-template-columns:
-      repeat(
-        2,
-        1fr
-      );
-  }
-
-}
-
-
-@media (
-  max-width: 500px
-) {
-
-  .prediction-grid {
-    grid-template-columns:
-      1fr;
-  }
-
-}
+/* ============================================================
+   FORMULARIO
+============================================================ */
 
 .telemetry-form h2 {
   margin-top: 0;
@@ -380,37 +272,123 @@ summary {
 }
 
 
-@media (
-  max-width: 800px
-) {
+/* ============================================================
+   ERROR
+============================================================ */
 
-  .form-grid {
-    grid-template-columns:
-      1fr;
-  }
+.error-card {
+  margin-top: 28px;
 
+  border-color: #fecaca;
+
+  background: #fff7f7;
 }
 
-.csv-mapping {
+
+/* ============================================================
+   SOH ACTUAL
+============================================================ */
+
+.current-soh {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-height: 230px;
+
+  margin:
+    24px
+    0
+    36px;
+
+  border-radius: 18px;
+
+  background: #f8fafc;
+}
+
+
+.current-soh strong {
+  font-size: 4rem;
+
+  line-height: 1;
+}
+
+
+.current-soh span,
+.current-soh small {
+  color: #667085;
+}
+
+
+/* ============================================================
+   PREDICCIONES FUTURAS
+============================================================ */
+
+.prediction-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      1fr
+    );
+
+  gap: 16px;
+
   margin-top: 20px;
+}
+
+
+.prediction-card {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
   padding: 20px;
-  border: 1px solid #d0d5dd;
-  border-radius: 12px;
-  min-width: 0;
+
+  border-radius: 16px;
+
+  background: #f8fafc;
 }
-.csv-mapping legend { font-weight: 700; }
-.form-grid select {
-  width: 100%;
-  min-width: 0;
-  padding: 12px 14px;
-  border: 1px solid #d0d5dd;
-  border-radius: 10px;
-  background: white;
-  color: #111827;
+
+
+.prediction-card strong {
+  font-size: 1.8rem;
 }
-.csv-help { color: #475467; line-height: 1.6; }
-.time-origin { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; }
-.time-origin input { margin-top: 5px; }
+
+
+.prediction-card span,
+.prediction-card small {
+  color: #667085;
+}
+
+
+.prediction-card em {
+  width: fit-content;
+
+  padding:
+    4px
+    8px;
+
+  border-radius: 999px;
+
+  background: #fff3cd;
+
+  color: #7a5d00;
+
+  font-size: 0.72rem;
+}
+
+
+/* ============================================================
+   GRÁFICA
+============================================================ */
 
 .prediction-chart {
   margin-top: 42px;
@@ -504,6 +482,31 @@ summary {
 }
 
 
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (
+  max-width: 800px
+) {
+
+  .form-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .prediction-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        1fr
+      );
+  }
+
+}
+
+
 @media (
   max-width: 700px
 ) {
@@ -521,6 +524,35 @@ summary {
   .chart-disclaimer {
     grid-template-columns:
       1fr;
+  }
+
+}
+
+
+@media (
+  max-width: 500px
+) {
+
+  .prediction-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .prediction-page {
+    width: min(
+      100% - 24px,
+      1100px
+    );
+
+    padding-top: 36px;
+  }
+
+
+  .card,
+  .results,
+  .error-card {
+    padding: 20px;
   }
 
 }
