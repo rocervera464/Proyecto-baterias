@@ -23,14 +23,16 @@
 }
 
 
-.eyebrow {
-  font-size: 0.8rem;
+.hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 28px;
+  border-radius: 20px;
+}
 
-  font-weight: 700;
-
-  letter-spacing: 0.16em;
-
-  color: #5076ff;
+.hero-image[hidden] {
+  display: none;
 }
 
 
@@ -47,7 +49,7 @@
       4.8rem
     );
 
-  line-height: 0.96;
+  line-height: 1.08;
 }
 
 
@@ -247,3 +249,165 @@
   }
 
 }
+
+.telemetry-form h2 {
+  margin-top: 0;
+}
+
+
+.telemetry-form h3 {
+  margin-top: 32px;
+}
+
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      1fr
+    );
+
+  gap: 18px;
+
+  margin-top: 18px;
+}
+
+
+.form-grid label,
+.file-upload {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  color: #475467;
+
+  font-size: 0.9rem;
+
+  font-weight: 600;
+}
+
+
+.form-grid input,
+.file-upload input {
+  width: 100%;
+
+  padding:
+    12px
+    14px;
+
+  border:
+    1px
+    solid
+    #d0d5dd;
+
+  border-radius: 10px;
+
+  background: white;
+
+  color: #111827;
+}
+
+
+.file-upload {
+  margin-top: 18px;
+}
+
+
+.file-summary {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 16px;
+
+  padding: 16px;
+
+  border-radius: 12px;
+
+  background: #f0fdf4;
+}
+
+
+.file-summary strong {
+  width: 100%;
+}
+
+
+.file-summary span {
+  color: #475467;
+
+  font-size: 0.85rem;
+}
+
+
+.form-error {
+  margin-top: 16px;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  background: #fff1f2;
+
+  color: #be123c;
+}
+
+
+details {
+  margin-top: 28px;
+
+  padding:
+    16px
+    0;
+
+  border-top:
+    1px
+    solid
+    #eaecf0;
+}
+
+
+summary {
+  cursor: pointer;
+
+  font-weight: 700;
+}
+
+
+@media (
+  max-width: 800px
+) {
+
+  .form-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+
+.csv-mapping {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+  min-width: 0;
+}
+.csv-mapping legend { font-weight: 700; }
+.form-grid select {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  background: white;
+  color: #111827;
+}
+.csv-help { color: #475467; line-height: 1.6; }
+.time-origin { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; }
+.time-origin input { margin-top: 5px; }
