@@ -2,8 +2,9 @@ import {
   useState,
 } from "react";
 
-import TelemetryForm
-  from "../components/TelemetryForm";
+import PredictionChart from "../components/PredictionChart";
+
+import TelemetryForm from "../components/TelemetryForm";
 
 import {
   predictBattery,
@@ -109,6 +110,10 @@ export default function PredictionPage() {
   return (
     <main className="prediction-page">
 
+      {/* =====================================================
+          ENCABEZADO PRINCIPAL
+      ===================================================== */}
+
       <header className="hero">
 
         <h1>
@@ -137,6 +142,10 @@ export default function PredictionPage() {
       </header>
 
 
+      {/* =====================================================
+          FORMULARIO DE TELEMETRÍA
+      ===================================================== */}
+
       <section className="card">
 
         <TelemetryForm
@@ -150,6 +159,10 @@ export default function PredictionPage() {
 
       </section>
 
+
+      {/* =====================================================
+          ERROR
+      ===================================================== */}
 
       {
         error
@@ -171,6 +184,10 @@ export default function PredictionPage() {
       }
 
 
+      {/* =====================================================
+          RESULTADOS
+      ===================================================== */}
+
       {
         prediction
         &&
@@ -181,6 +198,10 @@ export default function PredictionPage() {
               Resultado
             </h2>
 
+
+            {/* ===============================================
+                SOH ACTUAL
+            =============================================== */}
 
             <div className="current-soh">
 
@@ -204,6 +225,10 @@ export default function PredictionPage() {
 
             </div>
 
+
+            {/* ===============================================
+                PREDICCIONES FUTURAS
+            =============================================== */}
 
             <h3>
               Proyección futura
@@ -240,6 +265,7 @@ export default function PredictionPage() {
 
                         </span>
 
+
                         <strong>
 
                           {
@@ -249,6 +275,7 @@ export default function PredictionPage() {
                           }%
 
                         </strong>
+
 
                         <small>
 
@@ -279,6 +306,17 @@ export default function PredictionPage() {
               }
 
             </div>
+
+
+            {/* ===============================================
+                GRÁFICA DE EVOLUCIÓN DEL SOH
+            =============================================== */}
+
+            <PredictionChart
+              prediction={
+                prediction
+              }
+            />
 
           </section>
         )
