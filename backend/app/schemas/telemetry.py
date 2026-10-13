@@ -24,7 +24,7 @@ class PreviousCharge(TelemetryModel):
 
 
 class TelemetryRequest(TelemetryModel):
-    cycle: int = Field(ge=0)
+    cycle: int = Field(ge=1)
     ambient_temperature_c: float
     cutoff_voltage_v: float = Field(gt=0)
     discharge_samples: list[DischargeSample] = Field(min_length=2)

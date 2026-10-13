@@ -13,7 +13,13 @@ router = APIRouter(
     tags=["telemetry"],
 )
 
+legacy_router = APIRouter(tags=["telemetry"])
 
+
+@legacy_router.post(
+    "/telemetry/features",
+    response_model=FeatureExtractionResponse,
+)
 @router.post(
     "/validate",
     response_model=FeatureExtractionResponse,

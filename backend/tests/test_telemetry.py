@@ -47,109 +47,28 @@ def test_invalid_sample_time_returns_validation_error(invalid_time):
     data = payload()
     data["discharge_samples"][0]["time_s"] = invalid_time
     assert client.post("/telemetry/features", json=data).status_code == 422
-from fastapi.testclient import (
-    TestClient,
-)
-
-from app.main import app
 
 
-client = TestClient(
-    app
-)
+@pytest.mark.parametrize("cycle", [0, -1])
+def test_reject_invalid_cycle(cycle):
+    data = payload()
+    data["cycle"] = cycle
+    response = client.post("/api/v1/telemetry/validate", json=data)
+    assert response.status_code == 422
 
 
-VALID_PAYLOAD = {
-    "cycle": 25,
+def test_reject_insufficient_samples():
+    data = payload()
+    data["discharge_samples"] = [
+        {"time_s": t, "voltage_v": v, "current_a": -1, "temperature_c": 25}
+        for t, v in [(0, 4.1), (400, 3.7)]
+    ]
+    response = client.post("/api/v1/telemetry/validate", json=data)
+    assert response.status_code == 422
 
-    "ambient_temperature_c": 4.0,
 
-    "cutoff_voltage_v": 2.2,
-
-    "discharge_samples": [
-        {
-            "time_s": 0,
-            "voltage_v": 4.10,
-            "current_a": -1.01,
-            "temperature_c": 4.2,
-        },
-        {
-            "time_s": 100,
-            "voltage_v": 3.95,
-            "current_a": -1.00,
-            "temperature_c": 4.6,
-        },
-        {
-            "time_s": 300,
-            "voltage_v": 3.78,
-            "current_a": -1.00,
-            "temperature_c": 5.2,
-        },
-    ],
-
-    "previous_eis": {
-        "re_ohm": 0.085,
-        "rct_ohm": 0.15,
-    },
-
-    "previous_charge": {
-        "temperature_start_c": 4.1,
-        "temperature_max_c": 5.4,
-        "temperature_delta_c": 1.3,
-    },
-}
-
-def test_reject_invalid_cycle():
-    payload = (
-        VALID_PAYLOAD.copy()
-    )
-
-    payload[
-        "cycle"
-    ] = 0
-
-    response = client.post(
-        "/api/v1/telemetry/validate",
-        json=payload,
-    )
-
-    assert (
-        response.status_code
-        == 422
-    )
-
-    def test_reject_insufficient_samples():
-        payload = {
-        "cycle": 25,
-
-        "ambient_temperature_c":
-            4.0,
-
-        "cutoff_voltage_v":
-            2.2,
-
-        "discharge_samples": [
-            {
-                "time_s": 0,
-                "voltage_v": 4.1,
-                "current_a": -1.0,
-                "temperature_c": 4.2,
-            },
-            {
-                "time_s": 400,
-                "voltage_v": 3.7,
-                "current_a": -1.0,
-                "temperature_c": 5.5,
-            },
-        ],
-    }
-
-    response = client.post(
-        "/api/v1/telemetry/validate",
-        json=payload,
-    )
-
-    assert (
-        response.status_code
-        == 422
-    )
+def test_validate_telemetry_endpoint():
+    response = client.post("/api/v1/telemetry/validate", json=payload())
+    assert response.status_code == 200
+    assert response.json()["samples_used"] == 2
+    assert response.json()["features"]["voltage_mean"] == 4.0
