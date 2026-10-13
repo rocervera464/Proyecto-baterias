@@ -2,6 +2,9 @@ import {
   useState,
 } from "react";
 
+import TelemetryForm
+  from "../components/TelemetryForm";
+
 import {
   predictBattery,
 } from "../services/api";
@@ -15,92 +18,69 @@ import type {
 } from "../types/telemetry";
 
 
-const SAMPLE_TELEMETRY: TelemetryRequest = {
-  cycle: 25,
-
-  ambient_temperature_c: 4,
-
-  cutoff_voltage_v: 2.2,
-
-  discharge_samples: [
-    {
-      time_s: 0,
-      voltage_v: 4.1,
-      current_a: -1.01,
-      temperature_c: 4.2,
-    },
-    {
-      time_s: 100,
-      voltage_v: 3.95,
-      current_a: -1.0,
-      temperature_c: 4.6,
-    },
-    {
-      time_s: 200,
-      voltage_v: 3.85,
-      current_a: -0.99,
-      temperature_c: 4.9,
-    },
-    {
-      time_s: 300,
-      voltage_v: 3.78,
-      current_a: -1.0,
-      temperature_c: 5.2,
-    },
-  ],
-
-  previous_eis: {
-    re_ohm: 0.085,
-    rct_ohm: 0.15,
-  },
-
-  previous_charge: {
-    temperature_start_c: 4.1,
-    temperature_max_c: 5.4,
-    temperature_delta_c: 1.3,
-  },
-};
-
-
 export default function PredictionPage() {
 
   const [
     prediction,
     setPrediction,
-  ] = useState<PredictionResponse | null>(
+  ] = useState<
+    PredictionResponse | null
+  >(
     null,
   );
+
 
   const [
     loading,
     setLoading,
-  ] = useState(false);
+  ] = useState(
+    false,
+  );
+
 
   const [
     error,
     setError,
-  ] = useState<string | null>(
+  ] = useState<
+    string | null
+  >(
     null,
   );
 
 
-  async function handlePrediction() {
+  async function handlePrediction(
+    telemetry:
+      TelemetryRequest,
+  ) {
 
-    setLoading(true);
+    setLoading(
+      true,
+    );
 
-    setError(null);
+    setError(
+      null,
+    );
+
+    setPrediction(
+      null,
+    );
+
 
     try {
 
-      const result = await predictBattery(
-        SAMPLE_TELEMETRY,
-      );
+      const result =
+        await predictBattery(
+          telemetry,
+        );
+
 
       setPrediction(
         result,
       );
 
-    } catch (error) {
+    } catch (
+      error
+    ) {
 
       if (
         error instanceof Error
@@ -113,13 +93,15 @@ export default function PredictionPage() {
       } else {
 
         setError(
-          "Unknown error",
+          "Ocurrió un error inesperado.",
         );
       }
 
     } finally {
 
-      setLoading(false);
+      setLoading(
+        false,
+      );
     }
   }
 
@@ -127,54 +109,44 @@ export default function PredictionPage() {
   return (
     <main className="prediction-page">
 
-      <section className="hero">
-
-        <p className="eyebrow">
-          EV BATTERY ANALYTICS
-        </p>
+      <header className="hero">
 
         <h1>
-          Battery Health Predictor
+          Predictor del estado de salud de baterías
         </h1>
 
         <p>
-          Predicción del Estado de Salud
-          de baterías utilizando XGBoost
-          y datos de telemetría.
+          Carga la telemetría de una
+          descarga para estimar el
+          Estado de Salud actual y su
+          evolución futura mediante
+          XGBoost.
         </p>
 
-      </section>
+        <img
+          className="hero-image"
+          src="/battery-header.jpg"
+          alt="Vehículo eléctrico, baterías y gráficos de análisis en una ciudad futurista"
+          width={1376}
+          height={768}
+          onError={(event) => {
+            event.currentTarget.hidden = true;
+          }}
+        />
+
+      </header>
 
 
       <section className="card">
 
-        <h2>
-          Probar modelo predictivo
-        </h2>
-
-        <p>
-          Esta primera versión utiliza una
-          telemetría de prueba para verificar
-          la comunicación entre React,
-          FastAPI y XGBoost.
-        </p>
-
-        <button
-          onClick={
+        <TelemetryForm
+          onSubmit={
             handlePrediction
           }
-          disabled={
+          loading={
             loading
           }
-        >
-
-          {
-            loading
-              ? "Analizando..."
-              : "Ejecutar predicción"
-          }
-
-        </button>
+        />
 
       </section>
 
@@ -186,7 +158,8 @@ export default function PredictionPage() {
           <section className="error-card">
 
             <strong>
-              Error
+              No fue posible realizar
+              la predicción
             </strong>
 
             <p>
@@ -208,6 +181,7 @@ export default function PredictionPage() {
               Resultado
             </h2>
 
+
             <div className="current-soh">
 
               <span>
@@ -215,11 +189,13 @@ export default function PredictionPage() {
               </span>
 
               <strong>
+
                 {
                   prediction
                     .current_soh_percent
                     .toFixed(2)
                 }%
+
               </strong>
 
               <small>
@@ -246,18 +222,22 @@ export default function PredictionPage() {
 
                       <article
                         key={
-                          item.horizon_cycles
+                          item
+                            .horizon_cycles
                         }
                         className="prediction-card"
                       >
 
                         <span>
+
                           +
                           {
-                            item.horizon_cycles
+                            item
+                              .horizon_cycles
                           }
                           {" "}
                           ciclos
+
                         </span>
 
                         <strong>
@@ -274,13 +254,16 @@ export default function PredictionPage() {
 
                           Ciclo{" "}
                           {
-                            item.target_cycle
+                            item
+                              .target_cycle
                           }
 
                         </small>
 
+
                         {
-                          item.experimental
+                          item
+                            .experimental
                           &&
                           (
                             <em>
