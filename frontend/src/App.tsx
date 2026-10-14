@@ -6,10 +6,12 @@ import "./App.css";
 
 function App() {
   return (
-    <main className="prediction-page">
+    <>
       <PredictionHeader />
-      <PredictionPage />
-    </main>
+      <main className="prediction-page">
+        <PredictionPage />
+      </main>
+    </>
   );
 }
 

@@ -5,6 +5,8 @@ import {
 import PredictionChart
   from "../components/PredictionChart";
 
+import BatteryUsageCard from "../components/BatteryUsageCard";
+
 import TelemetryForm
   from "../components/TelemetryForm";
 
@@ -206,10 +208,12 @@ export default function PredictionPage() {
               <strong>
 
                 {
-                  prediction
-                    .current_soh_percent
-                    .toFixed(2)
-                }%
+                  Number.isFinite(prediction.current_soh_percent)
+                    && prediction.current_soh_percent >= 0
+                    && prediction.current_soh_percent <= 100
+                    ? `${prediction.current_soh_percent.toFixed(2)}%`
+                    : "SoH no válido"
+                }
 
               </strong>
 
@@ -220,6 +224,8 @@ export default function PredictionPage() {
 
             </div>
 
+
+            <BatteryUsageCard soh={prediction.current_soh_percent} />
 
             {/* ===============================================
                 PREDICCIONES FUTURAS

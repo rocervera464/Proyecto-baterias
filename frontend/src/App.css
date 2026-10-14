@@ -2,6 +2,136 @@
   min-height: 100vh;
 }
 
+.telemetry-import {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid #e8edf4;
+}
+
+.telemetry-import-heading { display: flex; align-items: center; gap: 14px; }
+.telemetry-import .telemetry-import-heading h3 { margin: 0; font-size: 1.25rem; }
+.telemetry-import-heading p { margin: 6px 0 0; color: #667085; font-size: 0.9rem; line-height: 1.5; }
+.telemetry-import-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #eef2ff;
+  color: #4338ca;
+}
+.csv-format-badge { margin-left: auto; padding: 6px 10px; border-radius: 8px; background: #f1f5f9; color: #475467; font-size: 0.75rem; font-weight: 700; }
+.telemetry-import .file-upload {
+  gap: 6px;
+  padding: 24px;
+  border: 1px dashed #a5b4fc;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8faff, #f1f5ff);
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.telemetry-import .file-upload:focus-within { border-color: #4f46e5; box-shadow: 0 0 0 3px #e0e7ff; }
+.csv-upload-title { color: #1e293b; font-size: 1rem; }
+.csv-upload-description { color: #64748b; font-weight: 400; line-height: 1.5; }
+.telemetry-import .file-upload input { margin-top: 12px; padding: 0; border: 0; background: transparent; font: inherit; font-weight: 400; }
+.telemetry-import input::file-selector-button {
+  padding: 11px 16px;
+  margin-right: 14px;
+  border: 0;
+  border-radius: 9px;
+  background: #4338ca;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.telemetry-import input::file-selector-button:hover { background: #3730a3; }
+.telemetry-import input:disabled::file-selector-button { opacity: 0.5; cursor: not-allowed; }
+.telemetry-import .csv-help { margin: 12px 0 20px; color: #64748b; font-size: 0.85rem; line-height: 1.65; }
+.telemetry-import .csv-mapping { min-width: 0; margin: 24px 0 0; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fafbfe; }
+.csv-mapping legend { padding: 0 10px; color: #334155; font-size: 0.95rem; font-weight: 700; }
+.csv-mapping-intro { margin: 0 0 22px; color: #64748b; font-size: 0.85rem; line-height: 1.6; }
+.csv-group-title { margin: 24px 0 12px; color: #4338ca; font-size: 0.82rem; font-weight: 700; }
+.telemetry-import .csv-fields-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 0; }
+.telemetry-import .csv-fields-grid label { min-width: 0; font-size: 0.82rem; }
+.csv-fields-grid select {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 34px 12px 12px;
+  border: 1px solid #d5dce8;
+  border-radius: 10px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: #1e293b;
+  font: inherit;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.csv-fields-grid select:focus-visible { outline: 3px solid #c7d2fe; outline-offset: 2px; border-color: #6366f1; }
+.csv-fields-grid select:disabled { opacity: 0.6; cursor: not-allowed; }
+.time-origin { display: flex; align-items: flex-start; gap: 12px; margin-top: 24px; padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; background: white; color: #334155; font-size: 0.85rem; cursor: pointer; }
+.time-origin input { width: 18px; height: 18px; margin: 1px 0 0; flex-shrink: 0; accent-color: #4f46e5; }
+.time-origin-description { display: block; margin-top: 5px; color: #64748b; line-height: 1.5; }
+.csv-window-note { margin: 16px 0 0; padding-left: 12px; border-left: 3px solid #a5b4fc; color: #64748b; font-size: 0.82rem; line-height: 1.7; }
+.telemetry-import .file-summary { border: 1px solid #bbf7d0; }
+.telemetry-import .file-summary strong { overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .telemetry-import .csv-fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 500px) {
+  .telemetry-import .csv-fields-grid { grid-template-columns: 1fr; }
+  .telemetry-import .csv-mapping, .telemetry-import .file-upload { padding: 16px; }
+  .csv-format-badge { display: none; }
+}
+
+.soh-state-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.soh-image-gallery {
+  margin-top: 20px;
+}
+
+.soh-state-image-excellent {
+  max-width: 680px;
+  margin-inline: auto;
+}
+
+.soh-image-gallery-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+@media (max-width: 500px) {
+  .soh-image-gallery-pair {
+    grid-template-columns: 1fr;
+    max-width: 360px;
+  }
+}
+
+.battery-usage {
+  margin: 0 0 32px;
+  padding: 24px;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.battery-usage h3 { margin: 0 0 16px; }
+.battery-usage-status { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.battery-usage-status strong { color: #1e40af; }
+.battery-usage-status span { color: #475467; }
+.battery-usage li { margin-bottom: 8px; }
+.battery-usage-note { margin-bottom: 0; color: #475467; font-size: 0.9rem; line-height: 1.6; }
+
 
 /* ============================================================
    PÁGINA PRINCIPAL
@@ -16,7 +146,7 @@
   margin: 0 auto;
 
   padding:
-    64px
+    0
     0
     96px;
 }
@@ -28,23 +158,26 @@
 
 .hero {
   margin-bottom: 48px;
-}
-
-
-.hero-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin-top: 28px;
-  border-radius: 20px;
-}
-
-.hero-image[hidden] {
-  display: none;
+  padding: clamp(40px, 6vw, 88px) max(24px, calc((100% - 1100px) / 2));
+  min-height: clamp(440px, 42vw, 620px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #e5f1f2;
+  background-image:
+    linear-gradient(90deg, rgba(244, 250, 251, 0.78), rgba(244, 250, 251, 0.52) 55%, rgba(244, 250, 251, 0.08)),
+    url("/images/header-background.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 
 .hero h1 {
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+
   margin:
     10px
     0
@@ -64,7 +197,7 @@
 .hero p {
   max-width: 700px;
 
-  color: #667085;
+  color: #475467;
 
   font-size: 1.1rem;
 }
@@ -545,7 +678,7 @@ summary {
       1100px
     );
 
-    padding-top: 36px;
+    padding-top: 0;
   }
 
 

@@ -365,18 +365,30 @@ export default function TelemetryForm({
       </div>
 
 
-      <h3>
-        Telemetría de descarga
-      </h3>
+      <section className="telemetry-import" aria-labelledby="telemetry-import-title">
+      <div className="telemetry-import-heading">
+        <span className="telemetry-import-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 16V4m-4 4 4-4 4 4M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" />
+          </svg>
+        </span>
+        <div>
+          <h3 id="telemetry-import-title">Telemetría de descarga</h3>
+          <p>Importa tus mediciones y prepara los datos de la predicción.</p>
+        </div>
+        <span className="csv-format-badge">CSV</span>
+      </div>
 
 
       <label className="file-upload">
 
-        Archivo CSV
+        <span className="csv-upload-title">Selecciona tu archivo de telemetría</span>
+        <span className="csv-upload-description">Una batería y un ciclo de descarga por archivo.</span>
 
         <input
           type="file"
           accept=".csv,text/csv"
+          aria-describedby="csv-import-help"
           disabled={readingFile || loading}
           onChange={
             handleFileChange
@@ -386,16 +398,17 @@ export default function TelemetryForm({
       </label>
 
 
-      <p className="csv-help">
-        Puedes usar otros nombres de columnas y separadores (coma, punto y coma o tabulaci?n).
-        Asigna las cuatro mediciones y confirma sus unidades. Las columnas adicionales se ignoran.
-        Carga una sola bater?a y un solo ciclo de descarga por archivo.
+      <p className="csv-help" id="csv-import-help">
+        Admite coma, punto y coma o tabulación. Puedes usar otros nombres de columnas;
+        las columnas adicionales se ignoran.
       </p>
 
       {csvData && importOptions && (
         <fieldset className="csv-mapping" disabled={loading || readingFile}>
           <legend>Columnas y unidades del CSV</legend>
-          <div className="form-grid">
+          <p className="csv-mapping-intro">Revisa las columnas detectadas y confirma las unidades de tus mediciones.</p>
+          <h4 className="csv-group-title">1. Asigna las columnas</h4>
+          <div className="form-grid csv-fields-grid">
             {TELEMETRY_FIELDS.map((field) => (
               <label key={field}>
                 {{ time_s: "Tiempo", voltage_v: "Voltaje", current_a: "Corriente", temperature_c: "Temperatura" }[field]}
@@ -408,6 +421,9 @@ export default function TelemetryForm({
                 </select>
               </label>
             ))}
+          </div>
+          <h4 className="csv-group-title">2. Confirma las unidades</h4>
+          <div className="form-grid csv-fields-grid">
             <label>
               Unidad del tiempo
               <select value={importOptions.timeUnit} onChange={(event) => applyImport(csvData, {
@@ -434,17 +450,19 @@ export default function TelemetryForm({
               Unidad de la temperatura
               <select value={importOptions.temperatureUnit} onChange={(event) => applyImport(csvData, {
                 ...importOptions, temperatureUnit: event.target.value as ImportOptions["temperatureUnit"],
-              })}><option value="C">Celsius (?C)</option><option value="F">Fahrenheit (?F)</option><option value="K">Kelvin (K)</option></select>
+              })}><option value="C">Celsius (°C)</option><option value="F">Fahrenheit (°F)</option><option value="K">Kelvin (K)</option></select>
             </label>
           </div>
           <label className="time-origin">
             <input type="checkbox" checked={importOptions.relativeTime}
               disabled={importOptions.timeUnit === "datetime"}
               onChange={(event) => applyImport(csvData, { ...importOptions, relativeTime: event.target.checked })} />
-            El archivo comienza al inicio de la descarga: contar el tiempo desde la primera muestra.
+            <span><strong>Contar desde la primera muestra</strong>
+              <span className="time-origin-description">Actívalo si el archivo comienza al inicio de la descarga.</span>
+            </span>
           </label>
-          <p className="csv-help">Si el CSV empieza a mitad de una descarga, conserva el tiempo transcurrido desde su inicio.
-            El modelo utiliza las mediciones de los primeros 300 segundos.</p>
+          <p className="csv-window-note">Se utilizan los primeros <strong>300 segundos</strong> de la descarga.
+            Si tu archivo empieza a mitad de la descarga, desactiva la opción anterior para conservar el tiempo original.</p>
         </fieldset>
       )}
 
@@ -491,6 +509,8 @@ export default function TelemetryForm({
         )
       }
 
+
+      </section>
 
       <details>
 
