@@ -1,5 +1,5 @@
 export default function MethodologySection() {
-  return <section className="methodology card" id="metodologia" aria-labelledby="methodology-title">
+  return <section data-reveal className="methodology card" id="metodologia" aria-labelledby="methodology-title">
     <p className="section-kicker">METODOLOGÍA Y LIMITACIONES</p>
     <h2 id="methodology-title">Del dato a la estimación</h2>
     <details>

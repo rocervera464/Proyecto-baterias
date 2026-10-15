@@ -8,6 +8,22 @@ Integrar un modelo predictivo XGBoost dentro de una aplicación web que permita 
 
 ## Ejecutar en Windows
 
+Desde la carpeta `backend`, usa el iniciador del proyecto:
+
+```powershell
+.\start.ps1
+```
+
+También funciona desde la raíz con `.\backend\start.ps1`. Selecciona automáticamente el Python del entorno virtual y el módulo ASGI correcto, y activa la recarga de los archivos de `backend/app`.
+
+Si prefieres ejecutar Uvicorn directamente desde `backend`:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+```
+
+El módulo es `app.main` y la instancia se llama `app`: se separan con **un solo** `:`. La opción `--reload` utiliza **dos guiones**. `app:main:app`, `app:main` y `-reload` no son los comandos correctos. Antes de iniciar, detén con Ctrl+C cualquier instancia anterior que use el puerto 8000.
+
 Desde la raíz `Proyecto-baterias`, ejecuta sin activar el entorno virtual:
 
 ```powershell

@@ -304,7 +304,7 @@ export default function TelemetryForm({
     >
 
       <div className="analysis-columns">
-      <section className="parameter-panel" aria-labelledby="parameters-title">
+      <section data-reveal className="parameter-panel" aria-labelledby="parameters-title">
       <div className="parameter-heading">
         <span className="panel-icon"><Icon name="battery" /></span>
         <div><h2 id="parameters-title">Configura tu batería</h2>
@@ -569,7 +569,7 @@ export default function TelemetryForm({
 
       </details>
       </section>
-      <section className="telemetry-import" aria-labelledby="telemetry-import-title">
+      <section data-reveal className="telemetry-import" aria-labelledby="telemetry-import-title">
       <div className="telemetry-import-heading">
         <span className="telemetry-import-icon" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -752,14 +752,14 @@ export default function TelemetryForm({
 
 
       </div>
-      {samples.length > 0 && <section className="csv-preview" aria-labelledby="preview-title">
+      {samples.length > 0 && <section data-reveal className="csv-preview" aria-labelledby="preview-title">
         <div className="preview-heading"><h3 id="preview-title">Vista previa de telemetría</h3><span>Primeras {Math.min(5, samples.length)} muestras · unidades normalizadas</span></div>
         <div className="table-scroll" tabIndex={0} role="region" aria-label="Vista previa CSV, desplázate para ver todas las columnas">
           <table><thead><tr>{TELEMETRY_FIELDS.map((field) => <th key={field} scope="col">{field}</th>)}</tr></thead>
           <tbody>{samples.slice(0, 5).map((sample, index) => <tr key={index}>{TELEMETRY_FIELDS.map((field) => <td key={field}>{Number(sample[field].toFixed(4))}</td>)}</tr>)}</tbody></table>
         </div>
       </section>}
-      <div className="analysis-submit">
+      <div data-reveal className="analysis-submit">
       <button
         type="submit"
         disabled={

@@ -1,50 +1,45 @@
-import { getBatteryUsage } from "../utils/batteryUsage";
+import { getSohClassification } from "../data/batterySecondLifeData";
+import BatteryUseAccordion from "./BatteryUseAccordion";
 import { getSohImages } from "../utils/sohImage";
 import Icon from "./Icon";
 
+
 export default function BatteryUsageCard({ soh }: { soh: number }) {
-  const usage = getBatteryUsage(soh);
+  const usage = getSohClassification(soh);
   const images = getSohImages(soh);
 
   return (
     <section data-reveal className="battery-usage" aria-labelledby="battery-usage-title">
       <p className="section-kicker">REUTILIZACIÓN Y CIRCULARIDAD</p>
-      <h3 id="battery-usage-title">Potencial de segunda vida</h3>
+      <div className="second-life-title"><span className="panel-icon"><Icon name="battery" /></span><h3 id="battery-usage-title">Posibles usos de la batería según su estado de salud</h3></div>
+      <p>Explora aplicaciones potenciales para esta batería según su estado de salud estimado. Las recomendaciones son orientativas y requieren evaluación técnica antes de su implementación.</p>
       {usage ? (
         <>
           <div className="battery-usage-status">
-            <strong>{usage.state}</strong>
+            <span className="second-life-soh">SoH actual: <strong>{soh.toFixed(2)} %</strong></span>
+            <strong className="badge">{usage.label}</strong>
             <span>Rango orientativo: {usage.range}</span>
           </div>
-          <p>Posibles usos según la tabla del proyecto; su viabilidad no puede determinarse solo con SoH.</p>
-          <div className="usage-options">
-            {usage.uses.map((use, index) => <article key={use}><Icon name={index === 0 ? "solar" : index === 1 ? "shield" : "grid"} /><h4>{use}</h4><p>Requiere evaluación técnica y de seguridad adicional.</p></article>)}
+          <div className={`second-life-intro${images.length ? " has-image" : ""}`}>
+            <div className="second-life-intro-copy">
+              <p className="second-life-interpretation">{usage.interpretation}</p>
+              <p className="second-life-rationale">{usage.rationale}</p>
+            </div>
+            {images.length > 0 && <figure className="second-life-intro-images">
+              {images.map((image) => <img key={image.src} src={image.src} alt={image.alt} loading="lazy" decoding="async" />)}
+              <figcaption className="sr-only">Imagen representativa del rango {usage.range}; no acredita la viabilidad de una aplicación real.</figcaption>
+            </figure>}
           </div>
-          {images.length > 0 && (
-            <details className="usage-illustrations"><summary>Ver ilustraciones de los usos orientativos</summary>
-            <div className={images.length > 1 ? "soh-image-gallery soh-image-gallery-pair" : "soh-image-gallery"}>
-              {images.map((image) => (
-                <img
-                  key={image.src}
-                  className={soh >= 90 ? "soh-state-image soh-state-image-excellent" : "soh-state-image"}
-                  src={image.src}
-                  alt={image.alt}
-                  width={1376}
-                  height={768}
-                />
-              ))}
-            </div></details>
-          )}
-          <p className="battery-usage-note">
-            Las aplicaciones sugeridas son orientativas y se basan en el estado de salud estimado. La reutilización requiere evaluaciones técnicas y de seguridad adicionales.
-            El porcentaje por sí solo no confirma la aptitud para estos usos:
-            se requieren pruebas de seguridad, potencia y condición de las celdas antes de reutilizar la batería.
-          </p>
+          <p className="use-instructions">Despliega una aplicación para consultar sus requisitos y limitaciones. Puedes abrir varias a la vez.</p>
+          <div className="second-life-options">
+            {usage.applications.map((application) => <BatteryUseAccordion key={`${soh}-${application.id}`} application={application} />)}
+          </div>
         </>
       ) : (
-        <p>El SoH estimado está fuera del intervalo de 0–100 % de la tabla.
+        <p>El SoH actual no es un valor numérico válido entre 0 y 100 %.
           Revisa la predicción antes de asignar un uso.</p>
       )}
+      <p className="battery-usage-note">Los posibles usos presentados son orientativos y se basan principalmente en el SoH estimado. Este resultado no constituye una certificación de seguridad ni garantiza la viabilidad de reutilización. Es necesario realizar pruebas especializadas de capacidad, potencia, integridad, resistencia interna, comportamiento térmico y compatibilidad antes de cualquier aplicación real.</p>
     </section>
   );
 }
