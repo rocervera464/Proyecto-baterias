@@ -35,10 +35,15 @@ export async function predictBattery(
   if (!response.ok) {
 
     const errorBody = await response.text();
-
-    throw new Error(
-      `Prediction API error ${response.status}: ${errorBody}`,
-    );
+    let detail = "El servicio no pudo completar la predicción.";
+    try {
+      const parsed: { detail?: unknown } = JSON.parse(errorBody);
+      if (typeof parsed.detail === "string") detail = parsed.detail;
+      else if (Array.isArray(parsed.detail)) {
+        detail = parsed.detail.map((item: { loc?: (string | number)[]; msg?: string }) => `${item.loc?.filter((part) => part !== "body").join(" · ") ?? "Datos"}: ${item.msg ?? "valor inválido"}`).join(". ");
+      }
+    } catch { /* Una respuesta no JSON conserva el mensaje general. */ }
+    throw new Error(`Error del servicio (${response.status}). ${detail}`);
   }
 
 

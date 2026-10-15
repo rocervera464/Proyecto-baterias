@@ -23,7 +23,7 @@ interface PredictionChartProps {
 interface ChartPoint {
   cycle: number;
 
-  soh: number;
+  soh: number | null;
 
   horizon: number;
 
@@ -75,11 +75,13 @@ export default function PredictionChart({
           `+${item.horizon_cycles}`,
       }),
     ),
-  ];
+  ].map((point) => ({ ...point, soh: Number.isFinite(point.soh) ? point.soh : null }));
+  const finiteValues = chartData.flatMap((point) => point.soh === null ? [] : [point.soh]);
+  const yDomain = [Math.min(0, Math.floor(Math.min(...finiteValues, 0) / 10) * 10), Math.max(110, Math.ceil(Math.max(...finiteValues, 100) / 10) * 10)];
 
 
   return (
-    <section className="prediction-chart">
+    <section data-reveal className="prediction-chart">
 
       <div className="chart-header">
 
@@ -146,10 +148,7 @@ export default function PredictionChart({
 
 
             <YAxis
-              domain={[
-                0,
-                110,
-              ]}
+              domain={yDomain}
               tickFormatter={
                 (
                   value,
@@ -182,9 +181,9 @@ export default function PredictionChart({
               }
               labelFormatter={
                 (
-                  value,
+                  value, payload,
                 ) =>
-                  `Ciclo ${value}`
+                  `Ciclo ${value} · ${payload?.[0]?.payload?.label ?? ""}${payload?.[0]?.payload?.experimental ? " · Experimental" : ""}`
               }
             />
 
@@ -209,13 +208,15 @@ export default function PredictionChart({
               dataKey="soh"
               name="SoH estimado"
               strokeWidth={3}
+              stroke="#178B78"
+              strokeDasharray="5 6"
               dot={{
                 r: 5,
               }}
               activeDot={{
                 r: 7,
               }}
-              isAnimationActive
+              isAnimationActive={false}
             />
 
           </LineChart>
@@ -228,7 +229,7 @@ export default function PredictionChart({
       <div className="chart-disclaimer">
 
         <p>
-          Cada punto futuro corresponde
+          Las conexiones discontinuas son ayudas visuales, no una curva física continua. Cada punto futuro corresponde
           a un modelo XGBoost entrenado
           para un horizonte específico.
         </p>
@@ -241,6 +242,14 @@ export default function PredictionChart({
         </p>
 
       </div>
+
+      <details className="chart-table">
+        <summary>Consultar los valores de la gráfica</summary>
+        <div className="table-scroll" tabIndex={0} role="region" aria-label="Valores de las predicciones">
+          <table><caption className="sr-only">SoH por ciclo y horizonte de predicción</caption><thead><tr><th scope="col">Ciclo</th><th scope="col">Horizonte</th><th scope="col">SoH</th><th scope="col">Tipo</th></tr></thead>
+          <tbody>{chartData.map((point) => <tr key={point.horizon}><td>{point.cycle}</td><td>{point.label}</td><td>{point.soh === null ? "No disponible" : `${point.soh.toFixed(2)} %`}</td><td>{point.experimental ? "Experimental" : point.horizon === 0 ? "Actual" : "Principal"}</td></tr>)}</tbody></table>
+        </div>
+      </details>
 
     </section>
   );

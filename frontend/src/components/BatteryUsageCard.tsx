@@ -1,20 +1,27 @@
 import { getBatteryUsage } from "../utils/batteryUsage";
 import { getSohImages } from "../utils/sohImage";
+import Icon from "./Icon";
 
 export default function BatteryUsageCard({ soh }: { soh: number }) {
   const usage = getBatteryUsage(soh);
   const images = getSohImages(soh);
 
   return (
-    <section className="battery-usage" aria-labelledby="battery-usage-title">
-      <h3 id="battery-usage-title">Usos posibles de la batería</h3>
+    <section data-reveal className="battery-usage" aria-labelledby="battery-usage-title">
+      <p className="section-kicker">REUTILIZACIÓN Y CIRCULARIDAD</p>
+      <h3 id="battery-usage-title">Potencial de segunda vida</h3>
       {usage ? (
         <>
           <div className="battery-usage-status">
             <strong>{usage.state}</strong>
             <span>Rango orientativo: {usage.range}</span>
           </div>
+          <p>Posibles usos según la tabla del proyecto; su viabilidad no puede determinarse solo con SoH.</p>
+          <div className="usage-options">
+            {usage.uses.map((use, index) => <article key={use}><Icon name={index === 0 ? "solar" : index === 1 ? "shield" : "grid"} /><h4>{use}</h4><p>Requiere evaluación técnica y de seguridad adicional.</p></article>)}
+          </div>
           {images.length > 0 && (
+            <details className="usage-illustrations"><summary>Ver ilustraciones de los usos orientativos</summary>
             <div className={images.length > 1 ? "soh-image-gallery soh-image-gallery-pair" : "soh-image-gallery"}>
               {images.map((image) => (
                 <img
@@ -26,13 +33,10 @@ export default function BatteryUsageCard({ soh }: { soh: number }) {
                   height={768}
                 />
               ))}
-            </div>
+            </div></details>
           )}
-          <ul>
-            {usage.uses.map((use) => <li key={use}>{use}</li>)}
-          </ul>
           <p className="battery-usage-note">
-            Orientación según el SoH actual estimado y la tabla del proyecto.
+            Las aplicaciones sugeridas son orientativas y se basan en el estado de salud estimado. La reutilización requiere evaluaciones técnicas y de seguridad adicionales.
             El porcentaje por sí solo no confirma la aptitud para estos usos:
             se requieren pruebas de seguridad, potencia y condición de las celdas antes de reutilizar la batería.
           </p>
