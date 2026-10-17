@@ -1,0 +1,31 @@
+/* Shared feedback for mouse, touch and keyboard controls. */
+:where(button, a[href], summary, select, input, textarea, [role="button"], .file-upload) {
+  -webkit-tap-highlight-color: #178b7820;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :where(button, a[href], summary, select, input, textarea, [role="button"]) {
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease,
+      box-shadow 180ms ease, transform 180ms ease, opacity 180ms ease;
+  }
+  :where(button, a[href], summary, [role="button"]):active:not(:disabled) { transform: scale(.98); }
+  input[type="checkbox"] { transition: accent-color 180ms ease, transform 180ms ease, box-shadow 180ms ease; }
+  input[type="checkbox"]:active:not(:disabled) { transform: scale(.88); }
+  .use-carousel .use-panel-animation { transition: grid-template-rows 280ms cubic-bezier(.2,.7,.3,1), visibility 280ms, opacity 220ms ease; }
+  .use-carousel .use-panel-animation { opacity: 0; }
+  .use-carousel .is-open .use-panel-animation { opacity: 1; }
+  .use-carousel-pagination button span { transition: width 220ms ease, background-color 180ms ease; }
+  input::file-selector-button { transition: background-color 180ms ease, border-color 180ms ease; }
+}
+@media (hover: hover) {
+  :where(button, [role="button"]):hover:not(:disabled) { box-shadow: 0 4px 14px #123c4b12; }
+  summary:hover { color: #126c5e; }
+  a[href]:hover { color: #126c5e; }
+  .hero-primary-action:hover { color: white; }
+  input::file-selector-button:hover { background: #e7f1ec; border-color: #74a99d; }
+}
+:where(input, select, textarea):focus-visible { box-shadow: 0 0 0 4px #178b7815; }
+:where(button, a[href], summary, [role="button"]):focus-visible { outline: 2px solid #178b78; outline-offset: 3px; }
+.use-panel-animation { min-height: 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

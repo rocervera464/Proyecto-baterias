@@ -18,6 +18,7 @@ from app.services.feature_engineering import (
 
 from app.services.model_service import (
     get_model_service,
+    reconcile_predictions,
 )
 
 
@@ -98,11 +99,13 @@ def predict_battery_health(
     # ========================================================
 
     try:
-        predictions = (
-            model_service.predict_all(
+        raw_predictions = (
+            model_service.predict_raw_all(
                 features
             )
         )
+
+        predictions = reconcile_predictions(raw_predictions)
 
     except (
         ValueError,
@@ -150,6 +153,9 @@ def predict_battery_health(
                     ]
                 ),
 
+                raw_predicted_soh_percent=raw_predictions[horizon],
+                adjusted=abs(predictions[horizon] - raw_predictions[horizon]) > 1e-9,
+
                 experimental=(
                     horizon >= 20
                 ),
@@ -174,6 +180,9 @@ def predict_battery_health(
         current_soh_percent=(
             predictions[0]
         ),
+
+        raw_current_soh_percent=raw_predictions[0],
+        forecast_method="anchored_isotonic",
 
         future_predictions=
             future_predictions,

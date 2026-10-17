@@ -36,3 +36,9 @@ test('every application has its own complete content and stable unique identifie
     }
   }
 });
+
+test('the carousel starts with the priority option for each health range', () => {
+  for (const [soh, first] of [[95, 'mobility'], [85, 'mobility'], [75, 'solar'], [65, 'low-demand'], [55, 'diagnosis']]) {
+    assert.equal(getSohClassification(soh).applications[0].id, first);
+  }
+});

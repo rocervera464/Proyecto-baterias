@@ -1,0 +1,156 @@
+{
+  "purpose": "Structural and sensitivity diagnosis, not accuracy validation or model improvement.",
+  "training_rows_declared": {
+    "0": 277,
+    "5": 246,
+    "10": 230,
+    "20": 197,
+    "30": 157
+  },
+  "models": {
+    "0": {
+      "file": "xgboost_soh_current.json",
+      "sha256": "0de66da87a91b124db956829d71eadc0dadb730231e8db6ca4e3be98e0e8d8e7",
+      "feature_order_matches": true,
+      "trees": 500,
+      "nodes": 10156,
+      "objective": "reg:squarederror",
+      "cycle_split_threshold_min": 2.0,
+      "cycle_split_threshold_max": 71.0,
+      "threshold_caveat": "Split thresholds are not training coverage bounds or validated operating limits."
+    },
+    "5": {
+      "file": "xgboost_soh_plus_5.json",
+      "sha256": "5991fbf342bbad7e02752efe775780a24a8441435fd2b5c266525b9a49083973",
+      "feature_order_matches": true,
+      "trees": 500,
+      "nodes": 3404,
+      "objective": "reg:squarederror",
+      "cycle_split_threshold_min": 4.0,
+      "cycle_split_threshold_max": 65.0,
+      "threshold_caveat": "Split thresholds are not training coverage bounds or validated operating limits."
+    },
+    "10": {
+      "file": "xgboost_soh_plus_10.json",
+      "sha256": "1b21c64d29418005892dffbd322859905db9ffde3e7ce39ad490a88e65a5d256",
+      "feature_order_matches": true,
+      "trees": 500,
+      "nodes": 3342,
+      "objective": "reg:squarederror",
+      "cycle_split_threshold_min": 6.0,
+      "cycle_split_threshold_max": 60.0,
+      "threshold_caveat": "Split thresholds are not training coverage bounds or validated operating limits."
+    },
+    "20": {
+      "file": "xgboost_soh_plus_20.json",
+      "sha256": "3aa3c247543350b6e333deb3a8688dc75b84cb8d7e3995e8b47b43a610bc942c",
+      "feature_order_matches": true,
+      "trees": 500,
+      "nodes": 3248,
+      "objective": "reg:squarederror",
+      "cycle_split_threshold_min": 3.0,
+      "cycle_split_threshold_max": 51.0,
+      "threshold_caveat": "Split thresholds are not training coverage bounds or validated operating limits."
+    },
+    "30": {
+      "file": "xgboost_soh_plus_30.json",
+      "sha256": "d7f578b551efe7c742c5e3bdf853a53e54bbf9b3f50823f5ae15b41aef5a708f",
+      "feature_order_matches": true,
+      "trees": 500,
+      "nodes": 10438,
+      "objective": "reg:squarederror",
+      "cycle_split_threshold_min": 2.0,
+      "cycle_split_threshold_max": 42.0,
+      "threshold_caveat": "Split thresholds are not training coverage bounds or validated operating limits."
+    }
+  },
+  "samples": [
+    {
+      "file": "data\\samples\\telemetria_bateria_muy_degradada.csv",
+      "origin": "synthetic_test_not_measured",
+      "cycle": 180,
+      "samples_in_window": 61,
+      "raw_soh_percent": {
+        "0": 80.98990631103516,
+        "5": 77.27933502197266,
+        "10": 74.87525939941406,
+        "20": 75.71528625488281,
+        "30": 72.74581909179688
+      },
+      "reconciled_soh_percent": {
+        "0": 80.98990631103516,
+        "5": 77.27933502197266,
+        "10": 75.29527282714844,
+        "20": 75.29527282714844,
+        "30": 72.74581909179688
+      },
+      "fixed_signal_cycle_sensitivity": {
+        "1": {
+          "0": 112.63190460205078,
+          "5": 89.27104949951172,
+          "10": 85.38652801513672,
+          "20": 80.5923080444336,
+          "30": 76.49131774902344
+        },
+        "25": {
+          "0": 85.91106414794922,
+          "5": 82.26959991455078,
+          "10": 79.78620147705078,
+          "20": 76.44315338134766,
+          "30": 74.42520904541016
+        },
+        "50": {
+          "0": 81.60152435302734,
+          "5": 77.31029510498047,
+          "10": 74.8593978881836,
+          "20": 75.74467468261719,
+          "30": 72.74581909179688
+        },
+        "100": {
+          "0": 80.98990631103516,
+          "5": 77.27933502197266,
+          "10": 74.87525939941406,
+          "20": 75.71528625488281,
+          "30": 72.74581909179688
+        },
+        "180": {
+          "0": 80.98990631103516,
+          "5": 77.27933502197266,
+          "10": 74.87525939941406,
+          "20": 75.71528625488281,
+          "30": 72.74581909179688
+        },
+        "400": {
+          "0": 80.98990631103516,
+          "5": 77.27933502197266,
+          "10": 74.87525939941406,
+          "20": 75.71528625488281,
+          "30": 72.74581909179688
+        },
+        "1000": {
+          "0": 80.98990631103516,
+          "5": 77.27933502197266,
+          "10": 74.87525939941406,
+          "20": 75.71528625488281,
+          "30": 72.74581909179688
+        }
+      },
+      "increases_with_cycle": {
+        "0": [],
+        "5": [],
+        "10": [
+          {
+            "from_cycle": 50,
+            "to_cycle": 100,
+            "increase_pp": 0.01586151123046875
+          }
+        ],
+        "20": [],
+        "30": []
+      },
+      "caveat": "Synthetic diagnostic without measured capacity/SoH labels. Fixed-signal sweeps are not aging trajectories or accuracy tests."
+    }
+  ],
+  "accuracy_metrics": null,
+  "accuracy_metrics_reason": "No labeled training/validation/test dataset available in this checkout."
+}

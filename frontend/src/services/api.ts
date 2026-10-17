@@ -1,3 +1,4 @@
+import { validatePrediction } from "../utils/validatePrediction";
 import type {
   PredictionResponse,
 } from "../types/prediction";
@@ -47,5 +48,8 @@ export async function predictBattery(
   }
 
 
-  return response.json();
+  let result: unknown;
+  try { result = await response.json(); }
+  catch { throw new Error("El servicio devolvió una respuesta que no se pudo interpretar. Tus mediciones se conservan; vuelve a intentar el análisis."); }
+  return validatePrediction(result, telemetry.cycle);
 }

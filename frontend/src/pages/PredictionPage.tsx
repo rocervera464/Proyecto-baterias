@@ -1,3 +1,4 @@
+import BatteryHealthCard from "../components/BatteryHealthCard";
 import { useState } from "react";
 import { getForecastIncreases } from "../utils/forecastConsistency";
 import PredictionChart from "../components/PredictionChart";
@@ -12,7 +13,7 @@ import type { TelemetryRequest } from "../types/telemetry";
 
 const validSoh = (value: number) => Number.isFinite(value) && value >= 0 && value <= 100;
 
-export default function PredictionPage() {
+export default function PredictionPage({ onResultsChange }: { onResultsChange: (available: boolean) => void }) {
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,8 +23,9 @@ export default function PredictionPage() {
     if (loading) return;
     setAnalysisSequence((sequence) => sequence + 1);
     setLoading(true); setError(null); setPrediction(null);
+    onResultsChange(false);
     setImportWarnings(context?.warnings ?? []);
-    try { setPrediction(await predictBattery(telemetry)); }
+    try { setPrediction(await predictBattery(telemetry)); onResultsChange(true); }
     catch (error) { setError(error instanceof TypeError ? "No se pudo conectar con el servicio de predicción. Comprueba que el backend esté disponible." : error instanceof Error ? error.message : "Ocurrió un error inesperado."); }
     finally { setLoading(false); }
   }
@@ -40,28 +42,20 @@ export default function PredictionPage() {
       {prediction ? <>
         {importWarnings.length > 0 && <div className="import-warnings" role="note"><strong>Alcance de esta predicción</strong>{importWarnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
         <div className="results-overview">
-          <article data-reveal className="health-card" data-tone={!validSoh(soh) ? "neutral" : soh >= 80 ? "good" : soh >= 60 ? "caution" : "low"}>
-            <h3>Estado de salud actual</h3>
-            <div className="soh-gauge">
-              <svg viewBox="0 0 200 200" aria-hidden="true"><circle className="gauge-track" cx="100" cy="100" r="84" />{validSoh(soh) && <circle className="gauge-value" cx="100" cy="100" r="84" pathLength="100" strokeDasharray={`${soh} 100`} transform="rotate(-90 100 100)" />}</svg>
-              <div><strong>{Number.isFinite(soh) ? soh.toFixed(2) : "—"}<small>{Number.isFinite(soh) ? "%" : ""}</small></strong><span>SoH estimado</span></div>
-            </div>
-            <span className="badge">{usage?.state ?? "Fuera del intervalo orientativo"}</span>
-            {!validSoh(soh) && <p>El valor de la API está fuera de 0–100 %. No se representa en el indicador ni se le asigna una categoría de uso.</p>}
-            <p>Estimación de salud para el ciclo {prediction.current_cycle}. El SoH no es un porcentaje de seguridad.</p>
-          </article>
-          <section className="forecast-section" aria-labelledby="forecast-title">
-            <h3 id="forecast-title">Proyecciones futuras</h3><p className="panel-description">Estimaciones independientes para cada horizonte.</p>
+          <BatteryHealthCard key={analysisSequence} soh={soh} cycle={prediction.current_cycle} rawSoh={prediction.raw_current_soh_percent} />
+          <section id="proyecciones" className="forecast-section" aria-labelledby="forecast-title">
+            <h3 id="forecast-title">Proyecciones futuras</h3><p className="panel-description">Proyecciones ajustadas a una tendencia de degradación no creciente.</p>
             <div className="prediction-grid">{[5, 10, 20, 30].map((horizon) => {
               const item = prediction.future_predictions.find((item) => item.horizon_cycles === horizon);
               const experimental = item?.experimental ?? horizon >= 20;
               const increase = increases.find((change) => change.toHorizon === horizon);
               return <article data-reveal key={horizon} className={`prediction-card${experimental ? " experimental" : ""}`}>
-                <span>+{horizon} ciclos</span><strong>{item && Number.isFinite(item.predicted_soh_percent) ? `${item.predicted_soh_percent.toFixed(2)}%` : "No disponible"}</strong>
+                <span>+{horizon} ciclos</span><strong>{item && Number.isFinite(item.predicted_soh_percent) ? `${item.predicted_soh_percent.toFixed(2)} %` : "No disponible"}</strong>
                 <small>{item ? `Ciclo ${item.target_cycle}` : "Sin predicción válida"}</small>
                 <span className="forecast-label">{experimental ? "Experimental" : "Predicción principal"}</span>
-                {experimental && <p>Menor estabilidad en validación. Interpretar con cautela.</p>}
-                {increase && <p className="forecast-caution">Aumento de {increase.increase.toFixed(2)} puntos respecto {increase.fromHorizon === 0 ? "al estado actual" : `a +${increase.fromHorizon} ciclos`}. Revisar consistencia.</p>}
+                {item?.adjusted && <p>Ajustada para mantener una tendencia de degradación coherente. Salida original: {item.raw_predicted_soh_percent?.toFixed(2)} %.</p>}
+                {experimental && <p>Menor estabilidad en la validación. Interpreta el resultado con cautela.</p>}
+                {increase && <p className="forecast-caution">Aumento de {increase.increase.toFixed(2)} puntos porcentuales respecto {increase.fromHorizon === 0 ? "al estado actual" : `a la estimación de +${increase.fromHorizon} ciclos`}. Revisa la consistencia.</p>}
                 {item && !validSoh(item.predicted_soh_percent) && <p>Fuera del intervalo orientativo de 0–100 %.</p>}
               </article>;
             })}</div>
@@ -73,7 +67,7 @@ export default function PredictionPage() {
         <section data-reveal className="interpretation" aria-labelledby="interpretation-title"><Icon name="chart" /><div><h3 id="interpretation-title">Interpretación del resultado</h3><p>{usage ? `${usage.state} · rango orientativo ${usage.range}.` : "El resultado no se encuentra en el intervalo orientativo de 0–100 %. Revisa la predicción."} {validSoh(soh) && soh < 60 ? "Se recomienda una evaluación especializada antes de considerar reutilización o reciclaje." : "Estas categorías son orientativas y requieren evaluación técnica adicional."}</p></div></section>
       </> : <div data-reveal className="empty-results" role="status"><span className="empty-icon"><Icon name="chart" /></span><h3>{loading ? "Analizando la batería…" : "Tu análisis comienza con los datos"}</h3><p>{loading ? "Procesando la telemetría mediante los modelos predictivos." : "Carga la telemetría y ejecuta el análisis para ver el SoH actual, las cuatro proyecciones y su interpretación."}</p></div>}
     </section>
-    <MethodologySection />
-    <footer data-reveal className="app-footer"><span>VoltScope · EV Battery Intelligence</span><span>Analítica científica para una energía más sostenible</span></footer>
+    <MethodologySection prediction={prediction} />
+    <footer data-reveal className="app-footer"><span>BaterIA · Inteligencia para tu batería</span><span>Analítica científica para una energía más sostenible</span></footer>
   </div>;
 }

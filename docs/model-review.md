@@ -1,3 +1,19 @@
+# Corrección de coherencia de las proyecciones
+
+El backend aplica ahora regresión isotónica decreciente a las cuatro salidas futuras, con límites entre cero y el SoH actual (acotado a 0–100 %). El SoH actual queda fijo como referencia; no se modifica para acomodar las proyecciones futuras. El ajuste minimiza la suma de errores cuadrados respecto de las salidas originales y permite mesetas, sin inventar una tasa de degradación. Se usan pesos iguales porque no existen métricas de validación suficientes para ponderar los horizontes.
+
+La API conserva `raw_current_soh_percent` y `raw_predicted_soh_percent`, marca cada horizonte modificado con `adjusted` y declara `forecast_method: anchored_isotonic`. Las tarjetas y el gráfico utilizan las proyecciones ajustadas; las tarjetas muestran el valor original cuando cambia.
+
+Para el ejemplo 76,35 → 78,50 → 77,22 → 77,34 → 75,83, el resultado es 76,35 → 76,35 → 76,35 → 76,35 → 75,83. Una meseta expresa la limitación de las estimaciones disponibles, no una garantía de ausencia de desgaste.
+
+Este posprocesamiento garantiza coherencia dentro de una solicitud, no una mejora demostrada del MAE/RMSE ni monotonía entre solicitudes con telemetrías distintas. No se reentrenaron los modelos. Siguen siendo necesarios datos etiquetados, validación temporal por batería y evaluación de los horizontes experimentales para mejorar la precisión.
+
+Pruebas: caso de la captura, cruces entre horizontes, conservación de curvas coherentes, límites físicos, rechazo de valores no finitos y contrato de la API con modelos reales.
+
+## Revisión previa al ajuste (registro histórico)
+
+La revisión que sigue describe el comportamiento anterior a esta corrección.
+
 # Revisión de coherencia de las proyecciones
 
 Se inspeccionaron `manifest.json`, `features.json`, `metadata.json`, los cinco modelos exportados y el flujo `extract_features` → `prepare_input` → `predict_all` → respuesta de la API.

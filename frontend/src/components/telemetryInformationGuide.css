@@ -1,0 +1,24 @@
+.telemetry-import > .telemetry-information-guide { margin: 0 0 24px; padding: 0; border: 1px solid #d7e6de; border-radius: 16px; background: #f5faf7; }
+.telemetry-information-guide > summary { padding: 16px 20px; min-height: 52px; color: #126c5e; font-size: 14px; font-weight: 600; }
+.telemetry-guide-content { padding: 0 20px 22px; }
+.telemetry-guide-content p, .telemetry-guide-content li, .telemetry-guide-content dd { font-size: 13px; color: #536875; line-height: 1.8; }
+.telemetry-guide-content h4 { color: #123c4b; font-size: 15px; margin: 20px 0 12px; }
+.telemetry-guide-steps { padding-left: 24px; margin-bottom: 24px; }
+.telemetry-guide-steps li { padding-left: 6px; margin-bottom: 14px; }
+.telemetry-guide-steps li::marker { font-weight: 700; color: #178b78; }
+.telemetry-guide-steps strong { color: #123c4b; }
+.telemetry-guide-content details > summary { font-size: 13px; min-height: 44px; color: #126c5e; }
+.telemetry-variable-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.telemetry-variable-grid article { padding: 18px; border-radius: 12px; background: white; border: 1px solid #dfe9e3; min-width: 0; }
+.telemetry-variable-grid h4 { margin: 0 0 8px; }
+.telemetry-variable-unit { display: block; font-size: 11px; color: #126c5e; overflow-wrap: anywhere; margin-bottom: 12px; }
+.telemetry-variable-grid p:last-child { margin-bottom: 0; }
+.telemetry-variable-list { margin: 16px 0 0; }
+.telemetry-variable-list > div { padding: 16px 0; border-bottom: 1px solid #dfe9e3; }
+.telemetry-variable-list dt { color: #123c4b; font-size: 14px; font-weight: 600; }
+.telemetry-variable-list dt span { display: block; font-size: 11px; color: #126c5e; margin-top: 4px; font-weight: 400; overflow-wrap: anywhere; }
+.telemetry-variable-list dd { margin: 8px 0 0; }
+.telemetry-guide-note { margin-top: 24px; padding: 16px; border-left: 3px solid #a66a18; border-radius: 10px; background: #fffbf4; }
+.telemetry-guide-note strong { font-size: 13px; color: #87520e; }
+.telemetry-guide-note p { margin: 8px 0 0; }
+@media (max-width: 600px) { .telemetry-variable-grid { grid-template-columns: 1fr; } .telemetry-guide-content { padding-inline: 16px; } .telemetry-information-guide > summary { padding-inline: 16px; } }

@@ -1,5 +1,10 @@
+import TelemetryInformationGuide from "./TelemetryInformationGuide";
+import ManualTelemetryEditor from "./ManualTelemetryEditor";
+import { emptyManualRow, validateManualTelemetry } from "../utils/manualTelemetry";
+import type { ManualRow } from "../utils/manualTelemetry";
 import {
   useState,
+  useRef,
 } from "react";
 
 import {
@@ -122,6 +127,12 @@ export default function TelemetryForm({
   );
 
 
+  const [inputMode, setInputMode] = useState<"csv" | "manual">("csv");
+  const [manualRows, setManualRows] = useState<ManualRow[]>(() => [emptyManualRow(), emptyManualRow()]);
+  const manual = validateManualTelemetry(manualRows);
+  const activeSamples = inputMode === "manual" ? manual.samples : samples;
+  const submitting = useRef(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [csvData, setCsvData] = useState<CsvData | null>(null);
   const [importOptions, setImportOptions] = useState<ImportOptions | null>(null);
   const [readingFile, setReadingFile] = useState(false);
@@ -187,11 +198,12 @@ export default function TelemetryForm({
   ) {
 
     event.preventDefault();
-    if (loading || readingFile) return;
-
+    if (loading || readingFile || submitting.current) return;
+    setSubmitError(null);
+    if (inputMode === "manual" && manual.error) { setSubmitError(manual.error); return; }
 
     if (
-      samples.length < 2
+      activeSamples.length < 2
     ) {
 
       setCsvError(
@@ -214,7 +226,7 @@ export default function TelemetryForm({
           Number(cutoffVoltage),
 
         discharge_samples:
-          samples,
+          activeSamples,
       };
 
 
@@ -277,10 +289,15 @@ export default function TelemetryForm({
     }
 
 
-    await onSubmit(
-      telemetry,
-      { warnings: csvData && importOptions ? getImportMetadata(csvData, importOptions).warnings : [] },
-    );
+    const numericValues = [telemetry.cycle, telemetry.ambient_temperature_c, telemetry.cutoff_voltage_v,
+      ...Object.values(telemetry.previous_eis ?? {}), ...Object.values(telemetry.previous_charge ?? {})];
+    if (!numericValues.every((value) => value == null || Number.isFinite(value)) || !Number.isInteger(telemetry.cycle) || telemetry.cycle < 1 || telemetry.cutoff_voltage_v <= 0) {
+      setSubmitError("Revisa los parámetros generales y opcionales: deben ser números finitos, con un ciclo entero positivo y un voltaje de corte mayor que cero."); return;
+    }
+    submitting.current = true;
+    try {
+      await onSubmit(telemetry, { warnings: inputMode === "manual" ? manual.warnings : csvData && importOptions ? getImportMetadata(csvData, importOptions).warnings : [] });
+    } finally { submitting.current = false; }
   }
 
 
@@ -304,7 +321,7 @@ export default function TelemetryForm({
     >
 
       <div className="analysis-columns">
-      <section data-reveal className="parameter-panel" aria-labelledby="parameters-title">
+      <section data-reveal id="parametros" className="parameter-panel" aria-labelledby="parameters-title">
       <div className="parameter-heading">
         <span className="panel-icon"><Icon name="battery" /></span>
         <div><h2 id="parameters-title">Configura tu batería</h2>
@@ -316,13 +333,13 @@ export default function TelemetryForm({
 
         <label>
 
-          Ciclo actual
+          Ciclo actual de carga
 
           <input
             type="number"
             min="1"
             name="cycle"
-            placeholder="Ej. 25"
+            placeholder="Ej.: 25"
             aria-invalid={!!fieldErrors.cycle}
             aria-describedby="cycle-error"
             onInvalid={handleInvalid}
@@ -354,7 +371,7 @@ export default function TelemetryForm({
             type="number"
             step="0.1"
             name="ambient_temperature_c"
-            placeholder="Ej. 25.0"
+            placeholder="Ej.: 25"
             aria-invalid={!!fieldErrors.ambient_temperature_c}
             aria-describedby="ambient-error"
             onInvalid={handleInvalid}
@@ -378,6 +395,7 @@ export default function TelemetryForm({
         </label>
 
 
+        <div className="field-with-help">
         <label>
 
           Voltaje de corte [V]
@@ -387,9 +405,9 @@ export default function TelemetryForm({
             step="0.01"
             min="0.01"
             name="cutoff_voltage_v"
-            placeholder="Ej. 2.20"
+            placeholder="Ej.: 2,20"
             aria-invalid={!!fieldErrors.cutoff_voltage_v}
-            aria-describedby="cutoff-error"
+            aria-describedby="cutoff-error cutoff-help"
             onInvalid={handleInvalid}
             value={
               cutoffVoltage
@@ -409,6 +427,11 @@ export default function TelemetryForm({
           <span id="cutoff-error" className="field-error">{fieldErrors.cutoff_voltage_v}</span>
 
         </label>
+        <details className="field-help-toggle">
+          <summary>Ver descripción</summary>
+          <p className="field-help" id="cutoff-help">Umbral de voltaje al que se detiene la descarga. Introduce el valor configurado en la prueba, en voltios; no es necesariamente el voltaje final del archivo. Debe corresponder a la misma celda o conjunto que las mediciones.</p>
+        </details>
+        </div>
 
       </div>
 
@@ -423,15 +446,18 @@ export default function TelemetryForm({
         <h3>
           EIS previo
         </h3>
+        <details className="field-help-toggle section-help-toggle"><summary>¿Qué es el EIS previo?</summary><p className="panel-description">EIS significa espectroscopia de impedancia electroquímica: una prueba que caracteriza la respuesta eléctrica de la celda. Usa los valores de una medición anterior a esta descarga; si no los tienes, deja estos campos vacíos.</p></details>
 
 
         <div className="form-grid">
 
+          <div className="field-with-help">
           <label>
 
             Re [Ω]
 
             <input
+              aria-describedby="eis-re-help"
               type="number"
               step="any"
               placeholder="Opcional · Ω"
@@ -449,15 +475,18 @@ export default function TelemetryForm({
                   )
               }
             />
-
           </label>
+          <details className="field-help-toggle"><summary>Ver descripción</summary><p className="field-help" id="eis-re-help">Resistencia del electrolito: oposición al paso de iones dentro de la celda, medida en ohmios (Ω).</p></details>
+          </div>
 
 
+          <div className="field-with-help">
           <label>
 
             Rct [Ω]
 
             <input
+              aria-describedby="eis-rct-help"
               type="number"
               step="any"
               placeholder="Opcional · Ω"
@@ -475,8 +504,9 @@ export default function TelemetryForm({
                   )
               }
             />
-
           </label>
+          <details className="field-help-toggle"><summary>Ver descripción</summary><p className="field-help" id="eis-rct-help">Resistencia de transferencia de carga: dificultad de las reacciones entre los electrodos y el electrolito, medida en ohmios (Ω).</p></details>
+          </div>
 
         </div>
 
@@ -484,15 +514,18 @@ export default function TelemetryForm({
         <h3>
           Carga previa
         </h3>
+        <details className="field-help-toggle section-help-toggle"><summary>¿Qué datos de la carga previa se necesitan?</summary><p className="panel-description">Datos de temperatura de la carga anterior a esta descarga. Son opcionales; déjalos vacíos si no se midieron.</p></details>
 
 
         <div className="form-grid">
 
+          <div className="field-with-help">
           <label>
 
             Temperatura inicial [°C]
 
             <input
+              aria-describedby="charge-start-help"
               type="number"
               step="0.1"
               placeholder="Opcional · °C"
@@ -510,15 +543,18 @@ export default function TelemetryForm({
                   )
               }
             />
-
           </label>
+          <details className="field-help-toggle"><summary>Ver descripción</summary><p className="field-help" id="charge-start-help">Temperatura de la batería al comenzar la carga anterior.</p></details>
+          </div>
 
 
+          <div className="field-with-help">
           <label>
 
             Temperatura máxima [°C]
 
             <input
+              aria-describedby="charge-max-help"
               type="number"
               step="0.1"
               placeholder="Opcional · °C"
@@ -536,15 +572,18 @@ export default function TelemetryForm({
                   )
               }
             />
-
           </label>
+          <details className="field-help-toggle"><summary>Ver descripción</summary><p className="field-help" id="charge-max-help">Mayor temperatura registrada en la batería durante la carga anterior.</p></details>
+          </div>
 
 
+          <div className="field-with-help">
           <label>
 
-            Delta temperatura [°C]
+            Cambio de temperatura [°C]
 
             <input
+              aria-describedby="charge-delta-help"
               type="number"
               step="0.1"
               placeholder="Opcional · °C"
@@ -562,14 +601,15 @@ export default function TelemetryForm({
                   )
               }
             />
-
           </label>
+          <details className="field-help-toggle"><summary>Ver descripción</summary><p className="field-help" id="charge-delta-help">Cambio de temperatura durante la carga anterior: temperatura final menos temperatura inicial. Ejemplo: al terminar a 32 °C y comenzar a 25 °C, el cambio es 7 °C.</p></details>
+          </div>
 
         </div>
 
       </details>
       </section>
-      <section data-reveal className="telemetry-import" aria-labelledby="telemetry-import-title">
+      <section data-reveal id="telemetria" className="telemetry-import" aria-labelledby="telemetry-import-title">
       <div className="telemetry-import-heading">
         <span className="telemetry-import-icon" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -578,12 +618,20 @@ export default function TelemetryForm({
         </span>
         <div>
           <h3 id="telemetry-import-title">Carga la telemetría</h3>
-          <p>Importa tus mediciones y prepara los datos de la predicción.</p>
+          <p>Elige cómo ingresar tus mediciones y prepara los datos de la predicción.</p>
         </div>
-        <span className="csv-format-badge">CSV / JSON</span>
+        <span className="csv-format-badge">{inputMode === "csv" ? "CSV / JSON" : "INGRESO MANUAL"}</span>
       </div>
 
 
+      <div className="telemetry-source-selector" role="group" aria-label="Método de ingreso de telemetría">
+        <button type="button" aria-pressed={inputMode === "csv"} disabled={loading || readingFile} onClick={() => { setInputMode("csv"); setSubmitError(null); }}>Cargar archivo CSV</button>
+        <button type="button" aria-pressed={inputMode === "manual"} disabled={loading || readingFile} onClick={() => { setInputMode("manual"); setSubmitError(null); }}>Ingresar datos manualmente</button>
+      </div>
+      {inputMode === "manual" && <TelemetryInformationGuide />}
+      <div hidden={inputMode !== "manual"}><ManualTelemetryEditor rows={manualRows} onChange={setManualRows} disabled={loading || readingFile || inputMode !== "manual"} /></div>
+      <div hidden={inputMode !== "csv"}>
+      <fieldset className="csv-source-fields" disabled={inputMode !== "csv"}>
       <label className={`file-upload${dragging ? " is-dragging" : ""}`}
         onDragOver={(event) => { event.preventDefault(); if (!loading && !readingFile) setDragging(true); }}
         onDragLeave={() => setDragging(false)}
@@ -616,7 +664,7 @@ export default function TelemetryForm({
         <div className="csv-configuration">
         {(getImportMetadata(csvData, importOptions).cycle !== undefined || getImportMetadata(csvData, importOptions).ambient !== undefined) && <p className="csv-help">Datos detectados en el archivo: {getImportMetadata(csvData, importOptions).cycle !== undefined ? `ciclo ${getImportMetadata(csvData, importOptions).cycle}` : "ciclo no especificado"} · {getImportMetadata(csvData, importOptions).ambient !== undefined ? `ambiente ${getImportMetadata(csvData, importOptions).ambient} °C` : "temperatura ambiente no especificada"}. Se completan al cargar o cambiar de tramo; puedes ajustar los parámetros arriba.</p>}
         {getTelemetrySegments(csvData).length > 1 && <div className="form-grid segment-selector"><label>
-          Batería, ciclo y tramo a analizar
+          Batería, ciclo y tramo que se analizarán
           <select value={importOptions.segmentId ?? ""} disabled={loading || readingFile} onChange={(event) => applyImport(csvData, { ...importOptions, segmentId: event.target.value }, true)}>
             {getTelemetrySegments(csvData).map((segment) => <option key={segment.id} value={segment.id}>{segment.label} · {segment.rows.length} muestras</option>)}
           </select>
@@ -626,7 +674,7 @@ export default function TelemetryForm({
           {TELEMETRY_FIELDS.map((field) => <span key={field} className={importOptions.mapping[field] ? "" : "column-missing"}>{field}<strong>{importOptions.mapping[field] || "Sin asignar"}</strong></span>)}
         </div>
         <details className="csv-settings" key={fileName} open={samples.length === 0}>
-          <summary>Revisar columnas y unidades <span>{importOptions.timeUnit} · {importOptions.voltageUnit} · {importOptions.currentUnit} · °{importOptions.temperatureUnit} · {importOptions.relativeTime || importOptions.timeUnit === "datetime" ? "Desde la primera muestra" : "Tiempo original"}</span></summary>
+          <summary>Revisar columnas y unidades <span>{importOptions.timeUnit} · {importOptions.voltageUnit} · {importOptions.currentUnit} · {importOptions.temperatureUnit === "K" ? "K" : `°${importOptions.temperatureUnit}`} · {importOptions.relativeTime || importOptions.timeUnit === "datetime" ? "Desde la primera muestra" : "Tiempo original"}</span></summary>
         <fieldset className="csv-mapping" disabled={loading || readingFile}>
           <legend>Columnas y unidades del CSV</legend>
           <p className="csv-mapping-intro">Revisa las columnas detectadas y confirma las unidades de tus mediciones.</p>
@@ -676,7 +724,7 @@ export default function TelemetryForm({
               })}><option value="C">Celsius (°C)</option><option value="F">Fahrenheit (°F)</option><option value="K">Kelvin (K)</option></select>
             </label>
           </div>
-          <h4 className="csv-group-title">3. Adaptación de paquete y signo de corriente</h4>
+          <h4 className="csv-group-title">3. Adaptación del paquete y signo de la corriente</h4>
           <div className="form-grid csv-fields-grid">
             <label>Divisor de voltaje · celdas en serie
               <input type="number" min="1" step="1" value={importOptions.seriesCells ?? 1} onChange={(event) => applyImport(csvData, { ...importOptions, seriesCells: Number(event.target.value) })} />
@@ -746,33 +794,36 @@ export default function TelemetryForm({
       }
 
 
+      </fieldset>
+      </div>
       </section>
 
 
 
 
       </div>
-      {samples.length > 0 && <section data-reveal className="csv-preview" aria-labelledby="preview-title">
+      {inputMode === "csv" && samples.length > 0 && <section data-reveal className="csv-preview" aria-labelledby="preview-title">
         <div className="preview-heading"><h3 id="preview-title">Vista previa de telemetría</h3><span>Primeras {Math.min(5, samples.length)} muestras · unidades normalizadas</span></div>
-        <div className="table-scroll" tabIndex={0} role="region" aria-label="Vista previa CSV, desplázate para ver todas las columnas">
+        <div className="table-scroll" tabIndex={0} role="region" aria-label="Vista previa del CSV. Desplázate para ver todas las columnas.">
           <table><thead><tr>{TELEMETRY_FIELDS.map((field) => <th key={field} scope="col">{field}</th>)}</tr></thead>
           <tbody>{samples.slice(0, 5).map((sample, index) => <tr key={index}>{TELEMETRY_FIELDS.map((field) => <td key={field}>{Number(sample[field].toFixed(4))}</td>)}</tr>)}</tbody></table>
         </div>
       </section>}
       <div data-reveal className="analysis-submit">
+      {submitError && <p className="form-error" role="alert">{submitError}</p>}
       <button
         type="submit"
         disabled={
           loading
           || readingFile
           ||
-          samples.length < 2
+          activeSamples.length < 2
         }
       >
 
         {
           loading
-            ? "Analizando batería..."
+            ? "Analizando la batería…"
             : "Analizar batería"
         }
 

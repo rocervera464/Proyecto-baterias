@@ -1,7 +1,9 @@
 ﻿:root {
-  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  font-family: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-heading: "Sora", "Manrope", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
   color: #123c4b;
-  background: #f5f8fa;
+  background: #e4f1ed;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   --primary: #123c4b;
@@ -16,7 +18,7 @@ button, input, select, textarea { font: inherit; }
 a { color: inherit; }
 button, summary, select { cursor: pointer; }
 :focus-visible { outline: 3px solid #178b78; outline-offset: 4px; }
-h1, h2, h3, h4 { line-height: 1.25; letter-spacing: -0.025em; }
+h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height: 1.25; letter-spacing: -0.025em; }
 h2 { font-size: 24px; margin: 0 0 12px; }
 h3 { font-size: 18px; margin: 0 0 12px; }
 h4 { font-size: 15px; }

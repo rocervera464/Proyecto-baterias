@@ -5,10 +5,31 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from xgboost import XGBRegressor
+from sklearn.isotonic import IsotonicRegression
 
 from app.services.feature_engineering import (
     MODEL_FEATURES,
 )
+
+
+def reconcile_predictions(predictions: dict[int, float]) -> dict[int, float]:
+    """Least-squares non-increasing forecast, anchored to current SoH.
+
+    Equal horizon weights: validation errors are unavailable. Preserve raw
+    outputs separately; this constraint is not an accuracy calibration.
+    """
+    if not predictions or 0 not in predictions:
+        raise ValueError("Falta la estimación del SoH actual.")
+    if not all(np.isfinite(value) for value in predictions.values()):
+        raise ValueError("Las predicciones deben ser finitas.")
+    current = float(np.clip(predictions[0], 0.0, 100.0))
+    horizons = sorted(h for h in predictions if h != 0)
+    if not horizons or current == 0:
+        return {0: current, **{h: 0.0 for h in horizons}}
+    values = IsotonicRegression(
+        increasing=False, y_min=0.0, y_max=current,
+    ).fit_transform(horizons, [predictions[h] for h in horizons])
+    return {0: current, **dict(zip(horizons, map(float, values)))}
 
 
 # ============================================================
@@ -308,7 +329,7 @@ class ModelService:
     # PREDICCIÓN
     # ========================================================
 
-    def predict_all(
+    def predict_raw_all(
         self,
         features: dict[
             str,
@@ -364,6 +385,11 @@ class ModelService:
 
 
         return predictions
+
+
+    def predict_all(self, features: dict[str, float | None]) -> dict[int, float]:
+        """Return bounded forecasts consistent with cumulative degradation."""
+        return reconcile_predictions(self.predict_raw_all(features))
 
 
 # ============================================================

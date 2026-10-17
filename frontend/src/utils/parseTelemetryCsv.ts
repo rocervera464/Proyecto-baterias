@@ -157,7 +157,7 @@ export function getImportMetadata(data: CsvData, options: ImportOptions): { cycl
   return { cycle: cycle !== undefined && Number.isInteger(cycle) && cycle >= 1 ? cycle : undefined, ambient: uniqueNumber("ambient"), warnings };
 }
 
-function numberValue(raw: string | undefined, row: number, field: string): number {
+export function numberValue(raw: string | undefined, row: number, field: string): number {
   const text = (raw ?? "").trim().replace(/\u2212/g, "-");
   if (!/^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)(?:e[+-]?\d+)?$/i.test(text)) {
     throw new Error(`Fila ${row}: la columna «${field}» necesita un número válido; no se admiten valores vacíos.`);

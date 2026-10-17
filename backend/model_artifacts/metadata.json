@@ -32,5 +32,45 @@
     "plus_10": "validated pilot horizon",
     "plus_20": "experimental: pilot validation showed weak long-horizon generalization",
     "plus_30": "experimental: pilot validation showed weak long-horizon generalization"
-  }
+  },
+  "candidate_evaluation": {
+    "protocol": "Nested leave-one-battery-out; inner macro MAE selects configuration; outer battery never used to select.",
+    "dataset_sha256": "c4832ce550c68e2a61e997f0f356253f901313b36be618f2077902c63543a4fb",
+    "decisions": {
+      "0": {
+        "nested_comparison_accepted": false,
+        "configuration": "original_configuration",
+        "changed": false
+      },
+      "5": {
+        "nested_comparison_accepted": true,
+        "configuration": "regularized_cycle_constraint",
+        "changed": true
+      },
+      "10": {
+        "nested_comparison_accepted": true,
+        "configuration": "regularized",
+        "changed": true
+      },
+      "20": {
+        "nested_comparison_accepted": true,
+        "configuration": "regularized",
+        "changed": true
+      },
+      "30": {
+        "nested_comparison_accepted": false,
+        "configuration": "original_configuration",
+        "changed": false
+      }
+    },
+    "scope": "Pilot nested cross-validation only, not an independent external validation."
+  },
+  "model_version": "nasa_nested_v1",
+  "evaluation_reports": {
+    "raw": "docs/training-comparison.json",
+    "reconciled": "docs/reconciled-comparison.json",
+    "data_provenance": "docs/training-data-provenance.json"
+  },
+  "validation_scope": "Pilot nested leave-one-battery-out on B0045-B0048; package chosen on these comparisons. No independent external or forward-temporal test.",
+  "domain_profile_file": "domain_profile.json"
 }

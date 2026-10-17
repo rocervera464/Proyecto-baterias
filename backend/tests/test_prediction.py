@@ -184,3 +184,17 @@ def test_long_horizons_are_experimental():
         ]
         is True
     )
+
+def test_api_returns_consistent_forecast_and_raw_outputs():
+    response = client.post('/api/v1/predict', json=PAYLOAD)
+    assert response.status_code == 200
+    data = response.json()
+    assert data['forecast_method'] == 'anchored_isotonic'
+    assert math.isfinite(data['raw_current_soh_percent'])
+    previous = data['current_soh_percent']
+    for item in data['future_predictions']:
+        value = item['predicted_soh_percent']
+        assert 0 <= value <= previous <= 100
+        assert math.isfinite(item['raw_predicted_soh_percent'])
+        assert item['adjusted'] == (abs(value - item['raw_predicted_soh_percent']) > 1e-9)
+        previous = value
