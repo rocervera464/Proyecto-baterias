@@ -3,6 +3,16 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { readTelemetryCsv, detectImportOptions, convertTelemetryCsv, getDefaultImportOptions, getTelemetrySegments, getImportMetadata } from '../src/utils/parseTelemetryCsv.ts';
 
+test('clock durations and Excel fractional days preserve the selected temporal units', () => {
+  const data = readTelemetryCsv('time_s,voltage_v,current_a,temperature_c\n00:00:00,4.1,-1,25\n00:05:00,3.8,-1,26');
+  assert.equal(getDefaultImportOptions(data).timeUnit, 'clock');
+  assert.equal(convertTelemetryCsv(data, getDefaultImportOptions(data))[1].time_s, 300);
+  const days = readTelemetryCsv('time_s,voltage_v,current_a,temperature_c\n0,4.1,-1,25\n0.003472222222222222,3.8,-1,26');
+  assert.equal(convertTelemetryCsv(days, { ...getDefaultImportOptions(days), timeUnit: 'd' })[1].time_s, 300);
+  const invalid = readTelemetryCsv('time_s,voltage_v,current_a,temperature_c\n00:00:00,4.1,-1,25\n00:65:00,3.8,-1,26');
+  assert.throws(() => convertTelemetryCsv(invalid, getDefaultImportOptions(invalid)), /menores que 60/);
+});
+
 function parse(text) {
   const data = readTelemetryCsv(text);
   return convertTelemetryCsv(data, detectImportOptions(data.fields));

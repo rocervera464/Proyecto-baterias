@@ -2,6 +2,8 @@ from fastapi import (
     APIRouter,
     HTTPException,
 )
+from app.services.compatibility import assess_compatibility
+from app.services.model_registry import select_model_service
 
 from app.schemas.prediction import (
     FuturePrediction,
@@ -17,7 +19,6 @@ from app.services.feature_engineering import (
 )
 
 from app.services.model_service import (
-    get_model_service,
     reconcile_predictions,
 )
 
@@ -77,7 +78,7 @@ def predict_battery_health(
 
     try:
         model_service = (
-            get_model_service()
+            select_model_service(features)
         )
 
     except (
@@ -98,6 +99,12 @@ def predict_battery_health(
     # 3. EJECUTAR PREDICCIONES
     # ========================================================
 
+    compatibility = assess_compatibility(request, features, model_service.model_dir)
+    if request.analysis_mode == "strict" and not compatibility["can_estimate_in_strict_mode"]:
+        raise HTTPException(status_code=422, detail={
+            "message": "No hay un modelo compatible con la información proporcionada en modo estricto. Revisa los datos o activa explícitamente el análisis exploratorio.",
+            "compatibility": compatibility,
+        })
     try:
         raw_predictions = (
             model_service.predict_raw_all(
@@ -183,6 +190,7 @@ def predict_battery_health(
 
         raw_current_soh_percent=raw_predictions[0],
         forecast_method="anchored_isotonic",
+        compatibility=compatibility,
 
         future_predictions=
             future_predictions,

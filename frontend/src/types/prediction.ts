@@ -1,3 +1,14 @@
+export interface Compatibility {
+  status: "within_observed_ranges" | "out_of_range" | "unverified" | "incompatible";
+  model_id: string;
+  model_description?: string;
+  can_estimate_in_strict_mode: boolean;
+  reasons: string[];
+  quality_warnings: string[];
+  feature_deviations: { feature: string; value: number; observed_min: number; observed_max: number }[];
+  reference_coverage?: { min: number; max: number } | null;
+  limitation: string;
+}
 export interface FuturePrediction {
   horizon_cycles: number;
 
@@ -14,6 +25,7 @@ export interface FuturePrediction {
 
 
 export interface PredictionResponse {
+  compatibility?: Compatibility;
   status: string;
 
   model_family: string;

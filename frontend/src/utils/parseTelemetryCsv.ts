@@ -10,7 +10,7 @@ export interface CsvData {
 }
 export interface ImportOptions {
   mapping: ColumnMapping;
-  timeUnit: "s" | "ms" | "min" | "h" | "datetime";
+  timeUnit: "s" | "ms" | "min" | "h" | "d" | "clock" | "datetime";
   voltageUnit: "V" | "mV";
   currentUnit: "A" | "mA";
   temperatureUnit: "C" | "F" | "K";
@@ -131,6 +131,8 @@ export function getDefaultImportOptions(data: CsvData): ImportOptions {
   const selected = segments.find((segment) => isDischarge(segment.mode)) ?? segments[0];
   const options = detectImportOptions(data.fields);
   const firstTime = selected?.rows[0]?.[options.mapping.time_s]?.trim();
+  if (firstTime && /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}/.test(firstTime)) options.timeUnit = "datetime";
+  if (firstTime && /^\d+:\d{2}:\d{2}(?:[.,]\d+)?$/.test(firstTime)) options.timeUnit = "clock";
   if (options.timeUnit === "datetime" && firstTime && /^\d+(?:\.\d+)?$/.test(firstTime)) {
     options.timeUnit = firstTime.split(".")[0].length === 13 ? "ms" : "s";
   }
@@ -149,7 +151,7 @@ export function getImportMetadata(data: CsvData, options: ImportOptions): { cycl
   };
   const warnings: string[] = [];
   if (normalize(options.mapping.voltage_v).includes("pack") || normalize(options.mapping.current_a).includes("pack")) {
-    warnings.push("Se detectaron medidas de un paquete. El modelo se entrenó con celdas NASA B0045–B0048. Sin adaptación conocida, el resultado es exploratorio; importar el archivo no valida su aplicabilidad.");
+    warnings.push("Se detectaron medidas de un paquete. Las familias disponibles se entrenaron con celdas NASA. Sin validación propia del paquete, el resultado es exploratorio; importar el archivo no valida su aplicabilidad.");
   }
   if (segment?.mode && !isDischarge(segment.mode)) warnings.push(`El tramo seleccionado está marcado como ${segment.mode}. El modelo espera telemetría de descarga.`);
   if (data.fields.some((field) => ["soh", "sohpct", "sohpercent", "soc", "socpct"].includes(normalize(field)))) warnings.push("Las columnas SoH y SoC del archivo no se usan como entrada ni sustituyen la predicción del modelo.");
@@ -197,10 +199,14 @@ export function convertTelemetryCsv(data: CsvData, options: ImportOptions): Tele
       }
       time = Date.parse(raw) / 1000;
       if (!Number.isFinite(time)) throw new Error(`Fila ${line}: fecha y hora inválida.`);
+    } else if (options.timeUnit === "clock") {
+      const value = (row[mapping.time_s] ?? "").trim().match(/^(\d+):(\d{2}):(\d{2}(?:[.,]\d+)?)$/);
+      if (!value || Number(value[2]) >= 60 || Number(value[3].replace(",", ".")) >= 60) throw new Error(`Fila ${line}: usa una duración HH:MM:SS válida, con minutos y segundos menores que 60.`);
+      time = Number(value[1]) * 3600 + Number(value[2]) * 60 + Number(value[3].replace(",", "."));
     } else {
       time = numberValue(row[mapping.time_s], line, mapping.time_s);
       if (time < 0) throw new Error(`Fila ${line}: el tiempo no puede ser negativo.`);
-      time *= { s: 1, ms: 0.001, min: 60, h: 3600 }[options.timeUnit];
+      time *= { s: 1, ms: 0.001, min: 60, h: 3600, d: 86400 }[options.timeUnit];
     }
     const voltage = numberValue(row[mapping.voltage_v], line, mapping.voltage_v) / (options.voltageUnit === "mV" ? 1000 : 1) / series;
     const current = numberValue(row[mapping.current_a], line, mapping.current_a) / (options.currentUnit === "mA" ? 1000 : 1) / parallel * (options.invertCurrent ? -1 : 1);

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class FuturePrediction(BaseModel):
@@ -16,6 +16,7 @@ class FuturePrediction(BaseModel):
 
 
 class PredictionResponse(BaseModel):
+    compatibility: dict = Field(default_factory=dict)
     status: str
 
     model_family: str

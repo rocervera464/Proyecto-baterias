@@ -19,7 +19,7 @@ test('both journeys have six complete stages and evaluation does not invent metr
       assert.ok(step.points.length >= 3);
     }
   }
-  assert.match(trainingSteps[4].evidence, /No se encontraron/);
+  assert.match(trainingSteps[4].evidence, /particiones por batería/);
   assert.equal(predictionSteps[4].visual, 'results');
 });
 

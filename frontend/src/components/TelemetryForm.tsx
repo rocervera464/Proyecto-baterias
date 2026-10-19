@@ -1,3 +1,4 @@
+import { importTelemetryFile } from "../services/api";
 import TelemetryInformationGuide from "./TelemetryInformationGuide";
 import ManualTelemetryEditor from "./ManualTelemetryEditor";
 import { emptyManualRow, validateManualTelemetry } from "../utils/manualTelemetry";
@@ -133,6 +134,14 @@ export default function TelemetryForm({
   const activeSamples = inputMode === "manual" ? manual.samples : samples;
   const submitting = useRef(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [measurementLevel, setMeasurementLevel] = useState<NonNullable<TelemetryRequest["measurement_level"]>>("unknown");
+  const [chemistry, setChemistry] = useState<NonNullable<TelemetryRequest["chemistry"]>>("unknown");
+  const [exploratory, setExploratory] = useState(false);
+  const [binaryFile, setBinaryFile] = useState<File | null>(null);
+  const [sheets, setSheets] = useState<string[]>([]);
+  const [selectedSheet, setSelectedSheet] = useState("");
+  const [fileWarnings, setFileWarnings] = useState<string[]>([]);
+  const [historyFromFile, setHistoryFromFile] = useState(false);
   const [csvData, setCsvData] = useState<CsvData | null>(null);
   const [importOptions, setImportOptions] = useState<ImportOptions | null>(null);
   const [readingFile, setReadingFile] = useState(false);
@@ -156,6 +165,21 @@ export default function TelemetryForm({
       const metadata = getImportMetadata(data, options);
       if (metadata.cycle !== undefined) setCycle(String(metadata.cycle));
       if (metadata.ambient !== undefined) setAmbientTemperature(String(metadata.ambient));
+      const segment = getTelemetrySegments(data).find((item) => item.id === options.segmentId);
+      const levels = new Set((segment?.rows ?? data.rows).map((row) => row.measurement_level).filter(Boolean));
+      if (levels.size === 1 && levels.has("cell")) setMeasurementLevel("cell");
+      else if (/pack/i.test(options.mapping.voltage_v + options.mapping.current_a)) setMeasurementLevel("pack");
+      const cutoffs = new Set((segment?.rows ?? data.rows).map((row) => row.cutoff_voltage_v).filter(Boolean));
+      if (cutoffs.size === 1) setCutoffVoltage([...cutoffs][0]);
+      const unique = (field: string) => {
+        const values = new Set((segment?.rows ?? data.rows).map((row) => row[field] ?? ""));
+        return values.size === 1 ? [...values][0] : "";
+      };
+      if (binaryFile?.name.toLowerCase().endsWith(".mat") || data.fields.includes("re_ohm")) {
+        setHistoryFromFile(true);
+        setReValue(unique("re_ohm")); setRctValue(unique("rct_ohm"));
+        setChargeTempStart(unique("charge_temp_start_prev")); setChargeTempMax(unique("charge_temp_max_prev")); setChargeTempDelta(unique("charge_temp_delta_prev"));
+      }
     }
     try {
       setSamples(convertTelemetryCsv(data, options));
@@ -175,14 +199,28 @@ export default function TelemetryForm({
     setImportOptions(null);
     setFileName(file?.name ?? "");
     setCsvError(null);
+    setSheets([]); setSelectedSheet(""); setFileWarnings([]); setBinaryFile(null);
     if (!file) return;
+    setMeasurementLevel("unknown"); setChemistry("unknown");
+    if (historyFromFile) {
+      setReValue(""); setRctValue(""); setChargeTempStart(""); setChargeTempMax(""); setChargeTempDelta(""); setHistoryFromFile(false);
+    }
     setReadingFile(true);
     try {
-      if (/\.(xlsx?|parquet|mat)$/i.test(file.name)) throw new Error("Este formato binario requiere exportar las mediciones como CSV, TSV o JSON. No se puede convertir solo cambiando la extensión.");
+      if (file.size > 40 * 1024 * 1024) throw new Error("El archivo supera 40 MB. Selecciona un tramo menor.");
+      if (/\.(xlsx?|parquet|mat)$/i.test(file.name)) {
+        setBinaryFile(file);
+        const imported = await importTelemetryFile(file);
+        setSheets(imported.sheets); setSelectedSheet(imported.selected_sheet ?? ""); setFileWarnings(imported.warnings);
+        if (imported.rows.length) { setCsvData(imported); applyImport(imported, getDefaultImportOptions(imported), true); }
+        return;
+      }
+      if (!/\.(csv|tsv|txt|json)$/i.test(file.name)) throw new Error("Formato no soportado. Usa CSV, TSV, TXT, JSON, XLSX, XLS, MAT o Parquet.");
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
       const encoding = bytes[0] === 0xff && bytes[1] === 0xfe ? "utf-16le" : bytes[0] === 0xfe && bytes[1] === 0xff ? "utf-16be" : "utf-8";
       const data = readTelemetryCsv(new TextDecoder(encoding).decode(buffer));
+      if (data.rows.length > 100_000) throw new Error("El archivo supera 100 000 filas. Selecciona un tramo menor.");
       setCsvData(data);
       applyImport(data, getDefaultImportOptions(data), true);
     } catch (error) {
@@ -190,6 +228,17 @@ export default function TelemetryForm({
     } finally {
       setReadingFile(false);
     }
+  }
+
+  async function changeSheet(sheet: string) {
+    if (!binaryFile || !sheet || loading || readingFile) return;
+    setReadingFile(true); setCsvError(null); setSamples([]); setSelectedSheet(sheet);
+    try {
+      const imported = await importTelemetryFile(binaryFile, sheet);
+      setFileWarnings(imported.warnings); setCsvData(imported);
+      applyImport(imported, getDefaultImportOptions(imported), true);
+    } catch (error) { setCsvError(error instanceof Error ? error.message : "No se pudo leer la hoja."); }
+    finally { setReadingFile(false); }
   }
 
   async function handleSubmit(
@@ -217,6 +266,9 @@ export default function TelemetryForm({
     const telemetry:
       TelemetryRequest = {
 
+        measurement_level: measurementLevel,
+        chemistry,
+        analysis_mode: exploratory ? "exploratory" : "strict",
         cycle: Number(cycle),
 
         ambient_temperature_c:
@@ -296,7 +348,7 @@ export default function TelemetryForm({
     }
     submitting.current = true;
     try {
-      await onSubmit(telemetry, { warnings: inputMode === "manual" ? manual.warnings : csvData && importOptions ? getImportMetadata(csvData, importOptions).warnings : [] });
+      await onSubmit(telemetry, { warnings: inputMode === "manual" ? manual.warnings : csvData && importOptions ? [...fileWarnings, ...getImportMetadata(csvData, importOptions).warnings] : fileWarnings });
     } finally { submitting.current = false; }
   }
 
@@ -435,6 +487,16 @@ export default function TelemetryForm({
 
       </div>
 
+
+      <fieldset className="battery-context" disabled={loading || readingFile}>
+        <legend>Compatibilidad de la batería</legend>
+        <div className="form-grid">
+          <label>Nivel de las mediciones<select value={measurementLevel} onChange={(event) => setMeasurementLevel(event.target.value as typeof measurementLevel)}><option value="unknown">No lo sé</option><option value="cell">Celda individual</option><option value="module">Módulo</option><option value="pack">Paquete completo</option></select></label>
+          <label>Familia química<select value={chemistry} onChange={(event) => setChemistry(event.target.value as typeof chemistry)}><option value="unknown">No identificada</option><option value="li-ion">Ion-litio, ensayo comparable a NASA</option><option value="LFP">LFP</option><option value="lead-acid">Plomo-ácido</option><option value="other">Otra</option></select></label>
+        </div>
+        <p>El modo estricto solo estima cuando el tipo declarado y los rangos observados son compatibles. Importar un archivo correctamente no valida el modelo para esa batería.</p>
+        <label className="exploratory-control"><input type="checkbox" checked={exploratory} onChange={(event) => setExploratory(event.target.checked)} />Permitir una estimación exploratoria aunque no se confirme la compatibilidad</label>
+      </fieldset>
 
       <details>
 
@@ -620,29 +682,31 @@ export default function TelemetryForm({
           <h3 id="telemetry-import-title">Carga la telemetría</h3>
           <p>Elige cómo ingresar tus mediciones y prepara los datos de la predicción.</p>
         </div>
-        <span className="csv-format-badge">{inputMode === "csv" ? "CSV / JSON" : "INGRESO MANUAL"}</span>
+        <span className="csv-format-badge">{inputMode === "csv" ? "ARCHIVO" : "INGRESO MANUAL"}</span>
       </div>
 
 
       <div className="telemetry-source-selector" role="group" aria-label="Método de ingreso de telemetría">
-        <button type="button" aria-pressed={inputMode === "csv"} disabled={loading || readingFile} onClick={() => { setInputMode("csv"); setSubmitError(null); }}>Cargar archivo CSV</button>
+        <button type="button" aria-pressed={inputMode === "csv"} disabled={loading || readingFile} onClick={() => { setInputMode("csv"); setSubmitError(null); }}>Cargar archivo</button>
         <button type="button" aria-pressed={inputMode === "manual"} disabled={loading || readingFile} onClick={() => { setInputMode("manual"); setSubmitError(null); }}>Ingresar datos manualmente</button>
       </div>
       {inputMode === "manual" && <TelemetryInformationGuide />}
       <div hidden={inputMode !== "manual"}><ManualTelemetryEditor rows={manualRows} onChange={setManualRows} disabled={loading || readingFile || inputMode !== "manual"} /></div>
       <div hidden={inputMode !== "csv"}>
       <fieldset className="csv-source-fields" disabled={inputMode !== "csv"}>
+      {sheets.length > 1 && <div className="form-grid binary-sheet-select"><label>Hoja o batería del archivo<select value={selectedSheet} disabled={readingFile || loading} onChange={(event) => void changeSheet(event.target.value)}><option value="" disabled>Selecciona una tabla</option>{sheets.map((sheet) => <option key={sheet} value={sheet}>{sheet}</option>)}</select></label></div>}
+      {!!fileWarnings.length && <div className="import-warnings">{fileWarnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
       <label className={`file-upload${dragging ? " is-dragging" : ""}`}
         onDragOver={(event) => { event.preventDefault(); if (!loading && !readingFile) setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={(event) => { event.preventDefault(); setDragging(false); void loadFile(event.dataTransfer.files[0]); }}>
 
         <span className="csv-upload-title">Arrastra tu telemetría o selecciona un archivo</span>
-        <span className="csv-upload-description">CSV, TSV, TXT o JSON. Puedes elegir la batería, el ciclo y el tramo de descarga.</span>
+        <span className="csv-upload-description">CSV, Excel (XLSX/XLS), Parquet, MAT, TSV, TXT o JSON. Puedes elegir la batería, el ciclo y el tramo de descarga.</span>
 
         <input
           type="file"
-          accept=".csv,.tsv,.txt,.json,text/csv,text/tab-separated-values,text/plain,application/json"
+          accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.mat,.parquet"
           aria-describedby="csv-import-help csv-status"
           aria-invalid={!!csvError}
           disabled={readingFile || loading}
@@ -701,7 +765,7 @@ export default function TelemetryForm({
                 ...importOptions, timeUnit: event.target.value as ImportOptions["timeUnit"],
               })}>
                 <option value="s">Segundos</option><option value="ms">Milisegundos</option>
-                <option value="min">Minutos</option><option value="h">Horas</option>
+                <option value="min">Minutos</option><option value="h">Horas</option><option value="d">Días (incluidas fracciones)</option><option value="clock">Duración HH:MM:SS</option>
                 <option value="datetime">Fecha y hora ISO</option>
               </select>
             </label>
