@@ -65,3 +65,10 @@ Thumbs.db
 # ==========================================
 
 .ipynb_checkpoints/
+# Local original battery datasets and derived training tables
+data/raw/
+data/processed/
+
+# Reversible local model snapshots
+backend/model_backups/
+backend/model_candidates/

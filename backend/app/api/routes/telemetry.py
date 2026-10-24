@@ -6,6 +6,8 @@ from app.services.feature_engineering import (
     WINDOW_SECONDS,
     extract_features,
 )
+from app.services.compatibility import assess_compatibility
+from app.services.model_registry import select_model_service
 
 
 router = APIRouter(
@@ -14,6 +16,15 @@ router = APIRouter(
 )
 
 legacy_router = APIRouter(tags=["telemetry"])
+
+
+@router.post("/compatibility")
+def check_compatibility(request: TelemetryRequest):
+    try:
+        features, _ = extract_features(request)
+        return assess_compatibility(request, features, select_model_service(features).model_dir)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
 
 
 @legacy_router.post(

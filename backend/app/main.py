@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.api.routes.file_import import router as import_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -33,6 +34,7 @@ app.include_router(
     telemetry_router
 )
 app.include_router(legacy_telemetry_router)
+app.include_router(import_router)
 
 app.include_router(
     prediction_router

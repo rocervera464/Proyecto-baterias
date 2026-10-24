@@ -1,0 +1,20 @@
+.model-compatibility { padding: 20px; margin: 20px 0; background: #fffbf4; border: 1px solid #eedfc6; border-left: 4px solid #a66a18; border-radius: 14px; }
+.model-compatibility.observed { background: #f0f8f3; border-color: #cce2d4; border-left-color: #178b78; }
+.model-compatibility strong { color: #123c4b; font-size: 14px; }
+.model-compatibility p { font-size: 12px; color: #536875; line-height: 1.8; margin: 10px 0 0; }
+.model-compatibility summary { font-size: 12px; }
+.compatibility-recovery { margin: 24px 0; padding: clamp(18px, 3vw, 30px); border: 1px solid #e9d8b6; border-radius: 20px; background: #fffbf4; }
+.compatibility-recovery h3 { margin: 0 0 12px; color: #123c4b; }
+.compatibility-recovery > p { color: #536875; line-height: 1.7; }
+.compatibility-recovery .model-compatibility { margin: 18px 0; }
+.compatibility-recovery button { min-height: 44px; padding: 12px 20px; margin: 12px 20px 8px 0; border: 0; border-radius: 12px; background: #123c4b; color: white; font: inherit; font-weight: 600; cursor: pointer; }
+.compatibility-recovery > a { display: inline-block; padding: 12px 0; color: #087e70; text-underline-offset: 4px; }
+.battery-context { border: 1px solid #dce6e2; border-radius: 14px; margin: 24px 0; padding: 20px; min-width: 0; }
+.battery-context legend { padding: 0 8px; font-size: 14px; font-weight: 600; }
+.battery-context select, .binary-sheet-select select { width: 100%; min-height: 44px; padding: 10px; border: 1px solid #c6d9cf; border-radius: 10px; background: white; color: #123c4b; }
+.battery-context .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 0; }
+.battery-context p, .binary-sheet-select p { font-size: 12px; color: #536875; margin: 12px 0 0; }
+.exploratory-control { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; margin-top: 18px; color: #123c4b; }
+.exploratory-control input { margin-top: 4px; accent-color: #178b78; }
+.binary-sheet-select { margin-bottom: 20px; }
+@media (max-width: 600px) { .battery-context .form-grid { grid-template-columns: 1fr; } .battery-context { padding: 16px; } }

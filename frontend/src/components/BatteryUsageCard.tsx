@@ -1,5 +1,5 @@
 import { getSohClassification } from "../data/batterySecondLifeData";
-import BatteryUseAccordion from "./BatteryUseAccordion";
+import BatteryUseCarousel from "./BatteryUseCarousel";
 import { getSohImages } from "../utils/sohImage";
 import Icon from "./Icon";
 
@@ -9,7 +9,7 @@ export default function BatteryUsageCard({ soh }: { soh: number }) {
   const images = getSohImages(soh);
 
   return (
-    <section data-reveal className="battery-usage" aria-labelledby="battery-usage-title">
+    <section data-reveal id="usos-bateria" className="battery-usage" aria-labelledby="battery-usage-title">
       <p className="section-kicker">REUTILIZACIÓN Y CIRCULARIDAD</p>
       <div className="second-life-title"><span className="panel-icon"><Icon name="battery" /></span><h3 id="battery-usage-title">Posibles usos de la batería según su estado de salud</h3></div>
       <p>Explora aplicaciones potenciales para esta batería según su estado de salud estimado. Las recomendaciones son orientativas y requieren evaluación técnica antes de su implementación.</p>
@@ -30,10 +30,7 @@ export default function BatteryUsageCard({ soh }: { soh: number }) {
               <figcaption className="sr-only">Imagen representativa del rango {usage.range}; no acredita la viabilidad de una aplicación real.</figcaption>
             </figure>}
           </div>
-          <p className="use-instructions">Despliega una aplicación para consultar sus requisitos y limitaciones. Puedes abrir varias a la vez.</p>
-          <div className="second-life-options">
-            {usage.applications.map((application) => <BatteryUseAccordion key={`${soh}-${application.id}`} application={application} />)}
-          </div>
+          <BatteryUseCarousel key={`${usage.id}-${soh}`} applications={usage.applications} />
         </>
       ) : (
         <p>El SoH actual no es un valor numérico válido entre 0 y 100 %.

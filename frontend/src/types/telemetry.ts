@@ -20,6 +20,9 @@ export interface PreviousCharge {
 
 
 export interface TelemetryRequest {
+  measurement_level?: "unknown" | "cell" | "module" | "pack";
+  chemistry?: "unknown" | "li-ion" | "LFP" | "lead-acid" | "other";
+  analysis_mode?: "strict" | "exploratory";
   cycle: number;
 
   ambient_temperature_c: number;

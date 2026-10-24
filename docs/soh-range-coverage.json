@@ -1,0 +1,1509 @@
+{
+  "definition": "capacity / median(first 5 positive finite capacities per battery) * 100",
+  "caveat": "Coverage audit only: valid window does not establish trustworthy capacity measurement, compatible protocol or accuracy. Low-capacity anomalies need quality review.",
+  "batteries": [
+    {
+      "battery_id": "B0007",
+      "discharges": 168,
+      "reference_ah": 1.8806626717011388,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 168,
+      "usable_soh_min": 74.46605183267026,
+      "usable_soh_max": 100.5524448294735,
+      "below_50_usable": [],
+      "archive": "1. BatteryAgingARC-FY08Q4.zip",
+      "file": "B0007.mat",
+      "sha256": "d022afa086efaf54ab5b63f05220f5be178c8027e2fa8d68589db0e85a441a3b"
+    },
+    {
+      "battery_id": "B0018",
+      "discharges": 132,
+      "reference_ah": 1.8396018424355423,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 132,
+      "usable_soh_min": 72.89900508389353,
+      "usable_soh_max": 100.83728326424956,
+      "below_50_usable": [],
+      "archive": "1. BatteryAgingARC-FY08Q4.zip",
+      "file": "B0018.mat",
+      "sha256": "d1e6c923a43ea1c9666b3a90bbb521757a067fd60b4d17dbfaa49c50b179da69"
+    },
+    {
+      "battery_id": "B0005",
+      "discharges": 168,
+      "reference_ah": 1.8353491942234077,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 168,
+      "usable_soh_min": 70.14755154986739,
+      "usable_soh_max": 101.15172778353462,
+      "below_50_usable": [],
+      "archive": "1. BatteryAgingARC-FY08Q4.zip",
+      "file": "B0005.mat",
+      "sha256": "0eae4585baf3f200c09fe24c5ab884f1889679fc75206ca1aa19da704104f0b0"
+    },
+    {
+      "battery_id": "B0006",
+      "discharges": 168,
+      "reference_ah": 2.013326371345464,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 168,
+      "usable_soh_min": 57.30905570094814,
+      "usable_soh_max": 101.09327628016041,
+      "below_50_usable": [],
+      "archive": "1. BatteryAgingARC-FY08Q4.zip",
+      "file": "B0006.mat",
+      "sha256": "fa818ab4db5db8ab21e910b6dd6c3e20d3761bb9672089e1a4de8f96074616c5"
+    },
+    {
+      "battery_id": "B0028",
+      "discharges": 28,
+      "reference_ah": 1.797618668222458,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 28,
+      "usable_soh_min": 95.52824498243442,
+      "usable_soh_max": 100.39856357506649,
+      "below_50_usable": [],
+      "archive": "2. BatteryAgingARC_25_26_27_28_P1.zip",
+      "file": "B0028.mat",
+      "sha256": "050c377e85a2c41165f2e2e0d22bf9575385dd8c835a713c27edb65af6bb25e8"
+    },
+    {
+      "battery_id": "B0025",
+      "discharges": 28,
+      "reference_ah": 1.847111177186175,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 28,
+      "usable_soh_min": 95.7056131686318,
+      "usable_soh_max": 100.10137900687882,
+      "below_50_usable": [],
+      "archive": "2. BatteryAgingARC_25_26_27_28_P1.zip",
+      "file": "B0025.mat",
+      "sha256": "38894747a9c79d719e95a2e6c42be18017e29c522b760056b680a65105d1a15f"
+    },
+    {
+      "battery_id": "B0026",
+      "discharges": 28,
+      "reference_ah": 1.8142913014068198,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 28,
+      "usable_soh_min": 76.412059153237,
+      "usable_soh_max": 100.12327096938911,
+      "below_50_usable": [],
+      "archive": "2. BatteryAgingARC_25_26_27_28_P1.zip",
+      "file": "B0026.mat",
+      "sha256": "ca5eee0b33d8070e3a6c254696444a0c65a12f40587fcfc8db858640b2e6e36c"
+    },
+    {
+      "battery_id": "B0027",
+      "discharges": 28,
+      "reference_ah": 1.8142384651167962,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 28,
+      "usable_soh_min": 97.5667013662667,
+      "usable_soh_max": 100.49989619735884,
+      "below_50_usable": [],
+      "archive": "2. BatteryAgingARC_25_26_27_28_P1.zip",
+      "file": "B0027.mat",
+      "sha256": "de2b4045ef20a6900885e169f3540664bb637f5f94b41fb4333c31d759237209"
+    },
+    {
+      "battery_id": "B0029",
+      "discharges": 40,
+      "reference_ah": 1.815750429913437,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 40,
+      "usable_soh_min": 88.78311606891852,
+      "usable_soh_max": 101.59442490392895,
+      "below_50_usable": [],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0029.mat",
+      "sha256": "da9c63ac7b8a10d2354ff53fec9be23f4194352e667de5c503b069f7d267ebb2"
+    },
+    {
+      "battery_id": "B0030",
+      "discharges": 40,
+      "reference_ah": 1.751755031874225,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 40,
+      "usable_soh_min": 89.2122686102088,
+      "usable_soh_max": 101.70114214227792,
+      "below_50_usable": [],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0030.mat",
+      "sha256": "c29a910256812449aa6090031471a57440e2e7bc827bd2c822b0d3135485cc99"
+    },
+    {
+      "battery_id": "B0031",
+      "discharges": 40,
+      "reference_ah": 1.8044387333514835,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 40,
+      "usable_soh_min": 92.36529694510433,
+      "usable_soh_max": 101.57498445791222,
+      "below_50_usable": [],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0031.mat",
+      "sha256": "c47cb3a5ef47ef4de26fcc80c2173fec24a139f6c305852fccee603cd6c4bcec"
+    },
+    {
+      "battery_id": "B0032",
+      "discharges": 40,
+      "reference_ah": 1.8654947184112376,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 40,
+      "usable_soh_min": 87.68720014104173,
+      "usable_soh_max": 101.52974082434947,
+      "below_50_usable": [],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0032.mat",
+      "sha256": "bd146cad3a18f9e8d42d05014c90e7bcde7abc7ccc89bdd46e5655604c61bc0f"
+    },
+    {
+      "battery_id": "B0033",
+      "discharges": 197,
+      "reference_ah": 1.1610848192311252,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 197,
+      "usable_soh_min": 5.893257863049996,
+      "usable_soh_max": 162.3602461033306,
+      "below_50_usable": [
+        {
+          "cycle": 1,
+          "capacity_ah": 0.06842572240601812,
+          "usable_window": true,
+          "soh": 5.893257863049996
+        },
+        {
+          "cycle": 140,
+          "capacity_ah": 0.29866180371583506,
+          "usable_window": true,
+          "soh": 25.722651676180735
+        },
+        {
+          "cycle": 141,
+          "capacity_ah": 0.2344867974702557,
+          "usable_window": true,
+          "soh": 20.19549248999171
+        },
+        {
+          "cycle": 142,
+          "capacity_ah": 0.20256330380725823,
+          "usable_window": true,
+          "soh": 17.446038433384775
+        },
+        {
+          "cycle": 143,
+          "capacity_ah": 0.23531995654070248,
+          "usable_window": true,
+          "soh": 20.26724944147769
+        },
+        {
+          "cycle": 144,
+          "capacity_ah": 0.23550427837482876,
+          "usable_window": true,
+          "soh": 20.283124408669867
+        },
+        {
+          "cycle": 145,
+          "capacity_ah": 0.4304242256752923,
+          "usable_window": true,
+          "soh": 37.07086842805514
+        },
+        {
+          "cycle": 146,
+          "capacity_ah": 0.46436333202696434,
+          "usable_window": true,
+          "soh": 39.99391985285515
+        },
+        {
+          "cycle": 147,
+          "capacity_ah": 0.3994839380247729,
+          "usable_window": true,
+          "soh": 34.40609431870039
+        }
+      ],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0033.mat",
+      "sha256": "3f6b44d7e123b9e9e4a26c3651acd0b9f38ca4d21aac3930bd9197ccf8b04426"
+    },
+    {
+      "battery_id": "B0034",
+      "discharges": 197,
+      "reference_ah": 1.620729289277574,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 197,
+      "usable_soh_min": 46.02436080470035,
+      "usable_soh_max": 112.31400690490976,
+      "below_50_usable": [
+        {
+          "cycle": 1,
+          "capacity_ah": 0.7459302957645664,
+          "usable_window": true,
+          "soh": 46.02436080470035
+        }
+      ],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0034.mat",
+      "sha256": "d8cd5faff49f0d5672736327c5cd16913e0a0f08fb2817f672f52a67184cb885"
+    },
+    {
+      "battery_id": "B0036",
+      "discharges": 197,
+      "reference_ah": 1.8011007566288924,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 197,
+      "usable_soh_min": 55.63167882127454,
+      "usable_soh_max": 135.698262469957,
+      "below_50_usable": [],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0036.mat",
+      "sha256": "40511cccf0262d61b8345fdfe6c4e0a67ccc42e7f5e869ec32c7f33619e7dc15"
+    },
+    {
+      "battery_id": "B0038",
+      "discharges": 47,
+      "reference_ah": 1.0613249847591086,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 47,
+      "usable_soh_min": 84.61662392424564,
+      "usable_soh_max": 168.3217855694823,
+      "below_50_usable": [],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0038.mat",
+      "sha256": "41d4a6977e3f3a46623f80ad8f6e5ba6ad83a2746403f71966c88a4722ffd409"
+    },
+    {
+      "battery_id": "B0039",
+      "discharges": 47,
+      "reference_ah": 0.4711383364607152,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 47,
+      "usable_soh_min": 25.266107506270274,
+      "usable_soh_max": 376.0196209646232,
+      "below_50_usable": [
+        {
+          "cycle": 1,
+          "capacity_ah": 0.11903831859341765,
+          "usable_window": true,
+          "soh": 25.266107506270274
+        },
+        {
+          "cycle": 3,
+          "capacity_ah": 0.16280793829202067,
+          "usable_window": true,
+          "soh": 34.55629179214459
+        }
+      ],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0039.mat",
+      "sha256": "0ea0a44622b61f13306cfc9c7080c7a6a8eb187da38607bfdc776974fcb5f000"
+    },
+    {
+      "battery_id": "B0040",
+      "discharges": 47,
+      "reference_ah": 0.7795871426061582,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 47,
+      "usable_soh_min": 54.62025063090302,
+      "usable_soh_max": 222.4420522685655,
+      "below_50_usable": [],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0040.mat",
+      "sha256": "1d7eb3dbf82bda46837831756999d911211b9ed0cc892c7e2e8d7f9059a5e013"
+    },
+    {
+      "battery_id": "B0041",
+      "discharges": 67,
+      "reference_ah": 0.05583901629185397,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 67,
+      "usable_soh_min": 78.96323174882698,
+      "usable_soh_max": 2177.0609322382243,
+      "below_50_usable": [],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0041.mat",
+      "sha256": "a5440bfb8a141a123ed255ddccaec736b7e04028bce266f04da44c99d53c1eaf"
+    },
+    {
+      "battery_id": "B0042",
+      "discharges": 112,
+      "reference_ah": 1.7282350363146088,
+      "excluded_missing_or_nonpositive_capacity": 1,
+      "usable_label_count": 111,
+      "usable_soh_min": 3.597267160379911,
+      "usable_soh_max": 100.18721943501421,
+      "below_50_usable": [
+        {
+          "cycle": 42,
+          "capacity_ah": 0.07070127737340176,
+          "usable_window": true,
+          "soh": 4.090952670660431
+        },
+        {
+          "cycle": 43,
+          "capacity_ah": 0.08416878530139071,
+          "usable_window": true,
+          "soh": 4.870216349789855
+        },
+        {
+          "cycle": 44,
+          "capacity_ah": 0.08443785621465827,
+          "usable_window": true,
+          "soh": 4.885785465541688
+        },
+        {
+          "cycle": 45,
+          "capacity_ah": 0.08478919060590338,
+          "usable_window": true,
+          "soh": 4.906114551798053
+        },
+        {
+          "cycle": 46,
+          "capacity_ah": 0.09334258183442584,
+          "usable_window": true,
+          "soh": 5.401035152803933
+        },
+        {
+          "cycle": 47,
+          "capacity_ah": 0.10603180131397782,
+          "usable_window": true,
+          "soh": 6.135265116490541
+        },
+        {
+          "cycle": 48,
+          "capacity_ah": 0.106505866207118,
+          "usable_window": true,
+          "soh": 6.16269569642781
+        },
+        {
+          "cycle": 49,
+          "capacity_ah": 0.09439111585512952,
+          "usable_window": true,
+          "soh": 5.461705952705064
+        },
+        {
+          "cycle": 50,
+          "capacity_ah": 0.09450595927387112,
+          "usable_window": true,
+          "soh": 5.468351080036038
+        },
+        {
+          "cycle": 51,
+          "capacity_ah": 0.08211456108215626,
+          "usable_window": true,
+          "soh": 4.751353800653309
+        },
+        {
+          "cycle": 52,
+          "capacity_ah": 0.09518470631946747,
+          "usable_window": true,
+          "soh": 5.5076250810448215
+        },
+        {
+          "cycle": 53,
+          "capacity_ah": 0.09539129998659052,
+          "usable_window": true,
+          "soh": 5.519579107133981
+        },
+        {
+          "cycle": 54,
+          "capacity_ah": 0.08289664565854568,
+          "usable_window": true,
+          "soh": 4.796607169550238
+        },
+        {
+          "cycle": 55,
+          "capacity_ah": 0.08343199036452603,
+          "usable_window": true,
+          "soh": 4.827583552665462
+        },
+        {
+          "cycle": 56,
+          "capacity_ah": 0.09624772156495698,
+          "usable_window": true,
+          "soh": 5.569133800816893
+        },
+        {
+          "cycle": 57,
+          "capacity_ah": 0.0871279249656989,
+          "usable_window": true,
+          "soh": 5.04143956897759
+        },
+        {
+          "cycle": 58,
+          "capacity_ah": 0.09681912182757578,
+          "usable_window": true,
+          "soh": 5.602196448582516
+        },
+        {
+          "cycle": 59,
+          "capacity_ah": 0.08440054891345107,
+          "usable_window": true,
+          "soh": 4.883626771821026
+        },
+        {
+          "cycle": 60,
+          "capacity_ah": 0.09770121716674529,
+          "usable_window": true,
+          "soh": 5.653236690253033
+        },
+        {
+          "cycle": 61,
+          "capacity_ah": 0.08517426476572666,
+          "usable_window": true,
+          "soh": 4.928395905417895
+        },
+        {
+          "cycle": 62,
+          "capacity_ah": 0.08471993544879124,
+          "usable_window": true,
+          "soh": 4.902107275261186
+        },
+        {
+          "cycle": 63,
+          "capacity_ah": 0.08548836969893649,
+          "usable_window": true,
+          "soh": 4.946570802154143
+        },
+        {
+          "cycle": 64,
+          "capacity_ah": 0.08577749933433501,
+          "usable_window": true,
+          "soh": 4.963300565717731
+        },
+        {
+          "cycle": 65,
+          "capacity_ah": 0.08595553255245832,
+          "usable_window": true,
+          "soh": 4.973602012823152
+        },
+        {
+          "cycle": 66,
+          "capacity_ah": 0.08614796979658328,
+          "usable_window": true,
+          "soh": 4.984736912884855
+        },
+        {
+          "cycle": 67,
+          "capacity_ah": 0.08652450808993331,
+          "usable_window": true,
+          "soh": 5.006524359929846
+        },
+        {
+          "cycle": 68,
+          "capacity_ah": 0.08676036428685732,
+          "usable_window": true,
+          "soh": 5.020171589153191
+        },
+        {
+          "cycle": 69,
+          "capacity_ah": 0.08662025389371077,
+          "usable_window": true,
+          "soh": 5.012064451512622
+        },
+        {
+          "cycle": 70,
+          "capacity_ah": 0.0869802394927499,
+          "usable_window": true,
+          "soh": 5.032894118281026
+        },
+        {
+          "cycle": 71,
+          "capacity_ah": 0.07387787113473963,
+          "usable_window": true,
+          "soh": 4.274758327564125
+        },
+        {
+          "cycle": 72,
+          "capacity_ah": 0.08775865702231889,
+          "usable_window": true,
+          "soh": 5.077935302680859
+        },
+        {
+          "cycle": 73,
+          "capacity_ah": 0.08790576300272998,
+          "usable_window": true,
+          "soh": 5.086447222490377
+        },
+        {
+          "cycle": 74,
+          "capacity_ah": 0.08808784882200178,
+          "usable_window": true,
+          "soh": 5.096983163230248
+        },
+        {
+          "cycle": 75,
+          "capacity_ah": 0.08834250268158712,
+          "usable_window": true,
+          "soh": 5.111718072211632
+        },
+        {
+          "cycle": 76,
+          "capacity_ah": 0.07463055332745072,
+          "usable_window": true,
+          "soh": 4.318310401031873
+        },
+        {
+          "cycle": 77,
+          "capacity_ah": 0.07485698665122698,
+          "usable_window": true,
+          "soh": 4.331412399256554
+        },
+        {
+          "cycle": 78,
+          "capacity_ah": 0.07527573643141765,
+          "usable_window": true,
+          "soh": 4.355642308464022
+        },
+        {
+          "cycle": 79,
+          "capacity_ah": 0.07532351860488727,
+          "usable_window": true,
+          "soh": 4.358407104482248
+        },
+        {
+          "cycle": 80,
+          "capacity_ah": 0.07553765302367196,
+          "usable_window": true,
+          "soh": 4.370797457315351
+        },
+        {
+          "cycle": 81,
+          "capacity_ah": 0.07584285606128259,
+          "usable_window": true,
+          "soh": 4.388457268116402
+        },
+        {
+          "cycle": 82,
+          "capacity_ah": 0.0759921803489148,
+          "usable_window": true,
+          "soh": 4.397097544727773
+        },
+        {
+          "cycle": 83,
+          "capacity_ah": 0.07621652609591999,
+          "usable_window": true,
+          "soh": 4.410078750541283
+        },
+        {
+          "cycle": 84,
+          "capacity_ah": 0.06216923141552526,
+          "usable_window": true,
+          "soh": 3.597267160379911
+        },
+        {
+          "cycle": 85,
+          "capacity_ah": 0.0759822277461493,
+          "usable_window": true,
+          "soh": 4.396521662249038
+        },
+        {
+          "cycle": 86,
+          "capacity_ah": 0.06227013548943564,
+          "usable_window": true,
+          "soh": 3.6031057223688845
+        },
+        {
+          "cycle": 87,
+          "capacity_ah": 0.06259446608798445,
+          "usable_window": true,
+          "soh": 3.621872301667059
+        }
+      ],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0042.mat",
+      "sha256": "4c39701508278c7a4f14e8af299f2510403dca30f2627fcf30c0ad7dc9f33675"
+    },
+    {
+      "battery_id": "B0043",
+      "discharges": 112,
+      "reference_ah": 1.6814906372051954,
+      "excluded_missing_or_nonpositive_capacity": 1,
+      "usable_label_count": 111,
+      "usable_soh_min": 3.36275374186312,
+      "usable_soh_max": 101.92043917505018,
+      "below_50_usable": [
+        {
+          "cycle": 42,
+          "capacity_ah": 0.057034391042653794,
+          "usable_window": true,
+          "soh": 3.391894654700583
+        },
+        {
+          "cycle": 43,
+          "capacity_ah": 0.0571536334895882,
+          "usable_window": true,
+          "soh": 3.398986127248572
+        },
+        {
+          "cycle": 44,
+          "capacity_ah": 0.05729366005937665,
+          "usable_window": true,
+          "soh": 3.407313653235941
+        },
+        {
+          "cycle": 45,
+          "capacity_ah": 0.05744203185278054,
+          "usable_window": true,
+          "soh": 3.4161374783659157
+        },
+        {
+          "cycle": 46,
+          "capacity_ah": 0.06713062107721124,
+          "usable_window": true,
+          "soh": 3.992327973279054
+        },
+        {
+          "cycle": 47,
+          "capacity_ah": 0.06714781920234739,
+          "usable_window": true,
+          "soh": 3.993350763698199
+        },
+        {
+          "cycle": 48,
+          "capacity_ah": 0.06732001211690299,
+          "usable_window": true,
+          "soh": 4.0035912557203135
+        },
+        {
+          "cycle": 49,
+          "capacity_ah": 0.06784038051613318,
+          "usable_window": true,
+          "soh": 4.03453810655114
+        },
+        {
+          "cycle": 50,
+          "capacity_ah": 0.06799604927210635,
+          "usable_window": true,
+          "soh": 4.043795889647209
+        },
+        {
+          "cycle": 51,
+          "capacity_ah": 0.06828011147886554,
+          "usable_window": true,
+          "soh": 4.060689365023992
+        },
+        {
+          "cycle": 52,
+          "capacity_ah": 0.06844632943125976,
+          "usable_window": true,
+          "soh": 4.0705745198215535
+        },
+        {
+          "cycle": 53,
+          "capacity_ah": 0.06851361914788083,
+          "usable_window": true,
+          "soh": 4.074576309372574
+        },
+        {
+          "cycle": 54,
+          "capacity_ah": 0.06887402435616684,
+          "usable_window": true,
+          "soh": 4.096009982585589
+        },
+        {
+          "cycle": 55,
+          "capacity_ah": 0.056544389321695726,
+          "usable_window": true,
+          "soh": 3.36275374186312
+        },
+        {
+          "cycle": 56,
+          "capacity_ah": 0.06918353164189846,
+          "usable_window": true,
+          "soh": 4.1144167033179775
+        },
+        {
+          "cycle": 57,
+          "capacity_ah": 0.059122086455436665,
+          "usable_window": true,
+          "soh": 3.516052075895198
+        },
+        {
+          "cycle": 58,
+          "capacity_ah": 0.06956120084140223,
+          "usable_window": true,
+          "soh": 4.136877084074631
+        },
+        {
+          "cycle": 59,
+          "capacity_ah": 0.07017897804376615,
+          "usable_window": true,
+          "soh": 4.1736169379099595
+        },
+        {
+          "cycle": 60,
+          "capacity_ah": 0.07028148183862523,
+          "usable_window": true,
+          "soh": 4.179712945380418
+        },
+        {
+          "cycle": 61,
+          "capacity_ah": 0.05787364202878375,
+          "usable_window": true,
+          "soh": 3.4418057851916135
+        },
+        {
+          "cycle": 62,
+          "capacity_ah": 0.07056618554293374,
+          "usable_window": true,
+          "soh": 4.196644571284783
+        },
+        {
+          "cycle": 63,
+          "capacity_ah": 0.057989410208958,
+          "usable_window": true,
+          "soh": 3.4486906394758265
+        },
+        {
+          "cycle": 64,
+          "capacity_ah": 0.07129266446800787,
+          "usable_window": true,
+          "soh": 4.239849029816982
+        },
+        {
+          "cycle": 65,
+          "capacity_ah": 0.07146546557664281,
+          "usable_window": true,
+          "soh": 4.250125691774622
+        },
+        {
+          "cycle": 66,
+          "capacity_ah": 0.0716254973792324,
+          "usable_window": true,
+          "soh": 4.259642949798466
+        },
+        {
+          "cycle": 67,
+          "capacity_ah": 0.07192596356272017,
+          "usable_window": true,
+          "soh": 4.2775119867612394
+        },
+        {
+          "cycle": 68,
+          "capacity_ah": 0.058840095111364746,
+          "usable_window": true,
+          "soh": 3.4992817568798857
+        },
+        {
+          "cycle": 69,
+          "capacity_ah": 0.07213853480103966,
+          "usable_window": true,
+          "soh": 4.290153819764413
+        },
+        {
+          "cycle": 70,
+          "capacity_ah": 0.07231835711877917,
+          "usable_window": true,
+          "soh": 4.3008480403423155
+        },
+        {
+          "cycle": 71,
+          "capacity_ah": 0.05938170626668099,
+          "usable_window": true,
+          "soh": 3.531491936546212
+        },
+        {
+          "cycle": 72,
+          "capacity_ah": 0.07294488485625279,
+          "usable_window": true,
+          "soh": 4.338108297617074
+        },
+        {
+          "cycle": 73,
+          "capacity_ah": 0.07306917734079586,
+          "usable_window": true,
+          "soh": 4.345500101162864
+        },
+        {
+          "cycle": 74,
+          "capacity_ah": 0.07317054128128272,
+          "usable_window": true,
+          "soh": 4.351528320306287
+        },
+        {
+          "cycle": 75,
+          "capacity_ah": 0.07347430293304898,
+          "usable_window": true,
+          "soh": 4.369593342200857
+        },
+        {
+          "cycle": 76,
+          "capacity_ah": 0.06010697591831878,
+          "usable_window": true,
+          "soh": 3.5746244783273102
+        },
+        {
+          "cycle": 77,
+          "capacity_ah": 0.07383162509955737,
+          "usable_window": true,
+          "soh": 4.390843663707392
+        },
+        {
+          "cycle": 78,
+          "capacity_ah": 0.060495215307428206,
+          "usable_window": true,
+          "soh": 3.5977134792720147
+        },
+        {
+          "cycle": 79,
+          "capacity_ah": 0.060604010237618126,
+          "usable_window": true,
+          "soh": 3.604183627114809
+        },
+        {
+          "cycle": 80,
+          "capacity_ah": 0.06073438432235217,
+          "usable_window": true,
+          "soh": 3.6119371097598703
+        },
+        {
+          "cycle": 81,
+          "capacity_ah": 0.06099653048237791,
+          "usable_window": true,
+          "soh": 3.6275272150049083
+        },
+        {
+          "cycle": 82,
+          "capacity_ah": 0.061130459259873135,
+          "usable_window": true,
+          "soh": 3.6354920989318167
+        },
+        {
+          "cycle": 83,
+          "capacity_ah": 0.06129124410987595,
+          "usable_window": true,
+          "soh": 3.645054141469862
+        },
+        {
+          "cycle": 84,
+          "capacity_ah": 0.06130329065804092,
+          "usable_window": true,
+          "soh": 3.64577056223953
+        },
+        {
+          "cycle": 85,
+          "capacity_ah": 0.061151661574090986,
+          "usable_window": true,
+          "soh": 3.636753022647282
+        },
+        {
+          "cycle": 86,
+          "capacity_ah": 0.061405387192057306,
+          "usable_window": true,
+          "soh": 3.651842349483382
+        },
+        {
+          "cycle": 87,
+          "capacity_ah": 0.06175780765942851,
+          "usable_window": true,
+          "soh": 3.672801161835556
+        }
+      ],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0043.mat",
+      "sha256": "3e937018342628667a0b1cf30ce804aebed9a1d79577de372d5232ad4bf96034"
+    },
+    {
+      "battery_id": "B0044",
+      "discharges": 112,
+      "reference_ah": 1.6534010755700512,
+      "excluded_missing_or_nonpositive_capacity": 1,
+      "usable_label_count": 111,
+      "usable_soh_min": 3.3335476887109348,
+      "usable_soh_max": 102.00341466274917,
+      "below_50_usable": [
+        {
+          "cycle": 42,
+          "capacity_ah": 0.0572172710622218,
+          "usable_window": true,
+          "soh": 3.4605802492595283
+        },
+        {
+          "cycle": 43,
+          "capacity_ah": 0.0573587470253984,
+          "usable_window": true,
+          "soh": 3.469136912568086
+        },
+        {
+          "cycle": 44,
+          "capacity_ah": 0.05749687545445231,
+          "usable_window": true,
+          "soh": 3.4774911123502705
+        },
+        {
+          "cycle": 45,
+          "capacity_ah": 0.05763088809888528,
+          "usable_window": true,
+          "soh": 3.4855963837458854
+        },
+        {
+          "cycle": 46,
+          "capacity_ah": 0.055116913339787174,
+          "usable_window": true,
+          "soh": 3.3335476887109348
+        },
+        {
+          "cycle": 47,
+          "capacity_ah": 0.06740755265748018,
+          "usable_window": true,
+          "soh": 4.076902673735091
+        },
+        {
+          "cycle": 48,
+          "capacity_ah": 0.0675676530317139,
+          "usable_window": true,
+          "soh": 4.086585767365506
+        },
+        {
+          "cycle": 49,
+          "capacity_ah": 0.055637310449156464,
+          "usable_window": true,
+          "soh": 3.365022030723799
+        },
+        {
+          "cycle": 50,
+          "capacity_ah": 0.06822433276106823,
+          "usable_window": true,
+          "soh": 4.126302672057123
+        },
+        {
+          "cycle": 51,
+          "capacity_ah": 0.056052453431514465,
+          "usable_window": true,
+          "soh": 3.3901304565311827
+        },
+        {
+          "cycle": 52,
+          "capacity_ah": 0.06868220130105056,
+          "usable_window": true,
+          "soh": 4.153995199100173
+        },
+        {
+          "cycle": 53,
+          "capacity_ah": 0.06874755353346529,
+          "usable_window": true,
+          "soh": 4.157947793142862
+        },
+        {
+          "cycle": 54,
+          "capacity_ah": 0.05651439891347486,
+          "usable_window": true,
+          "soh": 3.41806956270366
+        },
+        {
+          "cycle": 55,
+          "capacity_ah": 0.05673307185387369,
+          "usable_window": true,
+          "soh": 3.4312952067188873
+        },
+        {
+          "cycle": 56,
+          "capacity_ah": 0.0694133756360175,
+          "usable_window": true,
+          "soh": 4.198217641299496
+        },
+        {
+          "cycle": 57,
+          "capacity_ah": 0.05931766444664955,
+          "usable_window": true,
+          "soh": 3.587614966695138
+        },
+        {
+          "cycle": 58,
+          "capacity_ah": 0.06981707253622738,
+          "usable_window": true,
+          "soh": 4.222633792115818
+        },
+        {
+          "cycle": 59,
+          "capacity_ah": 0.05746435089694075,
+          "usable_window": true,
+          "soh": 3.475523981809948
+        },
+        {
+          "cycle": 60,
+          "capacity_ah": 0.07053774383993697,
+          "usable_window": true,
+          "soh": 4.266220996355486
+        },
+        {
+          "cycle": 61,
+          "capacity_ah": 0.05805466052344494,
+          "usable_window": true,
+          "soh": 3.5112267302371962
+        },
+        {
+          "cycle": 62,
+          "capacity_ah": 0.07083992015291063,
+          "usable_window": true,
+          "soh": 4.284497040652209
+        },
+        {
+          "cycle": 63,
+          "capacity_ah": 0.058171836130525824,
+          "usable_window": true,
+          "soh": 3.518313674162189
+        },
+        {
+          "cycle": 64,
+          "capacity_ah": 0.05830515712798288,
+          "usable_window": true,
+          "soh": 3.526377113785336
+        },
+        {
+          "cycle": 65,
+          "capacity_ah": 0.05845592669367763,
+          "usable_window": true,
+          "soh": 3.535495867118841
+        },
+        {
+          "cycle": 66,
+          "capacity_ah": 0.05862986110638707,
+          "usable_window": true,
+          "soh": 3.5460156626650896
+        },
+        {
+          "cycle": 67,
+          "capacity_ah": 0.05890033218383382,
+          "usable_window": true,
+          "soh": 3.5623741301563183
+        },
+        {
+          "cycle": 68,
+          "capacity_ah": 0.05906467702011044,
+          "usable_window": true,
+          "soh": 3.5723139347630104
+        },
+        {
+          "cycle": 69,
+          "capacity_ah": 0.07240579982844073,
+          "usable_window": true,
+          "soh": 4.37920362447309
+        },
+        {
+          "cycle": 70,
+          "capacity_ah": 0.07255632846891659,
+          "usable_window": true,
+          "soh": 4.388307806313782
+        },
+        {
+          "cycle": 71,
+          "capacity_ah": 0.05959222988909599,
+          "usable_window": true,
+          "soh": 3.6042210670844086
+        },
+        {
+          "cycle": 72,
+          "capacity_ah": 0.07321709022768585,
+          "usable_window": true,
+          "soh": 4.4282715978300935
+        },
+        {
+          "cycle": 73,
+          "capacity_ah": 0.05984100849986973,
+          "usable_window": true,
+          "soh": 3.6192675439767723
+        },
+        {
+          "cycle": 74,
+          "capacity_ah": 0.07344347056971572,
+          "usable_window": true,
+          "soh": 4.441963396231265
+        },
+        {
+          "cycle": 75,
+          "capacity_ah": 0.07373739605923264,
+          "usable_window": true,
+          "soh": 4.459740419233116
+        },
+        {
+          "cycle": 76,
+          "capacity_ah": 0.06032312489727431,
+          "usable_window": true,
+          "soh": 3.6484266152104934
+        },
+        {
+          "cycle": 77,
+          "capacity_ah": 0.07409611978234346,
+          "usable_window": true,
+          "soh": 4.481436529657329
+        },
+        {
+          "cycle": 78,
+          "capacity_ah": 0.060717150532954955,
+          "usable_window": true,
+          "soh": 3.672257834477409
+        },
+        {
+          "cycle": 79,
+          "capacity_ah": 0.06082844229397962,
+          "usable_window": true,
+          "soh": 3.6789889151975723
+        },
+        {
+          "cycle": 80,
+          "capacity_ah": 0.060928844447982224,
+          "usable_window": true,
+          "soh": 3.685061377317387
+        },
+        {
+          "cycle": 81,
+          "capacity_ah": 0.061220387365620216,
+          "usable_window": true,
+          "soh": 3.7026942990534204
+        },
+        {
+          "cycle": 82,
+          "capacity_ah": 0.06133677582691605,
+          "usable_window": true,
+          "soh": 3.709733635304953
+        },
+        {
+          "cycle": 83,
+          "capacity_ah": 0.0615021959933087,
+          "usable_window": true,
+          "soh": 3.719738477374843
+        },
+        {
+          "cycle": 84,
+          "capacity_ah": 0.0615436456229027,
+          "usable_window": true,
+          "soh": 3.7222454087060513
+        },
+        {
+          "cycle": 85,
+          "capacity_ah": 0.061368282981907545,
+          "usable_window": true,
+          "soh": 3.7116392319237668
+        },
+        {
+          "cycle": 86,
+          "capacity_ah": 0.061633508888739995,
+          "usable_window": true,
+          "soh": 3.7276804641904757
+        },
+        {
+          "cycle": 87,
+          "capacity_ah": 0.061981030875948785,
+          "usable_window": true,
+          "soh": 3.74869907802493
+        }
+      ],
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0044.mat",
+      "sha256": "e66d3620de32f134619eaf9692a41d2ab70fa3f8c49211c2b303261504974f30"
+    },
+    {
+      "battery_id": "B0045",
+      "discharges": 72,
+      "reference_ah": 0.885193608411576,
+      "excluded_missing_or_nonpositive_capacity": 2,
+      "usable_label_count": 70,
+      "usable_soh_min": 68.56665153060774,
+      "usable_soh_max": 122.23081795851367,
+      "below_50_usable": [],
+      "archive": "4. BatteryAgingARC_45_46_47_48.zip",
+      "file": "B0045.mat",
+      "sha256": "dc8e4cc149fe87f4ff855f30f0d31155ada6f467d06f5365550bab9370670fe3"
+    },
+    {
+      "battery_id": "B0046",
+      "discharges": 72,
+      "reference_ah": 1.503121190703977,
+      "excluded_missing_or_nonpositive_capacity": 3,
+      "usable_label_count": 69,
+      "usable_soh_min": 74.75852107601945,
+      "usable_soh_max": 114.97670600668035,
+      "below_50_usable": [],
+      "archive": "4. BatteryAgingARC_45_46_47_48.zip",
+      "file": "B0046.mat",
+      "sha256": "fe62dffc7079f6131e591415c740f6863364b23e728fe2aa7286a9c749dcdebc"
+    },
+    {
+      "battery_id": "B0047",
+      "discharges": 72,
+      "reference_ah": 1.5080762969973425,
+      "excluded_missing_or_nonpositive_capacity": 3,
+      "usable_label_count": 69,
+      "usable_soh_min": 73.33696224745154,
+      "usable_soh_max": 111.02254892747455,
+      "below_50_usable": [],
+      "archive": "4. BatteryAgingARC_45_46_47_48.zip",
+      "file": "B0047.mat",
+      "sha256": "8089a9180cf353704642c457c844d83dd2e83aa2fc43fe4f7c05322f86fd0648"
+    },
+    {
+      "battery_id": "B0048",
+      "discharges": 72,
+      "reference_ah": 1.4989223343608031,
+      "excluded_missing_or_nonpositive_capacity": 3,
+      "usable_label_count": 69,
+      "usable_soh_min": 77.23432266592093,
+      "usable_soh_max": 110.61250749024248,
+      "below_50_usable": [],
+      "archive": "4. BatteryAgingARC_45_46_47_48.zip",
+      "file": "B0048.mat",
+      "sha256": "341219d38d8531e0a89ecaa18736b79e1547d22edea4a1d45357bb5bfeb7757d"
+    },
+    {
+      "battery_id": "B0049",
+      "discharges": 25,
+      "reference_ah": 1.372852133389263,
+      "excluded_missing_or_nonpositive_capacity": 1,
+      "usable_label_count": 24,
+      "usable_soh_min": 50.361470568413026,
+      "usable_soh_max": 173.26292269338722,
+      "below_50_usable": [],
+      "archive": "5. BatteryAgingARC_49_50_51_52.zip",
+      "file": "B0049.mat",
+      "sha256": "bf56a4362287c8489dbeda27b823432f1e587473a7bf7096deec057c5a44d895"
+    },
+    {
+      "battery_id": "B0050",
+      "discharges": 25,
+      "reference_ah": 1.5517564797427017,
+      "excluded_missing_or_nonpositive_capacity": 5,
+      "usable_label_count": 20,
+      "usable_soh_min": 2.0981653715240474,
+      "usable_soh_max": 170.13939688374734,
+      "below_50_usable": [
+        {
+          "cycle": 5,
+          "capacity_ah": 0.03255841710834194,
+          "usable_window": true,
+          "soh": 2.0981653715240474
+        },
+        {
+          "cycle": 11,
+          "capacity_ah": 0.5268786924650971,
+          "usable_window": true,
+          "soh": 33.953696945570954
+        },
+        {
+          "cycle": 14,
+          "capacity_ah": 0.07658354174014805,
+          "usable_window": true,
+          "soh": 4.9352809374346185
+        },
+        {
+          "cycle": 15,
+          "capacity_ah": 0.5736933387569048,
+          "usable_window": true,
+          "soh": 36.970577938365004
+        },
+        {
+          "cycle": 16,
+          "capacity_ah": 0.3014742035427856,
+          "usable_window": true,
+          "soh": 19.42793263494368
+        },
+        {
+          "cycle": 18,
+          "capacity_ah": 0.17956542632321462,
+          "usable_window": true,
+          "soh": 11.571752956558528
+        },
+        {
+          "cycle": 20,
+          "capacity_ah": 0.0961913170505672,
+          "usable_window": true,
+          "soh": 6.198866787816912
+        },
+        {
+          "cycle": 21,
+          "capacity_ah": 0.27808517709104497,
+          "usable_window": true,
+          "soh": 17.92067123426187
+        }
+      ],
+      "archive": "5. BatteryAgingARC_49_50_51_52.zip",
+      "file": "B0050.mat",
+      "sha256": "4dcb2475a8e689d54ac231832b40be0bf081805f28f69524e1c46f4c1d153d4e"
+    },
+    {
+      "battery_id": "B0051",
+      "discharges": 25,
+      "reference_ah": 1.2288940261191657,
+      "excluded_missing_or_nonpositive_capacity": 1,
+      "usable_label_count": 24,
+      "usable_soh_min": 52.36200568473035,
+      "usable_soh_max": 189.67245582135382,
+      "below_50_usable": [],
+      "archive": "5. BatteryAgingARC_49_50_51_52.zip",
+      "file": "B0051.mat",
+      "sha256": "37c247607dc7e5384fae4ef595d8b2f9072a2107ce1112fe0a460b4f48c8894b"
+    },
+    {
+      "battery_id": "B0052",
+      "error": "Fewer than 5 valid reference capacities",
+      "archive": "5. BatteryAgingARC_49_50_51_52.zip",
+      "file": "B0052.mat",
+      "sha256": "640d86ac187b223c2edf83715b0f95ba5faeaaf5402a51dc81fc5f6275d4edd8"
+    },
+    {
+      "battery_id": "B0053",
+      "discharges": 56,
+      "reference_ah": 1.1305863853936766,
+      "excluded_missing_or_nonpositive_capacity": 1,
+      "usable_label_count": 55,
+      "usable_soh_min": 86.69246111768835,
+      "usable_soh_max": 102.0773651932283,
+      "below_50_usable": [],
+      "archive": "6. BatteryAgingARC_53_54_55_56.zip",
+      "file": "B0053.mat",
+      "sha256": "5ae945704d75f9865608c1bf585c80b62ba8e6a98c555840735c1f64fa5513f9"
+    },
+    {
+      "battery_id": "B0054",
+      "discharges": 103,
+      "reference_ah": 1.0960302257185877,
+      "excluded_missing_or_nonpositive_capacity": 1,
+      "usable_label_count": 102,
+      "usable_soh_min": 67.5104651882024,
+      "usable_soh_max": 106.43356327575648,
+      "below_50_usable": [],
+      "archive": "6. BatteryAgingARC_53_54_55_56.zip",
+      "file": "B0054.mat",
+      "sha256": "02ececa6edf2ab1febdfa31daccaaff59b090e627b9403a59060157c9488712a"
+    },
+    {
+      "battery_id": "B0055",
+      "discharges": 102,
+      "reference_ah": 1.2572591312230865,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 102,
+      "usable_soh_min": 63.55092382000983,
+      "usable_soh_max": 104.98171170002647,
+      "below_50_usable": [],
+      "archive": "6. BatteryAgingARC_53_54_55_56.zip",
+      "file": "B0055.mat",
+      "sha256": "8405c13378ced0894019a74f343057b0151f58c417fed45a5e068c4e372ea039"
+    },
+    {
+      "battery_id": "B0056",
+      "discharges": 102,
+      "reference_ah": 1.2973654679476911,
+      "excluded_missing_or_nonpositive_capacity": 0,
+      "usable_label_count": 102,
+      "usable_soh_min": 60.528674477574505,
+      "usable_soh_max": 103.62196223924316,
+      "below_50_usable": [],
+      "archive": "6. BatteryAgingARC_53_54_55_56.zip",
+      "file": "B0056.mat",
+      "sha256": "e894d92938c6fb09b6455bcc49330902c0e3ea8ee65129f664f1718a4843e709"
+    }
+  ],
+  "duplicate_files_not_counted": [
+    {
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0025.mat",
+      "same_as": "2. BatteryAgingARC_25_26_27_28_P1.zip/B0025.mat"
+    },
+    {
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0026.mat",
+      "same_as": "2. BatteryAgingARC_25_26_27_28_P1.zip/B0026.mat"
+    },
+    {
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0027.mat",
+      "same_as": "2. BatteryAgingARC_25_26_27_28_P1.zip/B0027.mat"
+    },
+    {
+      "archive": "3. BatteryAgingARC_25-44.zip",
+      "file": "B0028.mat",
+      "same_as": "2. BatteryAgingARC_25_26_27_28_P1.zip/B0028.mat"
+    }
+  ],
+  "bins": [
+    {
+      "from_inclusive": 0,
+      "to": 10,
+      "upper_inclusive": false,
+      "count": 142
+    },
+    {
+      "from_inclusive": 10,
+      "to": 20,
+      "upper_inclusive": false,
+      "count": 4
+    },
+    {
+      "from_inclusive": 20,
+      "to": 30,
+      "upper_inclusive": false,
+      "count": 5
+    },
+    {
+      "from_inclusive": 30,
+      "to": 40,
+      "upper_inclusive": false,
+      "count": 6
+    },
+    {
+      "from_inclusive": 40,
+      "to": 50,
+      "upper_inclusive": false,
+      "count": 1
+    },
+    {
+      "from_inclusive": 50,
+      "to": 60,
+      "upper_inclusive": false,
+      "count": 30
+    },
+    {
+      "from_inclusive": 60,
+      "to": 70,
+      "upper_inclusive": false,
+      "count": 75
+    },
+    {
+      "from_inclusive": 70,
+      "to": 80,
+      "upper_inclusive": false,
+      "count": 385
+    },
+    {
+      "from_inclusive": 80,
+      "to": 90,
+      "upper_inclusive": false,
+      "count": 734
+    },
+    {
+      "from_inclusive": 90,
+      "to": 100,
+      "upper_inclusive": true,
+      "count": 957
+    }
+  ],
+  "above_100_count": 407,
+  "minimum_usable_soh": 2.0981653715240474,
+  "dataset_notes": {
+    "1. BatteryAgingARC-FY08Q4.zip": {
+      "README.txt": "Data Description:\r\nA set of four Li-ion batteries (# 5, 6, 7 and 18) were run through 3 different operational profiles (charge, discharge and impedance) at room temperature. Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Discharge was carried out at a constant current (CC) level of 2A until the battery voltage fell to 2.7V, 2.5V, 2.2V and 2.5V for batteries 5 6 7 and 18 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz. Repeated charge and discharge cycles result in accelerated aging of the batteries while impedance measurements provide insight into the internal battery parameters that change as aging progresses. The experiments were stopped when the batteries reached end-of-life (EOL) criteria, which was a 30% fade in rated capacity (from 2Ahr to 1.4Ahr). This dataset can be used for the prediction of both remaining charge (for a given discharge cycle) and remaining useful life (RUL)."
+    },
+    "2. BatteryAgingARC_25_26_27_28_P1.zip": {
+      "README.txt": "Data Description:\r\nA set of four Li-ion batteries (# 25, 26, 27 and 28) were run through 3 different operational profiles (charge, discharge and impedance) at room temperature (24 deg C). Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Discharge was carried out using a 0.05Hz square wave loading profile of 4A amplitude and 50% duty cycle until the battery voltage fell to 2.0V, 2.2V, 2.5V and 2.7V for batteries 25, 26, 27 and 28 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz."
+    },
+    "3. BatteryAgingARC_25-44.zip": {
+      "README_33_34_36.txt": "Data Description:\r\nA set of three Li-ion batteries (# 33, 34 and 36) were run through 3 different operational profiles (charge, discharge and impedance) at room temperature (24 deg C). Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Discharge was carried out at 4A until the battery voltage fell to 2.0V and 2.2V for batteries 33 and 34 respectively. For battery 36 discharge was done at 2A until voltage fell to 2.7V. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz. The experiments were carried out until the capacity had reduced to 1.6Ahr (20% fade).",
+      "README_38_39_40.txt": "Data Description:\r\nA set of three Li-ion batteries (# 38, 39 and 40) were run through 3 different operational profiles (charge, discharge and impedance) at multiple ambient temperatures (24 & 44 deg C). Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Multiple load current levels (1, 2, and 4 A) were used and the discharge runs were stopped at 2.2V, 2.5V and 2.7V for batteries 38, 39 and 40 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz. The experiments were carried out until the capacity had reduced to 1.6Ahr (20% fade).",
+      "README_41_42_43_44.txt": "Data Description:\r\nA set of four Li-ion batteries (# 41 - 44) were run through 3 different operational profiles (charge, discharge and impedance) at an ambient temperature of 4 deg C. Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Multiple fixed load current levels (4A and 1A) were used and the discharge runs were stopped at 2V, 2.2V, 2.5V and 2.7V for batteries 41, 42, 43 and 44 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz. The experiments were carried out until the capacity had reduced to 1.4Ahr (30% fade). Note that there are several discharge runs where the capacity was very low. Reasons for this have not been fully analyzed.",
+      "README_25_26_27_28.txt": "Data Description:\r\nA set of four Li-ion batteries (# 25, 26, 27 and 28) were run through 3 different operational profiles (charge, discharge and impedance) at room temperature (24 deg C). Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Discharge was carried out using a 0.05Hz square wave loading profile of 4A amplitude and 50% duty cycle until the battery voltage fell to 2.0V, 2.2V, 2.5V and 2.7V for batteries 25, 26, 27 and 28 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz.",
+      "README_29_30_31_32.txt": "Data Description:\r\nA set of four Li-ion batteries (# 29, 30, 31 and 32) were run through 3 different operational profiles (charge, discharge and impedance) at elevated ambient temperature (43 deg C). Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Discharge was carried out at 4A until the battery voltage fell to 2.0V, 2.2V, 2.5V and 2.7V for batteries 29, 30, 31 and 32 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz."
+    },
+    "4. BatteryAgingARC_45_46_47_48.zip": {
+      "README_45_46_47_48.txt": "Data Description:\r\nA set of four Li-ion batteries (# 45 - 48) were run through 3 different operational profiles (charge, discharge and impedance) at an ambient temperature of 4 deg C. Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Fixed load current level of 1A was used and the discharge runs were stopped at 2V, 2.2V, 2.5V and 2.7V for batteries 45, 46, 47 and 48 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz. The experiments were carried out until the capacity had reduced to 1.4Ahr (30% fade). Note that there are several discharge runs where the capacity was very low. Reasons for this have not been fully analyzed."
+    },
+    "5. BatteryAgingARC_49_50_51_52.zip": {
+      "README_49_50_51_52.txt": "Data Description:\r\nA set of four Li-ion batteries (# 49 - 52) were run through 3 different operational profiles (charge, discharge and impedance) at an ambient temperature of 4 deg C. Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Fixed load current level of 2A was used and the discharge runs were stopped at 2V, 2.2V, 2.5V and 2.7V for batteries 49, 50, 51 and 52 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz. The experiments were carried out until the experiment control software crashed.  Note that there are several discharge runs where the capacity as well as voltage levels were very low. Reasons for this have not been fully analyzed."
+    },
+    "6. BatteryAgingARC_53_54_55_56.zip": {
+      "README_53_54_55_56.txt": "Data Description:\r\nA set of four Li-ion batteries (# 53 - 56) were run through 3 different operational profiles (charge, discharge and impedance) at an ambient temperature of 4 deg C. Charging was carried out in a constant current (CC) mode at 1.5A until the battery voltage reached 4.2V and then continued in a constant voltage (CV) mode until the charge current dropped to 20mA. Fixed load current level of 2A was used and the discharge runs were stopped at 2V, 2.2V, 2.5V and 2.7V for batteries 53, 54, 55 and 56 respectively. Impedance measurement was carried out through an electrochemical impedance spectroscopy (EIS) frequency sweep from 0.1Hz to 5kHz. The experiments were carried out until the capacity had reduced to 1.4Ahr (30% fade). Note that there are several discharge runs where the capacity was very low. Reasons for this have not been fully analyzed."
+    }
+  },
+  "deployment_decision": "Do not claim validated 0-100% physical health or replace production models from this coverage audit. Low-capacity records require protocol/measurement-quality review.",
+  "total_usable_windows": 2746
+}

@@ -1,0 +1,388 @@
+{
+  "scope": "Pilot out-of-battery estimates for the nested-selected package, including current isotonic correction. Not external/temporal validation.",
+  "dataset_sha256": "c4832ce550c68e2a61e997f0f356253f901313b36be618f2077902c63543a4fb",
+  "folds": [
+    {
+      "procedure": "baseline",
+      "battery": "B0045",
+      "horizon": 0,
+      "n": 70,
+      "mae": 2.91365987095919,
+      "rmse": 4.15198203339412
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0045",
+      "horizon": 5,
+      "n": 63,
+      "mae": 2.401636067840803,
+      "rmse": 2.9362131297212546
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0045",
+      "horizon": 10,
+      "n": 59,
+      "mae": 2.6693862395784502,
+      "rmse": 3.076252535657902
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0045",
+      "horizon": 20,
+      "n": 50,
+      "mae": 3.5582542084789206,
+      "rmse": 3.8597764532938768
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0045",
+      "horizon": 30,
+      "n": 40,
+      "mae": 4.063565899400759,
+      "rmse": 4.380370981067927
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0046",
+      "horizon": 0,
+      "n": 69,
+      "mae": 1.5508574554928407,
+      "rmse": 2.573953199935422
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0046",
+      "horizon": 5,
+      "n": 61,
+      "mae": 2.5149582215094384,
+      "rmse": 2.828277448936963
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0046",
+      "horizon": 10,
+      "n": 57,
+      "mae": 2.2380115924633595,
+      "rmse": 2.670555847236183
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0046",
+      "horizon": 20,
+      "n": 49,
+      "mae": 2.4393479189175267,
+      "rmse": 2.952202674414311
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0046",
+      "horizon": 30,
+      "n": 39,
+      "mae": 1.8626772500500743,
+      "rmse": 2.1812644413398
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0047",
+      "horizon": 0,
+      "n": 69,
+      "mae": 4.0987300143421805,
+      "rmse": 4.5825766232881495
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0047",
+      "horizon": 5,
+      "n": 61,
+      "mae": 3.6634084988927067,
+      "rmse": 4.275671921845206
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0047",
+      "horizon": 10,
+      "n": 57,
+      "mae": 3.6860398510282635,
+      "rmse": 4.216305889906592
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0047",
+      "horizon": 20,
+      "n": 49,
+      "mae": 4.932703205674825,
+      "rmse": 5.284279818514112
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0047",
+      "horizon": 30,
+      "n": 39,
+      "mae": 4.315839007461159,
+      "rmse": 4.574360733350176
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0048",
+      "horizon": 0,
+      "n": 69,
+      "mae": 3.320003479369724,
+      "rmse": 3.6496863516224334
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0048",
+      "horizon": 5,
+      "n": 61,
+      "mae": 4.093751735781082,
+      "rmse": 4.540240415339205
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0048",
+      "horizon": 10,
+      "n": 57,
+      "mae": 4.257448390742008,
+      "rmse": 4.873420814845516
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0048",
+      "horizon": 20,
+      "n": 49,
+      "mae": 4.583531136070266,
+      "rmse": 5.02708294180046
+    },
+    {
+      "procedure": "baseline",
+      "battery": "B0048",
+      "horizon": 30,
+      "n": 39,
+      "mae": 5.036234248751585,
+      "rmse": 5.364765812604134
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0045",
+      "horizon": 0,
+      "n": 70,
+      "mae": 2.91365987095919,
+      "rmse": 4.15198203339412
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0045",
+      "horizon": 5,
+      "n": 63,
+      "mae": 2.2087085145302483,
+      "rmse": 2.7817874377115595
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0045",
+      "horizon": 10,
+      "n": 59,
+      "mae": 2.3153622645257976,
+      "rmse": 2.8309600043713927
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0045",
+      "horizon": 20,
+      "n": 50,
+      "mae": 2.981375208798714,
+      "rmse": 3.3743874107445326
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0045",
+      "horizon": 30,
+      "n": 40,
+      "mae": 3.980588922370322,
+      "rmse": 4.310148979367614
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0046",
+      "horizon": 0,
+      "n": 69,
+      "mae": 1.5508574554928407,
+      "rmse": 2.573953199935422
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0046",
+      "horizon": 5,
+      "n": 61,
+      "mae": 2.3762263523038585,
+      "rmse": 2.698363992431681
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0046",
+      "horizon": 10,
+      "n": 57,
+      "mae": 1.9595002078838781,
+      "rmse": 2.2913487076943873
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0046",
+      "horizon": 20,
+      "n": 49,
+      "mae": 2.4116355083391294,
+      "rmse": 2.9603049385288496
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0046",
+      "horizon": 30,
+      "n": 39,
+      "mae": 1.8626772500500743,
+      "rmse": 2.1812644413398
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0047",
+      "horizon": 0,
+      "n": 69,
+      "mae": 4.0987300143421805,
+      "rmse": 4.5825766232881495
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0047",
+      "horizon": 5,
+      "n": 61,
+      "mae": 3.6817986332767787,
+      "rmse": 4.265536163790754
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0047",
+      "horizon": 10,
+      "n": 57,
+      "mae": 3.8076490982470594,
+      "rmse": 4.39584645377581
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0047",
+      "horizon": 20,
+      "n": 49,
+      "mae": 5.0501073389589966,
+      "rmse": 5.467961291908654
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0047",
+      "horizon": 30,
+      "n": 39,
+      "mae": 4.397372618791372,
+      "rmse": 4.646244720591332
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0048",
+      "horizon": 0,
+      "n": 69,
+      "mae": 3.320003479369724,
+      "rmse": 3.6496863516224334
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0048",
+      "horizon": 5,
+      "n": 61,
+      "mae": 3.908941816517587,
+      "rmse": 4.439254017183249
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0048",
+      "horizon": 10,
+      "n": 57,
+      "mae": 4.177582769359604,
+      "rmse": 4.752874168629361
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0048",
+      "horizon": 20,
+      "n": 49,
+      "mae": 4.195411873167351,
+      "rmse": 4.806450308851908
+    },
+    {
+      "procedure": "candidate_procedure",
+      "battery": "B0048",
+      "horizon": 30,
+      "n": 39,
+      "mae": 5.00387498695354,
+      "rmse": 5.32305493032523
+    }
+  ],
+  "macro_average": [
+    {
+      "procedure": "baseline",
+      "horizon": 0,
+      "mae": 2.970812705040984,
+      "rmse": 3.7395495520600313
+    },
+    {
+      "procedure": "baseline",
+      "horizon": 5,
+      "mae": 3.1684386310060075,
+      "rmse": 3.6451007289606574
+    },
+    {
+      "procedure": "baseline",
+      "horizon": 10,
+      "mae": 3.2127215184530202,
+      "rmse": 3.7091337719115485
+    },
+    {
+      "procedure": "baseline",
+      "horizon": 20,
+      "mae": 3.8784591172853844,
+      "rmse": 4.280835472005689
+    },
+    {
+      "procedure": "baseline",
+      "horizon": 30,
+      "mae": 3.8195791014158944,
+      "rmse": 4.12519049209051
+    },
+    {
+      "procedure": "candidate_procedure",
+      "horizon": 0,
+      "mae": 2.970812705040984,
+      "rmse": 3.7395495520600313
+    },
+    {
+      "procedure": "candidate_procedure",
+      "horizon": 5,
+      "mae": 3.043918829157118,
+      "rmse": 3.5462354027793106
+    },
+    {
+      "procedure": "candidate_procedure",
+      "horizon": 10,
+      "mae": 3.065023585004085,
+      "rmse": 3.567757333617738
+    },
+    {
+      "procedure": "candidate_procedure",
+      "horizon": 20,
+      "mae": 3.6596324823160478,
+      "rmse": 4.152275987508486
+    },
+    {
+      "procedure": "candidate_procedure",
+      "horizon": 30,
+      "mae": 3.811128444541327,
+      "rmse": 4.1151782679059945
+    }
+  ]
+}

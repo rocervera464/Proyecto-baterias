@@ -1,0 +1,528 @@
+{
+  "dataset_sha256": "5f48f32fcdd11f368e767466d84efbc07943387f254b9575af6a4bd085bb764d",
+  "protocol": "Nested leave-one-battery-out; inner macro MAE selects configuration; outer battery never used to select.",
+  "scope": "Raw five-model outputs, before isotonic adjustment. No external-domain or temporal-forward validation.",
+  "candidates": {
+    "original_configuration": {
+      "n_estimators": 500,
+      "learning_rate": 0.03,
+      "max_depth": 4,
+      "min_child_weight": 3,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "reg_alpha": 0.0,
+      "reg_lambda": 1.0
+    },
+    "regularized": {
+      "n_estimators": 500,
+      "learning_rate": 0.03,
+      "max_depth": 2,
+      "min_child_weight": 8,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "reg_alpha": 0.1,
+      "reg_lambda": 10.0
+    },
+    "regularized_cycle_constraint": {
+      "n_estimators": 500,
+      "learning_rate": 0.03,
+      "max_depth": 2,
+      "min_child_weight": 5,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "reg_alpha": 0.1,
+      "reg_lambda": 5.0,
+      "monotone_constraints": {
+        "cycle": -1
+      }
+    }
+  },
+  "horizons": {
+    "0": {
+      "folds": [
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0005",
+          "n_train": 468,
+          "n_test": 168,
+          "mae": 1.858977907350505,
+          "rmse": 2.1365284209221453,
+          "r2": 0.9573366038515938
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0005",
+          "n_train": 468,
+          "n_test": 168,
+          "mae": 1.858977907350505,
+          "rmse": 2.1365284209221453,
+          "r2": 0.9573366038515938
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0006",
+          "n_train": 468,
+          "n_test": 168,
+          "mae": 4.165812270740841,
+          "rmse": 5.400578113987609,
+          "r2": 0.8127724826156436
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized",
+          "test_battery": "B0006",
+          "n_train": 468,
+          "n_test": 168,
+          "mae": 4.580110489329134,
+          "rmse": 5.648393408368255,
+          "r2": 0.7951957099846573
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 468,
+          "n_test": 168,
+          "mae": 2.1147660654324225,
+          "rmse": 2.4748003509450545,
+          "r2": 0.9158776971373195
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 468,
+          "n_test": 168,
+          "mae": 2.1147660654324225,
+          "rmse": 2.4748003509450545,
+          "r2": 0.9158776971373195
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0018",
+          "n_train": 504,
+          "n_test": 132,
+          "mae": 3.252538614970696,
+          "rmse": 3.8161226760319464,
+          "r2": 0.7929961499152312
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0018",
+          "n_train": 504,
+          "n_test": 132,
+          "mae": 3.252538614970696,
+          "rmse": 3.8161226760319464,
+          "r2": 0.7929961499152312
+        }
+      ],
+      "macro_average": {
+        "baseline": {
+          "mae": 2.8480237146236163,
+          "rmse": 3.457007390471689,
+          "r2": 0.869745733379947
+        },
+        "nested_selected": {
+          "mae": 2.9515982692706895,
+          "rmse": 3.5189612140668505,
+          "r2": 0.8653515402222005
+        }
+      },
+      "lower_mae_and_rmse": false
+    },
+    "5": {
+      "folds": [
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0005",
+          "n_train": 453,
+          "n_test": 163,
+          "mae": 2.37947616691371,
+          "rmse": 2.8166833310419226,
+          "r2": 0.9233255717134125
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0005",
+          "n_train": 453,
+          "n_test": 163,
+          "mae": 2.37947616691371,
+          "rmse": 2.8166833310419226,
+          "r2": 0.9233255717134125
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0006",
+          "n_train": 453,
+          "n_test": 163,
+          "mae": 6.058321026921688,
+          "rmse": 6.938267880900702,
+          "r2": 0.6639913167047388
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized",
+          "test_battery": "B0006",
+          "n_train": 453,
+          "n_test": 163,
+          "mae": 6.196046922310769,
+          "rmse": 7.057925557720769,
+          "r2": 0.6523017375409778
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 453,
+          "n_test": 163,
+          "mae": 1.7657066714683427,
+          "rmse": 1.9868888941713747,
+          "r2": 0.9435803242439478
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 453,
+          "n_test": 163,
+          "mae": 1.7657066714683427,
+          "rmse": 1.9868888941713747,
+          "r2": 0.9435803242439478
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0018",
+          "n_train": 489,
+          "n_test": 127,
+          "mae": 2.713175951498814,
+          "rmse": 3.8746552541105257,
+          "r2": 0.7634227608004911
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized_cycle_constraint",
+          "test_battery": "B0018",
+          "n_train": 489,
+          "n_test": 127,
+          "mae": 2.5147864377533935,
+          "rmse": 3.7061413588396723,
+          "r2": 0.7835533917560854
+        }
+      ],
+      "macro_average": {
+        "baseline": {
+          "mae": 3.2291699542006382,
+          "rmse": 3.9041238400561316,
+          "r2": 0.8235799933656476
+        },
+        "nested_selected": {
+          "mae": 3.2140040496115536,
+          "rmse": 3.891909785443435,
+          "r2": 0.8256902563136058
+        }
+      },
+      "lower_mae_and_rmse": true
+    },
+    "10": {
+      "folds": [
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0005",
+          "n_train": 438,
+          "n_test": 158,
+          "mae": 2.2799668354664844,
+          "rmse": 2.6088944866795534,
+          "r2": 0.9318968358922568
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0005",
+          "n_train": 438,
+          "n_test": 158,
+          "mae": 2.2799668354664844,
+          "rmse": 2.6088944866795534,
+          "r2": 0.9318968358922568
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0006",
+          "n_train": 438,
+          "n_test": 158,
+          "mae": 6.321346127810715,
+          "rmse": 7.261793276343098,
+          "r2": 0.5984179202407096
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized",
+          "test_battery": "B0006",
+          "n_train": 438,
+          "n_test": 158,
+          "mae": 6.834724580368468,
+          "rmse": 7.577445293170794,
+          "r2": 0.5627476214657294
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 438,
+          "n_test": 158,
+          "mae": 1.4252395303697771,
+          "rmse": 1.7086504448814674,
+          "r2": 0.9563594676793681
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 438,
+          "n_test": 158,
+          "mae": 1.4252395303697771,
+          "rmse": 1.7086504448814674,
+          "r2": 0.9563594676793681
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0018",
+          "n_train": 474,
+          "n_test": 122,
+          "mae": 3.000023161181708,
+          "rmse": 4.294209140584421,
+          "r2": 0.6749618343952115
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized_cycle_constraint",
+          "test_battery": "B0018",
+          "n_train": 474,
+          "n_test": 122,
+          "mae": 2.8464226766806706,
+          "rmse": 3.8907473869825853,
+          "r2": 0.7331703766504324
+        }
+      ],
+      "macro_average": {
+        "baseline": {
+          "mae": 3.256643913707171,
+          "rmse": 3.968386837122135,
+          "r2": 0.7904090145518865
+        },
+        "nested_selected": {
+          "mae": 3.3465884057213504,
+          "rmse": 3.9464344029286003,
+          "r2": 0.7960435754219467
+        }
+      },
+      "lower_mae_and_rmse": false
+    },
+    "20": {
+      "folds": [
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0005",
+          "n_train": 408,
+          "n_test": 148,
+          "mae": 2.662627601480283,
+          "rmse": 3.0337101554829906,
+          "r2": 0.9005477643253862
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized_cycle_constraint",
+          "test_battery": "B0005",
+          "n_train": 408,
+          "n_test": 148,
+          "mae": 2.848670438662129,
+          "rmse": 3.298273212442605,
+          "r2": 0.8824453981645682
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0006",
+          "n_train": 408,
+          "n_test": 148,
+          "mae": 7.082864015055984,
+          "rmse": 7.73057545559324,
+          "r2": 0.46960419151857824
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized_cycle_constraint",
+          "test_battery": "B0006",
+          "n_train": 408,
+          "n_test": 148,
+          "mae": 6.913351601412481,
+          "rmse": 7.485479475647788,
+          "r2": 0.502703177712891
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 408,
+          "n_test": 148,
+          "mae": 1.6089115135908705,
+          "rmse": 2.0248518379158438,
+          "r2": 0.9323988906841087
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 408,
+          "n_test": 148,
+          "mae": 1.6089115135908705,
+          "rmse": 2.0248518379158438,
+          "r2": 0.9323988906841087
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0018",
+          "n_train": 444,
+          "n_test": 112,
+          "mae": 3.946683541933793,
+          "rmse": 5.315368642868096,
+          "r2": 0.3745250440993153
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized_cycle_constraint",
+          "test_battery": "B0018",
+          "n_train": 444,
+          "n_test": 112,
+          "mae": 5.040785084369515,
+          "rmse": 6.0073603699062135,
+          "r2": 0.20106671405500243
+        }
+      ],
+      "macro_average": {
+        "baseline": {
+          "mae": 3.8252716680152323,
+          "rmse": 4.5261265229650425,
+          "r2": 0.669268972656847
+        },
+        "nested_selected": {
+          "mae": 4.1029296595087485,
+          "rmse": 4.703991223978112,
+          "r2": 0.6296535451541425
+        }
+      },
+      "lower_mae_and_rmse": false
+    },
+    "30": {
+      "folds": [
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0005",
+          "n_train": 378,
+          "n_test": 138,
+          "mae": 2.6657462109092256,
+          "rmse": 3.117659250905362,
+          "r2": 0.8797101408717162
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized",
+          "test_battery": "B0005",
+          "n_train": 378,
+          "n_test": 138,
+          "mae": 2.466333127001036,
+          "rmse": 2.963411787182678,
+          "r2": 0.8913184731680386
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0006",
+          "n_train": 378,
+          "n_test": 138,
+          "mae": 7.659997753951177,
+          "rmse": 8.206137346795277,
+          "r2": 0.2423595608751552
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "regularized_cycle_constraint",
+          "test_battery": "B0006",
+          "n_train": 378,
+          "n_test": 138,
+          "mae": 7.328513607777388,
+          "rmse": 7.877338733951116,
+          "r2": 0.301856617081917
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 378,
+          "n_test": 138,
+          "mae": 1.5590467364392084,
+          "rmse": 2.0936977321492605,
+          "r2": 0.9143394823344397
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0007",
+          "n_train": 378,
+          "n_test": 138,
+          "mae": 1.5590467364392084,
+          "rmse": 2.0936977321492605,
+          "r2": 0.9143394823344397
+        },
+        {
+          "procedure": "baseline",
+          "selected": "original_configuration",
+          "test_battery": "B0018",
+          "n_train": 414,
+          "n_test": 102,
+          "mae": 5.645607264438073,
+          "rmse": 6.974324432025733,
+          "r2": -0.3347683220542683
+        },
+        {
+          "procedure": "nested_selected",
+          "selected": "original_configuration",
+          "test_battery": "B0018",
+          "n_train": 414,
+          "n_test": 102,
+          "mae": 5.645607264438073,
+          "rmse": 6.974324432025733,
+          "r2": -0.3347683220542683
+        }
+      ],
+      "macro_average": {
+        "baseline": {
+          "mae": 4.382599491434421,
+          "rmse": 5.097954690468908,
+          "r2": 0.42541021550676067
+        },
+        "nested_selected": {
+          "mae": 4.249875183913927,
+          "rmse": 4.977193171327197,
+          "r2": 0.4431865626325317
+        }
+      },
+      "lower_mae_and_rmse": true
+    }
+  },
+  "deployment": "No model exported or promoted. Evaluate per-battery regressions, temporal forecasts and reconciled outputs before production."
+}

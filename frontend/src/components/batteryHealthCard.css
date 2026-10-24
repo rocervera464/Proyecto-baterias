@@ -1,0 +1,40 @@
+.health-card.battery-health-card[data-tone] {
+  --battery-accent: #78e6bf;
+  --battery-fill-start: #20bf99;
+  --battery-fill-end: #8af0bf;
+  background: linear-gradient(135deg, #245d4d, #347a60);
+  border: 1px solid #58947a;
+  color: #f3fffa;
+  padding: 28px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  box-shadow: 0 12px 32px #123c4b16;
+}
+.health-card.battery-health-card[data-tone="caution"] { --battery-accent: #f4cf86; --battery-fill-start: #c48d38; --battery-fill-end: #f4cf86; }
+.health-card.battery-health-card[data-tone="low"] { --battery-accent: #ffaca4; --battery-fill-start: #d66d69; --battery-fill-end: #ffaca4; }
+.health-card.battery-health-card[data-tone="neutral"] { --battery-accent: #b5c8cc; --battery-fill-start: #839ba2; --battery-fill-end: #b5c8cc; }
+.battery-health-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.battery-health-kicker { color: #d4e8e3; font-size: 9px; letter-spacing: .12em; font-weight: 600; }
+.battery-health-heading h3 { font-size: 19px; margin: 8px 0 0; letter-spacing: -.035em; line-height: 1.3; }
+.battery-cycle { flex-shrink: 0; font-size: 11px; padding: 6px 10px; border-radius: 999px; background: #ffffff14; color: #d3ebe3; }
+.battery-health-display { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 40px 0 30px; }
+.health-battery { display: flex; align-items: center; width: min(100%, 270px); padding-right: 2px; }
+.health-battery-body { position: relative; flex: 1; height: 126px; padding: 9px; border: 2px solid var(--battery-accent); border-radius: 23px; background: #ffffff06; overflow: hidden; }
+.health-battery-interior { position: absolute; inset: 9px; overflow: hidden; border-radius: 13px; }
+.health-battery-level { position: absolute; top: 0; bottom: 0; left: 0; max-width: 100%; background: linear-gradient(90deg, var(--battery-fill-start), var(--battery-fill-end)); border-radius: 13px; transform-origin: left; }
+.health-battery-divisions { position: absolute; inset: 12px; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), #f4fff92b calc(25% - 1px), #f4fff92b 25%); border-radius: 12px; }
+.health-battery-terminal { width: 13px; height: 43px; border-radius: 0 6px 6px 0; background: var(--battery-accent); }
+.health-battery-pulse { position: absolute; width: 90px; height: 60px; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #f1fff6; filter: drop-shadow(0 2px 8px #0b36394d); }
+.battery-health-reading { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.battery-health-reading > span:first-child { font-size: 12px; color: #e0efeb; }
+.battery-health-reading > strong { font-size: clamp(44px, 4vw, 58px); letter-spacing: -.055em; line-height: 1.12; font-variant-numeric: tabular-nums; font-weight: 700; }
+.battery-health-reading > strong small { font-size: .48em; margin-left: 4px; color: #d6eae4; }
+.battery-health-status { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; background: #ffffff0d; font-size: 12px; color: var(--battery-accent); margin-top: 8px; }
+.battery-health-status i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.battery-health-scale { border-top: 1px solid #ffffff24; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #d9eae4; font-size: 10px; }
+.health-card.battery-health-card p { color: #dcece6; font-size: 11px; line-height: 1.7; max-width: none; margin: 16px 0 0; }
+@media (max-width: 760px) { .health-card.battery-health-card { padding: 24px; } .battery-health-display { padding-block: 30px; gap: 24px; } }
+@media (max-width: 380px) { .battery-health-heading { flex-wrap: wrap; gap: 10px; } .battery-health-scale > span:nth-child(2) { font-size: 9px; } }

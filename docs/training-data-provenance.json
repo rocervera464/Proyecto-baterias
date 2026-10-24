@@ -1,0 +1,26 @@
+{
+  "archive_name": "4. BatteryAgingARC_45_46_47_48.zip",
+  "archive_sha256": "21822c9889487f8e16e210f419cc5fe803d7ef43a06cdaf33489489967a881ec",
+  "files": {
+    "B0045.mat": "dc8e4cc149fe87f4ff855f30f0d31155ada6f467d06f5365550bab9370670fe3",
+    "B0046.mat": "fe62dffc7079f6131e591415c740f6863364b23e728fe2aa7286a9c749dcdebc",
+    "B0047.mat": "8089a9180cf353704642c457c844d83dd2e83aa2fc43fe4f7c05322f86fd0648",
+    "B0048.mat": "341219d38d8531e0a89ecaa18736b79e1547d22edea4a1d45357bb5bfeb7757d"
+  },
+  "processed_rows": 277,
+  "rows_by_battery": {
+    "B0045": 70,
+    "B0046": 69,
+    "B0047": 69,
+    "B0048": 69
+  },
+  "cutoff_v": {
+    "B0045": 2.0,
+    "B0046": 2.2,
+    "B0047": 2.5,
+    "B0048": 2.7
+  },
+  "documented_ambient_c": 4,
+  "documented_discharge_a": 1,
+  "notebook_backend_parity": "Nonhistorical features match first discharge of each of four cells; numpy allclose rtol/atol 1e-10."
+}

@@ -1,0 +1,36 @@
+.interactive-forecast { margin-top: 40px; border: 1px solid #e1eae5; border-radius: 24px; padding: 28px; background: #fff; min-width: 0; }
+.interactive-forecast .chart-header { align-items: flex-start; }
+.forecast-subtitle { color: #62716e; font-size: 13px; margin: 8px 0 0; }
+.forecast-discrete-badge { background: #edf5f1; border-radius: 999px; padding: 8px 12px; font-size: 11px; color: #126c5e; white-space: nowrap; }
+.forecast-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin: 24px 0; }
+.forecast-scale { display: flex; padding: 4px; background: #edf3f0; border-radius: 12px; gap: 4px; }
+.forecast-scale button { border: 0; background: transparent; color: #536875; border-radius: 9px; min-height: 40px; padding: 8px 14px; font-size: 12px; }
+.forecast-scale button[aria-pressed="true"] { background: white; color: #123c4b; box-shadow: 0 2px 8px #123c4b0b; font-weight: 700; }
+.forecast-toggles { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.forecast-toggles label { display: flex; align-items: center; min-height: 40px; gap: 7px; font-size: 11px; color: #536875; cursor: pointer; }
+.forecast-toggles input { accent-color: #178b78; width: 15px; height: 15px; }
+.forecast-replay { border: 1px solid #d5e4dc; border-radius: 999px; padding: 9px 14px; min-height: 40px; background: white; color: #126c5e; font-size: 12px; }
+.forecast-replay:disabled { opacity: .4; cursor: default; }
+.forecast-selected { display: flex; flex-wrap: wrap; gap: 20px 40px; justify-content: space-between; align-items: center; padding: 22px; border-radius: 16px; background: linear-gradient(110deg, #edf7f1, #f7faf8); margin-bottom: 20px; }
+.forecast-selected > div { display: flex; flex-direction: column; gap: 5px; }
+.forecast-selected span, .forecast-selected small { font-size: 11px; color: #536875; }
+.forecast-selected strong { font-size: 32px; letter-spacing: -.045em; font-variant-numeric: tabular-nums; color: #123c4b; }
+.forecast-selected .forecast-delta { font-size: 20px; letter-spacing: -.025em; }
+.forecast-canvas { padding: 8px 0 16px; background: #fbfdfc; border-radius: 16px; }
+.interactive-forecast .chart-container { height: 340px; margin: 0; width: 100%; }
+.forecast-tooltip { padding: 14px 18px; border-radius: 14px; background: #123c4bf5; color: white; box-shadow: 0 8px 30px #123c4b22; display: flex; flex-direction: column; gap: 6px; }
+.forecast-tooltip span, .forecast-tooltip small, .forecast-tooltip p { color: #d5e9e0; font-size: 11px; margin: 0; }
+.forecast-tooltip strong { font-size: 24px; letter-spacing: -.03em; }
+.forecast-legend { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 20px; padding: 12px 16px 0; }
+.forecast-legend span { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #536875; }
+.forecast-legend i { width: 8px; height: 8px; border-radius: 50%; background: #178b78; }
+.forecast-legend i.experimental { background: #a66a18; }
+.forecast-legend i.original { width: 18px; height: 0; border-radius: 0; background: none; border-top: 2px dashed #9b661d; }
+.forecast-horizons { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+.forecast-horizons button { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; background: white; border: 1px solid #dce6e0; border-radius: 14px; padding: 14px; text-align: left; min-width: 0; }
+.forecast-horizons button[aria-pressed="true"] { background: #eaf5ef; border-color: #178b78; box-shadow: inset 0 0 0 1px #178b78; }
+.forecast-horizons span, .forecast-horizons small { font-size: 11px; color: #536875; }
+.forecast-horizons strong { font-size: clamp(14px, 1.6vw, 20px); color: #123c4b; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.forecast-horizons .is-experimental small { color: #87520e; }
+@media (max-width: 760px) { .interactive-forecast { padding: 20px 14px; border-radius: 20px; } .forecast-horizons { grid-template-columns: repeat(3, minmax(0, 1fr)); } .forecast-horizons button { padding: 12px; } .forecast-toggles { gap: 8px 14px; } .interactive-forecast .chart-container { height: 300px; } }
+@media (max-width: 420px) { .forecast-horizons { grid-template-columns: repeat(2, minmax(0, 1fr)); } .forecast-selected { padding: 16px; } }

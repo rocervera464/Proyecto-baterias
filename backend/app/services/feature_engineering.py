@@ -200,9 +200,9 @@ def extract_features(
 
     # Necesitamos al menos dos mediciones para poder
     # representar una evolución de la señal.
-    if len(window_samples) < 2:
+    if len(window_samples) < 2 or len({sample.time_s for sample in window_samples}) < 2:
         raise ValueError(
-            "Se necesitan al menos dos muestras "
+            "Se necesitan al menos dos muestras en instantes distintos "
             "dentro de los primeros 300 segundos."
         )
 

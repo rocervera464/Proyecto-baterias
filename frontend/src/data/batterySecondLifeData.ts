@@ -10,6 +10,8 @@ export interface BatteryUse {
   sohConsideration: string;
   scenarios: string[];
 }
+// applications: orden editorial de prioridad orientativa para cada rango de SoH.
+// No representa una puntuación de seguridad o viabilidad técnica.
 export interface SohClassification {
   id: string;
   label: string;
@@ -41,14 +43,14 @@ const applications = {
     summary: "Evaluación de almacenamiento fotovoltaico en una vivienda.",
     operation: "Se estudiaría cómo almacenar parte de la generación de los paneles y suministrarla posteriormente a través de un inversor y un sistema de gestión compatibles.",
     requirements: "Relacionar el consumo de la vivienda con capacidad y potencia medidas; revisar integridad, resistencia interna, ventilación, comportamiento térmico, BMS y protecciones de la instalación.",
-    limitations: "No se puede determinar autonomía ni cobertura de consumos únicamente a partir del porcentaje de salud.",
+    limitations: "No se puede determinar la autonomía ni la cobertura del consumo únicamente a partir del porcentaje de salud.",
   },
   commercialBackup: {
     id: "commercial-backup", title: "Respaldo para comercios", category: "Respaldo y continuidad",
     summary: "Evaluación de reserva energética para un entorno comercial.",
     operation: "La batería se estudiaría como reserva para alimentar cargas seleccionadas durante una interrupción mediante equipos de conversión y transferencia adecuados.",
     requirements: "Caracterizar cargas y arranques, capacidad útil, potencia, integridad, resistencia interna, calentamiento, BMS y coordinación de las protecciones y la transferencia.",
-    limitations: "El SoH no garantiza continuidad de servicio. No permite asignar cargas críticas ni tiempos de respaldo sin pruebas y dimensionamiento.",
+    limitations: "El SoH no garantiza la continuidad del servicio. No permite asignar cargas críticas ni tiempos de respaldo sin pruebas y dimensionamiento.",
   },
   stationary: {
     id: "stationary", title: "Sistemas estacionarios", category: "Almacenamiento energético",
@@ -83,7 +85,7 @@ const applications = {
     summary: "Evaluación de aprovechamiento posterior de energía generada localmente.",
     operation: "Se estudiaría el almacenamiento de excedentes para utilizarlos después, de acuerdo con el perfil de generación y consumo de la instalación.",
     requirements: "Medir capacidad útil, integridad, resistencia interna y respuesta térmica; verificar BMS, convertidor, control de energía y límites de carga y descarga.",
-    limitations: "No se pueden calcular ahorro, energía aprovechable o beneficios económicos a partir del SoH aislado.",
+    limitations: "No se pueden calcular el ahorro, la energía aprovechable ni los beneficios económicos a partir del SoH aislado.",
   },
   homeBackup: {
     id: "home-backup", title: "Respaldo residencial", category: "Respaldo y continuidad",
@@ -118,7 +120,7 @@ const applications = {
     summary: "Evaluación de suministro a equipos de sensado de baja demanda.",
     operation: "Se estudiaría el consumo continuo y los picos de adquisición o transmisión para comprobar si pueden cubrirse con la energía y potencia disponibles.",
     requirements: "Medir capacidad, autodescarga y resistencia interna; revisar integridad, respuesta térmica, BMS y compatibilidad del regulador y del sensor.",
-    limitations: "No se garantiza autonomía ni disponibilidad en ubicaciones remotas. La dificultad de mantenimiento y el ambiente requieren evaluación específica.",
+    limitations: "No se garantiza la autonomía ni la disponibilidad en ubicaciones remotas. La dificultad de mantenimiento y el ambiente requieren evaluación específica.",
   },
   environment: {
     id: "environment", title: "Monitoreo ambiental", category: "Baja exigencia",
@@ -165,7 +167,7 @@ const applications = {
   recycling: {
     id: "recycling", title: "Reciclaje de materiales", category: "Recuperación y reciclaje",
     summary: "Evaluación de gestión especializada y recuperación de materiales.",
-    operation: "Se estudiaría la entrega a un gestor especializado que determine el tratamiento apropiado según la química y condición de la batería.",
+    operation: "Se estudiaría la entrega a un gestor especializado que determine el tratamiento apropiado según la química y la condición de la batería.",
     requirements: "Identificación de la batería, evaluación de integridad y condición térmica, manipulación, aislamiento, almacenamiento y transporte mediante procedimientos profesionales.",
     limitations: "El SoH no define por sí solo el tratamiento ni permite asegurar materiales recuperables. No es una instrucción de desensamble o procesamiento doméstico.",
   },
@@ -198,7 +200,7 @@ const useDetails: Record<keyof typeof applications, Pick<BatteryUse, "sohConside
   components: { sohConsideration: "Un SoH global reducido puede motivar diagnóstico de componentes, pero no permite identificar cuáles conservarían capacidad, integridad o compatibilidad suficientes para recuperarse.", scenarios: ["Diagnóstico profesional de componentes del conjunto.", "Evaluación individual para decidir entre recuperación o gestión especializada."] },
   diagnosis: { sohConsideration: "Por debajo del 60 %, el resultado orienta hacia diagnóstico especializado. Las mediciones individuales permiten estudiar diferencias que el SoH agregado no revela.", scenarios: ["Comparación profesional de capacidad y resistencia entre módulos.", "Inspección de integridad y respuesta térmica antes de decidir su gestión."] },
   degradation: { sohConsideration: "Un SoH bajo puede ser relevante para investigar envejecimiento, pero no identifica por sí mismo los mecanismos físicos ni la causa de las diferencias entre componentes.", scenarios: ["Comparación de capacidad y resistencia bajo protocolos documentados.", "Estudio controlado de cambios eléctricos y térmicos durante ensayos."] },
-  recovery: { sohConsideration: "En este rango, recuperar cualquier elemento es una posibilidad a investigar mediante pruebas; no puede inferirse una mejora del conjunto ni la existencia de una alternativa viable.", scenarios: ["Estudio profesional de alternativas después del diagnóstico.", "Comparación técnica entre recuperación de elementos y gestión para reciclaje."] },
+  recovery: { sohConsideration: "En este rango, recuperar cualquier elemento es una posibilidad que debe investigarse mediante pruebas; no puede inferirse una mejora del conjunto ni la existencia de una alternativa viable.", scenarios: ["Estudio profesional de alternativas después del diagnóstico.", "Comparación técnica entre recuperación de elementos y gestión para reciclaje."] },
   recycling: { sohConsideration: "Una salud estimada baja motiva valorar gestión especializada, pero la ruta de tratamiento depende también de la química, la integridad y las condiciones del conjunto.", scenarios: ["Evaluación de entrega a un gestor especializado.", "Identificación profesional de la química y condición para determinar el tratamiento."] },
   sorting: { sohConsideration: "El SoH agregado no permite agrupar componentes por equivalencia. La clasificación requiere resultados individuales y no implica que las celdas o módulos puedan volver a combinarse.", scenarios: ["Registro profesional de mediciones individuales de celdas o módulos.", "Separación técnica de alternativas de diagnóstico, recuperación o reciclaje."] },
 };

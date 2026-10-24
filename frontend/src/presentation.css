@@ -1,0 +1,104 @@
+/* Refined presentation for BaterIA. Functional component styles stay in App.css. */
+:root {
+  background: #eef4f1;
+  --text-muted: #62716e;
+  --border: #e1e8e4;
+}
+.page-navigation {
+  background: rgba(250, 252, 251, .88);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border-bottom: 1px solid #123c4b12;
+  box-shadow: none;
+  padding-block: 10px;
+}
+.page-navigation .brand { font-size: 20px; letter-spacing: -.04em; }
+.page-navigation .brand small { font-size: 10px; letter-spacing: .02em; }
+.page-navigation .brand-mark { width: 36px; height: 36px; }
+.page-navigation nav a { font-size: 12px; font-weight: 500; padding: 10px; border-radius: 20px; }
+.hero {
+  padding-top: clamp(56px, 7vw, 100px);
+  padding-bottom: 64px;
+  margin-bottom: 56px;
+  border: 0;
+  background-color: #f8faf9;
+  background-image: linear-gradient(180deg, #f8faf9ed 5%, #f8faf9dc 65%, #eef4f1 94%), url("/images/header-background.jpg");
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, #eef4f1 90%);
+  pointer-events: none;
+}
+.hero > .section-kicker { letter-spacing: .18em; font-size: 10px; margin-bottom: 24px; }
+.hero h1 .hero-brand { gap: 16px; margin-bottom: 24px; }
+.hero-brand-name { font-size: clamp(58px, 8vw, 96px); font-weight: 600; }
+.hero-brand > img { width: clamp(48px, 5.5vw, 64px); box-shadow: 0 12px 32px #123c4b12; }
+.hero h1 .hero-title-description { font-size: clamp(30px, 4.5vw, 56px); line-height: 1.12; letter-spacing: -.05em; }
+.hero > p:not(.section-kicker) { font-size: clamp(15px, 1.7vw, 19px); line-height: 1.65; max-width: 700px; }
+.hero-energy-line { height: 24px; width: 180px; margin-bottom: 20px; opacity: .8; }
+.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 14px; margin: 28px 0 36px; }
+.hero-actions a { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 48px; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: 600; }
+.hero-primary-action { color: white; background: #126c5e; box-shadow: 0 6px 20px #126c5e18; }
+.hero-primary-action:hover { background: #0d584c; }
+.hero-secondary-action { color: #126c5e; border: 1px solid #126c5e50; background: #ffffff70; }
+.hero-secondary-action:hover { background: #e7f1ec; }
+.hero-facts { gap: 16px 32px; margin-top: 0; }
+.hero-facts span { font-size: 12px; color: #62716e; }
+.prediction-page { width: min(1200px, calc(100% - 64px)); padding-bottom: 48px; }
+.parameter-panel, .telemetry-import, .csv-preview, .analysis-submit, .results, .methodology.card {
+  border: 1px solid #ffffff;
+  border-radius: 26px;
+  box-shadow: 0 8px 36px #193e3006;
+  padding: clamp(24px, 3.5vw, 44px);
+}
+.analysis-columns { gap: 28px; }
+.parameter-heading, .telemetry-import-heading { margin-bottom: 28px; }
+.parameter-heading h2, .telemetry-import-heading h3, .results-heading h2, .methodology h2 { font-size: clamp(24px, 3vw, 34px); letter-spacing: -.045em; }
+.panel-icon, .telemetry-import-icon { border-radius: 14px; background: #f0f5f2; }
+.form-grid { gap: 24px; }
+.form-grid input, .csv-fields-grid select, .segment-selector select { border-radius: 12px; background: #fcfdfc; border-color: #d8e1dc; padding: 13px 14px; min-height: 48px; }
+.file-upload { border-radius: 20px; background: #f7faf8; border-color: #aac5b8; padding: 32px; }
+.analysis-submit { margin-top: 28px; }
+.analysis-submit button { border-radius: 999px; min-height: 52px; background: #126c5e; }
+.results { margin-top: 40px; }
+.results-heading { margin-bottom: 32px; }
+.health-card, .prediction-card, .empty-results { border-radius: 20px; }
+.prediction-card { padding: 24px; }
+.prediction-card > strong { letter-spacing: -.04em; }
+.battery-usage { margin-top: 48px; padding-top: 40px; }
+.second-life-title h3 { font-size: clamp(24px, 2.6vw, 32px); letter-spacing: -.04em; }
+.use-carousel { background: #f5f8f6; border: 0; border-radius: 24px; padding: 28px; }
+.use-carousel-slide { border-radius: 20px; border-color: #e1e8e4; }
+.use-slide-priority { background: #edf5f0; }
+.use-carousel-controls button { border-color: #d8e4dd; }
+.interpretation { background: #f7f9f8; border: 0; border-radius: 20px; }
+.methodology { margin-top: 40px; }
+.app-footer { margin-top: 40px; padding: 24px 0; border-top: 1px solid #dbe5de; font-size: 11px; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .hero-actions a { transition: transform 200ms ease, background-color 200ms ease, box-shadow 200ms ease; }
+  .hero-actions a:hover { transform: translateY(-2px); }
+}
+@media (max-width: 1100px) { .page-navigation { padding-block: 10px; gap: 6px; } }
+@media (max-width: 760px) {
+  .hero { padding: 48px 20px 40px; margin-bottom: 28px; }
+  .hero h1 { font-size: inherit; }
+  .hero-actions { gap: 12px; margin: 24px 0 28px; }
+  .hero-actions a { padding-inline: 20px; font-size: 13px; }
+  .prediction-page { width: calc(100% - 28px); }
+  .parameter-panel, .telemetry-import, .csv-preview, .analysis-submit, .results, .methodology.card { padding: 24px 20px; border-radius: 22px; }
+  .parameter-heading, .telemetry-import-heading { margin-bottom: 20px; }
+  .file-upload { padding: 22px 18px; }
+  .use-carousel { padding: 16px; border-radius: 20px; }
+  .battery-usage { margin-top: 32px; padding-top: 28px; }
+  .app-footer { gap: 8px; }
+}
+
+@media (min-width: 761px) {
+  .hero .hero-title { max-width: 1200px; }
+  .hero h1 .hero-title-description { font-size: clamp(28px, 3.7vw, 52px); white-space: nowrap; text-wrap: nowrap; }
+}
