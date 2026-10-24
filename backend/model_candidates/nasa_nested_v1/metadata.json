@@ -1,0 +1,68 @@
+{
+  "model_family": "XGBoost",
+  "task": "State of Health prediction",
+  "target": "SoH_percent",
+  "window_seconds": 300,
+  "horizons_cycles": [
+    0,
+    5,
+    10,
+    20,
+    30
+  ],
+  "training_batteries": [
+    "B0045",
+    "B0046",
+    "B0047",
+    "B0048"
+  ],
+  "number_of_features": 29,
+  "training_rows": {
+    "0": 277,
+    "5": 246,
+    "10": 230,
+    "20": 197,
+    "30": 157
+  },
+  "soh_definition": "capacity / median(first 5 valid capacities) * 100",
+  "xgboost_version": "3.4.1",
+  "sklearn_version": "1.6.1",
+  "notes": {
+    "plus_5": "validated pilot horizon",
+    "plus_10": "validated pilot horizon",
+    "plus_20": "experimental: pilot validation showed weak long-horizon generalization",
+    "plus_30": "experimental: pilot validation showed weak long-horizon generalization"
+  },
+  "candidate_evaluation": {
+    "protocol": "Nested leave-one-battery-out; inner macro MAE selects configuration; outer battery never used to select.",
+    "dataset_sha256": "c4832ce550c68e2a61e997f0f356253f901313b36be618f2077902c63543a4fb",
+    "decisions": {
+      "0": {
+        "nested_comparison_accepted": false,
+        "configuration": "original_configuration",
+        "changed": false
+      },
+      "5": {
+        "nested_comparison_accepted": true,
+        "configuration": "regularized_cycle_constraint",
+        "changed": true
+      },
+      "10": {
+        "nested_comparison_accepted": true,
+        "configuration": "regularized",
+        "changed": true
+      },
+      "20": {
+        "nested_comparison_accepted": true,
+        "configuration": "regularized",
+        "changed": true
+      },
+      "30": {
+        "nested_comparison_accepted": false,
+        "configuration": "original_configuration",
+        "changed": false
+      }
+    },
+    "scope": "Pilot nested cross-validation only, not an independent external validation."
+  }
+}
