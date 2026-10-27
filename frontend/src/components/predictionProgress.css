@@ -1,0 +1,38 @@
+.prediction-progress { margin-top: 24px; padding: clamp(20px, 4vw, 36px); border: 1px solid #beddd3; border-radius: 22px; background: linear-gradient(135deg, #fff, #f0faf6); box-shadow: 0 12px 36px #123c4b0a; animation: prediction-enter .35s ease-out; }
+.prediction-progress-heading { display: flex; align-items: center; gap: 16px; }
+.prediction-progress-heading .section-kicker { margin: 0 0 6px; color: #178b78; font-size: 11px; letter-spacing: .12em; }
+.prediction-progress-heading h3 { margin: 0; }
+.prediction-progress-orb { display: grid; place-items: center; flex-shrink: 0; width: 48px; height: 48px; border-radius: 16px; color: #087e70; background: #ddf3eb; animation: prediction-glow 2s ease-in-out infinite; }
+.prediction-telemetry-animation { display: block; width: 100%; max-width: 680px; height: auto; margin: 20px auto; }
+.telemetry-packets { animation: telemetry-flow 2.4s linear infinite; }
+.telemetry-signal { stroke-dasharray: 240; animation: telemetry-scan 2.4s ease-in-out infinite; }
+.telemetry-cell { animation: telemetry-charge 2.8s ease-in-out infinite; }
+.telemetry-cell-1 { animation-delay: .25s; }
+.telemetry-cell-2 { animation-delay: .5s; }
+.telemetry-cell-3 { animation-delay: .75s; }
+.telemetry-bars { transform-box: fill-box; transform-origin: bottom; animation: telemetry-readings 1.8s ease-in-out infinite; }
+.prediction-progress-sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.prediction-progress-dots { display: flex; gap: 5px; margin-left: auto; }
+.prediction-progress-dots i { width: 6px; height: 6px; background: #178b78; border-radius: 50%; animation: prediction-dot 1.2s ease-in-out infinite; }
+.prediction-progress-dots i:nth-child(2) { animation-delay: .15s; }
+.prediction-progress-dots i:nth-child(3) { animation-delay: .3s; }
+.prediction-progress-steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.prediction-progress-steps li { display: flex; align-items: center; gap: 14px; padding: 14px; border: 1px solid transparent; border-radius: 14px; color: #536875; transition: background .3s, border-color .3s; }
+.prediction-progress-steps li.is-active { background: #e5f5ed; border-color: #bfdfd1; color: #123c4b; }
+.prediction-step-number { display: grid; place-items: center; flex-shrink: 0; width: 28px; height: 28px; border: 1px solid #cdded7; border-radius: 50%; font-size: 12px; }
+.is-active .prediction-step-number { background: #178b78; border-color: #178b78; color: white; }
+.is-explained .prediction-step-number { background: #edf5f1; color: #178b78; }
+.prediction-progress-steps strong { display: block; font-size: 14px; }
+.prediction-step-pulse { margin-left: auto; width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: #178b78; animation: prediction-glow 1.5s infinite; }
+.prediction-progress-track { height: 3px; overflow: hidden; background: #dcece5; border-radius: 4px; margin-top: 22px; }
+.prediction-progress-track span { display: block; width: 35%; height: 100%; background: #178b78; animation: prediction-travel 1.8s ease-in-out infinite; }
+@keyframes telemetry-flow { to { stroke-dashoffset: -185; } }
+@keyframes telemetry-scan { 0% { stroke-dashoffset: 240; opacity: .3; } 60%, 100% { stroke-dashoffset: 0; opacity: 1; } }
+@keyframes telemetry-charge { 0%, 100% { opacity: .2; } 45%, 65% { opacity: 1; } }
+@keyframes telemetry-readings { 50% { transform: scaleY(.55); opacity: .6; } }
+@keyframes prediction-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes prediction-dot { 0%, 80%, 100% { opacity: .35; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-4px); } }
+@keyframes prediction-glow { 50% { box-shadow: 0 0 0 6px #178b7812; } }
+@keyframes prediction-travel { from { transform: translateX(-110%); } to { transform: translateX(390%); } }
+@media (max-width: 520px) { .prediction-progress-heading { gap: 10px; } .prediction-progress-heading h3 { font-size: 16px; } .prediction-progress-steps li { padding: 10px 6px; gap: 10px; } }
+@media (prefers-reduced-motion: reduce) { .prediction-progress, .prediction-progress * { animation: none !important; transition: none !important; } }

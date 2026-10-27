@@ -22,9 +22,16 @@ legacy_router = APIRouter(tags=["telemetry"])
 def check_compatibility(request: TelemetryRequest):
     try:
         features, _ = extract_features(request)
-        return assess_compatibility(request, features, select_model_service(features).model_dir)
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
+    try:
+        model_service = select_model_service(features)
+        return assess_compatibility(request, features, model_service.model_dir)
+    except (OSError, RuntimeError, ValueError) as error:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Los modelos predictivos no están disponibles: {error}",
+        ) from error
 
 
 @legacy_router.post(

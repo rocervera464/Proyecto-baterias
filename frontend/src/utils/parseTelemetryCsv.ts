@@ -38,23 +38,27 @@ export function readTelemetryCsv(text: string): CsvData {
   if (cleaned.startsWith("[") || cleaned.startsWith("{")) {
     let parsed: unknown;
     try { parsed = JSON.parse(cleaned); } catch { throw new Error("El archivo JSON no tiene una estructura válida."); }
+    let metadata: Record<string, unknown> = {};
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
       const object = parsed as Record<string, unknown>;
+      metadata = Object.fromEntries(Object.entries(object).filter(([, value]) => typeof value === "string" || typeof value === "number"));
       parsed = object.samples ?? object.discharge_samples ?? object.telemetry ?? object.data ?? object.rows;
     }
     if (!Array.isArray(parsed) || parsed.length < 2 || parsed.some((row) => !row || typeof row !== "object" || Array.isArray(row))) {
       throw new Error("El JSON debe contener una lista de al menos dos mediciones, directamente o dentro de samples, discharge_samples, telemetry, data o rows.");
     }
-    const fields = [...new Set(parsed.flatMap((row) => Object.keys(row)))];
-    return { fields, rows: parsed.map((row) => Object.fromEntries(fields.map((field) => [field, row[field] == null ? "" : String(row[field])]))) };
+    parsed = parsed.map(row => ({ ...metadata, ...row }));
+    const fields = [...new Set((parsed as Record<string, unknown>[]).flatMap((row) => Object.keys(row)))];
+    return { fields, rows: (parsed as Record<string, unknown>[]).map((row) => Object.fromEntries(fields.map((field) => [field, row[field] == null ? "" : String(row[field])]))) };
   }
   const result = Papa.parse<Record<string, string>>(text.replace(/^\uFEFF/, ""), {
     header: true,
     skipEmptyLines: "greedy",
     transformHeader: (header) => header.trim(),
   });
-  if (result.errors.length) {
-    throw new Error(`No fue posible leer el CSV: ${result.errors[0].message}`);
+  const parseErrors = result.errors.filter(error => error.code !== "UndetectableDelimiter");
+  if (parseErrors.length) {
+    throw new Error(`No fue posible leer el CSV: ${parseErrors[0].message}`);
   }
   if (result.meta.renamedHeaders && Object.keys(result.meta.renamedHeaders).length) {
     throw new Error("Hay columnas con nombres repetidos. Usa nombres distintos para asignarlas.");
@@ -228,6 +232,67 @@ export function convertTelemetryCsv(data: CsvData, options: ImportOptions): Tele
     throw new Error("Se necesitan mediciones en al menos dos instantes distintos durante los primeros 300 segundos de la descarga.");
   }
   return samples;
+}
+
+export function recoverTelemetry(data: CsvData, options: ImportOptions): { samples: TelemetrySample[]; warnings: string[] } {
+  const selected = getTelemetrySegments(data).find(segment => segment.id === options.segmentId);
+  const rows = (selected?.rows ?? data.rows).map(row => ({ ...row }));
+  const fields = [...data.fields];
+  const adapted = { ...options, mapping: { ...options.mapping } };
+  const warnings: string[] = [];
+  if (![options.mapping.voltage_v, options.mapping.current_a].some(column => column && rows.some(row => row[column]?.trim()))) throw new Error("Se necesita al menos una señal eléctrica medida (voltaje o corriente). No se genera una batería enteramente ficticia.");
+  for (const field of TELEMETRY_FIELDS) {
+    let column = adapted.mapping[field];
+    if (!column) {
+      if (fields.filter(candidate => aliases[field].some(alias => normalize(alias) === normalize(candidate))).length > 1) throw new Error(`Hay columnas ambiguas para ${field}. Selecciona la columna correspondiente antes de analizar.`);
+      column = `__simulated_${field}`;
+      fields.push(column);
+      adapted.mapping[field] = column;
+      if (field === "time_s") adapted.timeUnit = "s";
+      if (field === "voltage_v") adapted.voltageUnit = "V";
+      if (field === "current_a") adapted.currentUnit = "A";
+      if (field === "temperature_c") adapted.temperatureUnit = "C";
+    }
+    const values = rows.map((row, index) => {
+      const raw = row[column]?.trim();
+      if (!raw) return null;
+      // Reject malformed measurements; only genuinely absent cells are recovered.
+      if (field === "time_s" && ["datetime", "clock"].includes(adapted.timeUnit)) return index;
+      return numberValue(raw, index + 2, column);
+    });
+    const known = values.flatMap((value, index) => value === null ? [] : [index]);
+    const missing = values.filter(value => value === null).length;
+    if (!missing) continue;
+    if (field === "time_s" && known.length && ["datetime", "clock"].includes(adapted.timeUnit)) throw new Error("Faltan marcas de tiempo: completa las fechas o exporta tiempo numérico para interpolarlo.");
+    let previous: number | undefined;
+    let cursor = 0;
+    for (let index = 0; index < rows.length; index++) {
+      if (values[index] !== null) { previous = index; continue; }
+      while (cursor < known.length && known[cursor] < index) cursor++;
+      const next = known[cursor];
+      let value: number;
+      if (previous !== undefined && next !== undefined) {
+        value = values[previous]! + (values[next]! - values[previous]!) * (index - previous) / (next - previous);
+      } else if (known.length) {
+        value = values[previous ?? next]!;
+        if (field === "time_s") {
+          const left = previous === undefined ? known[0] : known[Math.max(0, known.length - 2)];
+          const right = previous === undefined ? known[Math.min(1, known.length - 1)] : known[known.length - 1];
+          const slope = right === left ? 1 : (values[right]! - values[left]!) / (right - left);
+          value = values[left]! + (index - left) * slope;
+        }
+      } else {
+        value = field === "time_s" ? index : field === "voltage_v" ? (4.2 - 1.2 * index / Math.max(1, rows.length - 1)) * (options.seriesCells ?? 1)
+          : field === "current_a" ? (options.invertCurrent ? 1 : -1) * (options.parallelStrings ?? 1) : 25;
+      }
+      rows[index][column] = String(value);
+    }
+    warnings.push(known.length
+      ? `${field}: ${missing} datos ausentes interpolados por posición de fila; extremos ${field === "time_s" ? "extrapolados con el intervalo observado (o 1 unidad si solo hay un instante)" : "completados con el valor medido más cercano"}.`
+      : `${field}: señal simulada (${field === "time_s" ? "intervalo supuesto de 1 segundo" : field === "voltage_v" ? "descenso supuesto de 4,2 a 3 V por celda" : field === "current_a" ? "descarga supuesta de 1 A por rama" : "temperatura supuesta de 25 °C"}).`);
+  }
+  if (warnings.length) warnings.unshift("ESCENARIO SIMULADO: contiene datos reconstruidos o supuestos. El SoH resultante no es una medición de la salud real de la batería.");
+  return { samples: convertTelemetryCsv({ fields, rows }, { ...adapted, segmentId: undefined }), warnings };
 }
 
 export async function parseTelemetryCsv(file: File): Promise<TelemetrySample[]> {

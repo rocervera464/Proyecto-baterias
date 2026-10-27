@@ -94,6 +94,15 @@ class ModelService:
             "metadata.json"
         )
 
+        self.target_modes = self.metadata.get("forecast_target_modes", {})
+        if not isinstance(self.target_modes, dict) or any(
+            key not in {"0", "5", "10", "20", "30"}
+            or mode not in {"absolute", "delta_from_current"}
+            or (key == "0" and mode != "absolute")
+            for key, mode in self.target_modes.items()
+        ):
+            raise RuntimeError("Los objetivos de los modelos no son compatibles.")
+
         self._validate_features()
 
         self.models = (
@@ -236,6 +245,11 @@ class ModelService:
                 )
             )
 
+            declared_delta = model.get_booster().attr("prediction_target") == "soh_delta"
+            expected_delta = self.target_modes.get(str(horizon), "absolute") == "delta_from_current"
+            if declared_delta != expected_delta:
+                raise RuntimeError(f"El objetivo del modelo del horizonte {horizon} no coincide con sus metadatos.")
+
             models[
                 horizon
             ] = model
@@ -369,6 +383,9 @@ class ModelService:
             value = float(
                 prediction[0]
             )
+
+            if self.target_modes.get(str(horizon), "absolute") == "delta_from_current":
+                value += predictions[0]
 
             if not np.isfinite(
                 value

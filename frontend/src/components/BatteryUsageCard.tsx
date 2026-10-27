@@ -4,7 +4,7 @@ import { getSohImages } from "../utils/sohImage";
 import Icon from "./Icon";
 
 
-export default function BatteryUsageCard({ soh }: { soh: number }) {
+export default function BatteryUsageCard({ soh, exploratory = false }: { soh: number; exploratory?: boolean }) {
   const usage = getSohClassification(soh);
   const images = getSohImages(soh);
 
@@ -13,6 +13,7 @@ export default function BatteryUsageCard({ soh }: { soh: number }) {
       <p className="section-kicker">REUTILIZACIÓN Y CIRCULARIDAD</p>
       <div className="second-life-title"><span className="panel-icon"><Icon name="battery" /></span><h3 id="battery-usage-title">Posibles usos de la batería según su estado de salud</h3></div>
       <p>Explora aplicaciones potenciales para esta batería según su estado de salud estimado. Las recomendaciones son orientativas y requieren evaluación técnica antes de su implementación.</p>
+      {exploratory && <div className="import-warnings" role="note"><strong>Posibles usos orientativos · predicción exploratoria</strong><p>Estas aplicaciones se muestran según el SoH estimado, que puede depender de datos reconstruidos, supuestos o condiciones sin validar. Su viabilidad requiere una evaluación técnica de la batería.</p></div>}
       {usage ? (
         <>
           <div className="battery-usage-status">

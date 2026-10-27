@@ -37,6 +37,9 @@ def main():
         print("Held-out battery:", battery, flush=True)
         test = frame[frame.battery_id == battery]
         baseline = {h: model.predict(test[MODEL_FEATURES]) for h, model in old.models.items()}
+        for h in baseline:
+            if old.target_modes.get(str(h), "absolute") == "delta_from_current":
+                baseline[h] = baseline[h] + baseline[0]
         new = {}
         for h in [0, 5, 10, 20, 30]:
             dataset = horizon_dataset(frame, h)

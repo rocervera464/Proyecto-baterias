@@ -1,0 +1,409 @@
+{
+  "min": 57.30905570094814,
+  "max": 101.15172778353462,
+  "rows": 636,
+  "target_bands": [
+    {
+      "horizon": 0,
+      "lower": 0,
+      "upper": 10,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 0,
+      "lower": 10,
+      "upper": 20,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 0,
+      "lower": 20,
+      "upper": 30,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 0,
+      "lower": 30,
+      "upper": 40,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 0,
+      "lower": 40,
+      "upper": 50,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 0,
+      "lower": 50,
+      "upper": 60,
+      "n": 11,
+      "batteries": 1,
+      "mae": 12.208777958338517
+    },
+    {
+      "horizon": 0,
+      "lower": 60,
+      "upper": 70,
+      "n": 50,
+      "batteries": 1,
+      "mae": 6.631606624067579
+    },
+    {
+      "horizon": 0,
+      "lower": 70,
+      "upper": 80,
+      "n": 208,
+      "batteries": 4,
+      "mae": 1.7092235796149364
+    },
+    {
+      "horizon": 0,
+      "lower": 80,
+      "upper": 90,
+      "n": 156,
+      "batteries": 4,
+      "mae": 2.853067163751539
+    },
+    {
+      "horizon": 0,
+      "lower": 90,
+      "upper": 100,
+      "n": 187,
+      "batteries": 4,
+      "mae": 2.5561534200000096
+    },
+    {
+      "horizon": 5,
+      "lower": 0,
+      "upper": 10,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 5,
+      "lower": 10,
+      "upper": 20,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 5,
+      "lower": 20,
+      "upper": 30,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 5,
+      "lower": 30,
+      "upper": 40,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 5,
+      "lower": 40,
+      "upper": 50,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 5,
+      "lower": 50,
+      "upper": 60,
+      "n": 11,
+      "batteries": 1,
+      "mae": 12.53765688123447
+    },
+    {
+      "horizon": 5,
+      "lower": 60,
+      "upper": 70,
+      "n": 50,
+      "batteries": 1,
+      "mae": 6.764285469791048
+    },
+    {
+      "horizon": 5,
+      "lower": 70,
+      "upper": 80,
+      "n": 208,
+      "batteries": 4,
+      "mae": 1.7305574189653175
+    },
+    {
+      "horizon": 5,
+      "lower": 80,
+      "upper": 90,
+      "n": 156,
+      "batteries": 4,
+      "mae": 2.7141328618638525
+    },
+    {
+      "horizon": 5,
+      "lower": 90,
+      "upper": 100,
+      "n": 179,
+      "batteries": 4,
+      "mae": 2.834587020783912
+    },
+    {
+      "horizon": 10,
+      "lower": 0,
+      "upper": 10,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 10,
+      "lower": 10,
+      "upper": 20,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 10,
+      "lower": 20,
+      "upper": 30,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 10,
+      "lower": 30,
+      "upper": 40,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 10,
+      "lower": 40,
+      "upper": 50,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 10,
+      "lower": 50,
+      "upper": 60,
+      "n": 11,
+      "batteries": 1,
+      "mae": 12.89834136276856
+    },
+    {
+      "horizon": 10,
+      "lower": 60,
+      "upper": 70,
+      "n": 50,
+      "batteries": 1,
+      "mae": 6.909745217105501
+    },
+    {
+      "horizon": 10,
+      "lower": 70,
+      "upper": 80,
+      "n": 208,
+      "batteries": 4,
+      "mae": 1.8521083540748826
+    },
+    {
+      "horizon": 10,
+      "lower": 80,
+      "upper": 90,
+      "n": 156,
+      "batteries": 4,
+      "mae": 2.713229240605988
+    },
+    {
+      "horizon": 10,
+      "lower": 90,
+      "upper": 100,
+      "n": 163,
+      "batteries": 4,
+      "mae": 3.070027093145274
+    },
+    {
+      "horizon": 20,
+      "lower": 0,
+      "upper": 10,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 20,
+      "lower": 10,
+      "upper": 20,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 20,
+      "lower": 20,
+      "upper": 30,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 20,
+      "lower": 30,
+      "upper": 40,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 20,
+      "lower": 40,
+      "upper": 50,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 20,
+      "lower": 50,
+      "upper": 60,
+      "n": 11,
+      "batteries": 1,
+      "mae": 13.247547767021047
+    },
+    {
+      "horizon": 20,
+      "lower": 60,
+      "upper": 70,
+      "n": 50,
+      "batteries": 1,
+      "mae": 7.182058928550038
+    },
+    {
+      "horizon": 20,
+      "lower": 70,
+      "upper": 80,
+      "n": 208,
+      "batteries": 4,
+      "mae": 2.1675108686474465
+    },
+    {
+      "horizon": 20,
+      "lower": 80,
+      "upper": 90,
+      "n": 156,
+      "batteries": 4,
+      "mae": 3.0996522701491043
+    },
+    {
+      "horizon": 20,
+      "lower": 90,
+      "upper": 100,
+      "n": 125,
+      "batteries": 4,
+      "mae": 4.430889585055643
+    },
+    {
+      "horizon": 30,
+      "lower": 0,
+      "upper": 10,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 30,
+      "lower": 10,
+      "upper": 20,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 30,
+      "lower": 20,
+      "upper": 30,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 30,
+      "lower": 30,
+      "upper": 40,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 30,
+      "lower": 40,
+      "upper": 50,
+      "n": 0,
+      "batteries": 0,
+      "mae": null
+    },
+    {
+      "horizon": 30,
+      "lower": 50,
+      "upper": 60,
+      "n": 11,
+      "batteries": 1,
+      "mae": 13.376628105932623
+    },
+    {
+      "horizon": 30,
+      "lower": 60,
+      "upper": 70,
+      "n": 50,
+      "batteries": 1,
+      "mae": 7.367664919511233
+    },
+    {
+      "horizon": 30,
+      "lower": 70,
+      "upper": 80,
+      "n": 208,
+      "batteries": 4,
+      "mae": 2.7756508682758403
+    },
+    {
+      "horizon": 30,
+      "lower": 80,
+      "upper": 90,
+      "n": 156,
+      "batteries": 4,
+      "mae": 4.4569802882581095
+    },
+    {
+      "horizon": 30,
+      "lower": 90,
+      "upper": 100,
+      "n": 89,
+      "batteries": 4,
+      "mae": 4.097586685668223
+    }
+  ],
+  "evaluation_report": "docs/model-refinement-room-short-v2.json",
+  "evaluation_scope": "Exploratory fixed short-horizon follow-up motivated by the first comparison; same held-out datasets reused, not a new independent test. Pilot battery holdouts and purged temporal holdout on previously studied datasets. Not independent external validation. All scores include production reconciliation; baseline configurations refit only on training batteries/cycles."
+}

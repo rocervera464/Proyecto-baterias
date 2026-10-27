@@ -82,8 +82,9 @@ def predict_battery_health(
         )
 
     except (
-        FileNotFoundError,
+        OSError,
         RuntimeError,
+        ValueError,
     ) as error:
         raise HTTPException(
             status_code=503,

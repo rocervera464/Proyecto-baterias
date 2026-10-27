@@ -1,0 +1,823 @@
+{
+  "battery_holdout": {
+    "folds": [
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 0,
+        "n": 168,
+        "mae": 1.8553924537696769,
+        "rmse": 2.1365014896672143
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 5,
+        "n": 163,
+        "mae": 2.5048470146991213,
+        "rmse": 2.9088247887190404
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 10,
+        "n": 158,
+        "mae": 2.266275951363233,
+        "rmse": 2.590432752763344
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 20,
+        "n": 148,
+        "mae": 2.621856555279969,
+        "rmse": 2.9891010314757747
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 30,
+        "n": 138,
+        "mae": 2.4889912677640287,
+        "rmse": 2.98622995103694
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 0,
+        "n": 168,
+        "mae": 1.8553924537696769,
+        "rmse": 2.1365014896672143
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 5,
+        "n": 163,
+        "mae": 2.2504807689978916,
+        "rmse": 2.654987901466694
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 10,
+        "n": 158,
+        "mae": 2.434905628744501,
+        "rmse": 2.883196236239178
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 20,
+        "n": 148,
+        "mae": 2.479266470328955,
+        "rmse": 2.900921457510031
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 30,
+        "n": 138,
+        "mae": 2.4889912677640287,
+        "rmse": 2.98622995103694
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 0,
+        "n": 168,
+        "mae": 4.166725027887767,
+        "rmse": 5.4007499286354825
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 5,
+        "n": 163,
+        "mae": 4.956183954174879,
+        "rmse": 5.965585229070297
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 10,
+        "n": 158,
+        "mae": 5.474166796241618,
+        "rmse": 6.439835403565596
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 20,
+        "n": 148,
+        "mae": 6.643008578976369,
+        "rmse": 7.375069861671159
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 30,
+        "n": 138,
+        "mae": 7.16398076666163,
+        "rmse": 7.737856240409158
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 0,
+        "n": 168,
+        "mae": 4.166725027887767,
+        "rmse": 5.4007499286354825
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 5,
+        "n": 163,
+        "mae": 4.888815355358697,
+        "rmse": 5.972764606233492
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 10,
+        "n": 158,
+        "mae": 5.553364176250401,
+        "rmse": 6.486935791777413
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 20,
+        "n": 148,
+        "mae": 6.641213361869584,
+        "rmse": 7.36650195392911
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 30,
+        "n": 138,
+        "mae": 7.158579945014064,
+        "rmse": 7.734389300624282
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 0,
+        "n": 168,
+        "mae": 2.1123486693007862,
+        "rmse": 2.474886862554505
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 5,
+        "n": 163,
+        "mae": 1.3040557265955655,
+        "rmse": 1.6665605262418277
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 10,
+        "n": 158,
+        "mae": 1.4229550682654386,
+        "rmse": 1.7063946383481716
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 20,
+        "n": 148,
+        "mae": 1.5043809986933434,
+        "rmse": 1.9100111599506968
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 30,
+        "n": 138,
+        "mae": 1.0866335270307168,
+        "rmse": 1.412982858429533
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 0,
+        "n": 168,
+        "mae": 2.1123486693007862,
+        "rmse": 2.474886862554505
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 5,
+        "n": 163,
+        "mae": 1.6087863770699058,
+        "rmse": 1.93893985425469
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 10,
+        "n": 158,
+        "mae": 1.250008226970719,
+        "rmse": 1.5261896790987142
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 20,
+        "n": 148,
+        "mae": 1.5043809986933434,
+        "rmse": 1.9100111599506968
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 30,
+        "n": 138,
+        "mae": 1.0866335270307168,
+        "rmse": 1.412982858429533
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 0,
+        "n": 132,
+        "mae": 3.252538614970696,
+        "rmse": 3.8161226760319464
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 5,
+        "n": 127,
+        "mae": 3.0432387032574564,
+        "rmse": 4.0933864261445745
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 10,
+        "n": 122,
+        "mae": 3.256468500339096,
+        "rmse": 4.472581980212796
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 20,
+        "n": 112,
+        "mae": 3.9604249449253737,
+        "rmse": 5.308902396776351
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 30,
+        "n": 102,
+        "mae": 6.673696952680314,
+        "rmse": 7.706795393699567
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 0,
+        "n": 132,
+        "mae": 3.252538614970696,
+        "rmse": 3.8161226760319464
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 5,
+        "n": 127,
+        "mae": 2.8903929542573636,
+        "rmse": 3.940761375158676
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 10,
+        "n": 122,
+        "mae": 2.9487438613056303,
+        "rmse": 3.958064515626286
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 20,
+        "n": 112,
+        "mae": 3.965138116752315,
+        "rmse": 5.312514309145884
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 30,
+        "n": 102,
+        "mae": 6.673696952680314,
+        "rmse": 7.706795393699567
+      }
+    ],
+    "macro_average": [
+      {
+        "procedure": "baseline",
+        "horizon": 0,
+        "mae": 2.8467511914822317,
+        "rmse": 3.457065239222287
+      },
+      {
+        "procedure": "baseline",
+        "horizon": 5,
+        "mae": 2.9520813496817557,
+        "rmse": 3.658589242543935
+      },
+      {
+        "procedure": "baseline",
+        "horizon": 10,
+        "mae": 3.104966579052346,
+        "rmse": 3.8023111937224767
+      },
+      {
+        "procedure": "baseline",
+        "horizon": 20,
+        "mae": 3.682417769468764,
+        "rmse": 4.395771112468496
+      },
+      {
+        "procedure": "baseline",
+        "horizon": 30,
+        "mae": 4.353325628534172,
+        "rmse": 4.9609661108938
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 0,
+        "mae": 2.8467511914822317,
+        "rmse": 3.457065239222287
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 5,
+        "mae": 2.9096188639209646,
+        "rmse": 3.6268634342783876
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 10,
+        "mae": 3.0467554733178126,
+        "rmse": 3.7135965556853976
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 20,
+        "mae": 3.6474997369110493,
+        "rmse": 4.37248722013393
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 30,
+        "mae": 4.351975423122281,
+        "rmse": 4.96009937594758
+      }
+    ],
+    "selections": [
+      {
+        "battery": "B0005",
+        "selected": "delta_short",
+        "inner_mae": {}
+      },
+      {
+        "battery": "B0006",
+        "selected": "delta_short",
+        "inner_mae": {}
+      },
+      {
+        "battery": "B0007",
+        "selected": "delta_short",
+        "inner_mae": {}
+      },
+      {
+        "battery": "B0018",
+        "selected": "delta_short",
+        "inner_mae": {}
+      }
+    ]
+  },
+  "temporal_holdout": {
+    "folds": [
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 0,
+        "n": 84,
+        "mae": 1.924605104299663,
+        "rmse": 2.3616863058376296
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 5,
+        "n": 79,
+        "mae": 2.615102824228447,
+        "rmse": 2.900401596478364
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 10,
+        "n": 74,
+        "mae": 3.053778114932675,
+        "rmse": 3.3277877828921807
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 20,
+        "n": 64,
+        "mae": 4.305316008531902,
+        "rmse": 4.446208203341375
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0005",
+        "horizon": 30,
+        "n": 54,
+        "mae": 5.649276767396941,
+        "rmse": 5.692457545392869
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 0,
+        "n": 84,
+        "mae": 7.065721514862354,
+        "rmse": 8.404645459760587
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 5,
+        "n": 79,
+        "mae": 7.571432395640572,
+        "rmse": 8.690572203717865
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 10,
+        "n": 74,
+        "mae": 7.913029662921162,
+        "rmse": 8.958900107289473
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 20,
+        "n": 64,
+        "mae": 8.890282583270439,
+        "rmse": 9.62390973604574
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0006",
+        "horizon": 30,
+        "n": 54,
+        "mae": 9.823525915674145,
+        "rmse": 10.349741686611097
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 0,
+        "n": 84,
+        "mae": 2.5508477460444574,
+        "rmse": 2.7308781739469867
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 5,
+        "n": 79,
+        "mae": 2.5016216152872572,
+        "rmse": 2.6990806888376637
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 10,
+        "n": 74,
+        "mae": 2.8743488918337263,
+        "rmse": 3.1315404637161044
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 20,
+        "n": 64,
+        "mae": 3.654072050998369,
+        "rmse": 3.8830732199412203
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0007",
+        "horizon": 30,
+        "n": 54,
+        "mae": 4.374685740925487,
+        "rmse": 4.634445889124444
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 0,
+        "n": 66,
+        "mae": 0.9248643006530763,
+        "rmse": 1.1038129494431936
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 5,
+        "n": 61,
+        "mae": 1.5171626687779534,
+        "rmse": 1.8096297988739032
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 10,
+        "n": 56,
+        "mae": 1.7524218286287934,
+        "rmse": 2.114105022620982
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 20,
+        "n": 46,
+        "mae": 2.296138605704031,
+        "rmse": 2.6370128623383193
+      },
+      {
+        "procedure": "baseline",
+        "battery": "B0018",
+        "horizon": 30,
+        "n": 36,
+        "mae": 2.541409331610235,
+        "rmse": 3.115297800097568
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 0,
+        "n": 84,
+        "mae": 1.924605104299663,
+        "rmse": 2.3616863058376296
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 5,
+        "n": 79,
+        "mae": 2.4814169661905767,
+        "rmse": 2.86536217981327
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 10,
+        "n": 74,
+        "mae": 2.8631011599747573,
+        "rmse": 3.160505668238958
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 20,
+        "n": 64,
+        "mae": 4.069201185427708,
+        "rmse": 4.233654831300724
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0005",
+        "horizon": 30,
+        "n": 54,
+        "mae": 5.385687867765383,
+        "rmse": 5.431052811958771
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 0,
+        "n": 84,
+        "mae": 7.065721514862354,
+        "rmse": 8.404645459760587
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 5,
+        "n": 79,
+        "mae": 7.562496309230363,
+        "rmse": 8.68821983791632
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 10,
+        "n": 74,
+        "mae": 7.903489786888642,
+        "rmse": 8.9547425387835
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 20,
+        "n": 64,
+        "mae": 8.879252101607838,
+        "rmse": 9.617224875110855
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0006",
+        "horizon": 30,
+        "n": 54,
+        "mae": 9.810452752222172,
+        "rmse": 10.341717443172163
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 0,
+        "n": 84,
+        "mae": 2.5508477460444574,
+        "rmse": 2.7308781739469867
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 5,
+        "n": 79,
+        "mae": 2.102163647754391,
+        "rmse": 2.3493326712160227
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 10,
+        "n": 74,
+        "mae": 2.337467272916721,
+        "rmse": 2.633059858980225
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 20,
+        "n": 64,
+        "mae": 3.3377081133112405,
+        "rmse": 3.577370155843995
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0007",
+        "horizon": 30,
+        "n": 54,
+        "mae": 4.208409689986986,
+        "rmse": 4.429010976568045
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 0,
+        "n": 66,
+        "mae": 0.9248643006530763,
+        "rmse": 1.1038129494431936
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 5,
+        "n": 61,
+        "mae": 1.5470570339328196,
+        "rmse": 1.8258909962688343
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 10,
+        "n": 56,
+        "mae": 1.7369424565368614,
+        "rmse": 2.085344294693252
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 20,
+        "n": 46,
+        "mae": 2.2839422096837474,
+        "rmse": 2.6200499456570316
+      },
+      {
+        "procedure": "nested_selected",
+        "battery": "B0018",
+        "horizon": 30,
+        "n": 36,
+        "mae": 2.5043017896945163,
+        "rmse": 3.0789303066091307
+      }
+    ],
+    "macro_average": [
+      {
+        "procedure": "baseline",
+        "horizon": 0,
+        "mae": 3.1165096664648875,
+        "rmse": 3.6502557222470995
+      },
+      {
+        "procedure": "baseline",
+        "horizon": 5,
+        "mae": 3.5513298759835576,
+        "rmse": 4.024921071976949
+      },
+      {
+        "procedure": "baseline",
+        "horizon": 10,
+        "mae": 3.898394624579089,
+        "rmse": 4.383083344129685
+      },
+      {
+        "procedure": "baseline",
+        "horizon": 20,
+        "mae": 4.786452312126185,
+        "rmse": 5.1475510054166635
+      },
+      {
+        "procedure": "baseline",
+        "horizon": 30,
+        "mae": 5.597224438901701,
+        "rmse": 5.9479857303064945
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 0,
+        "mae": 3.1165096664648875,
+        "rmse": 3.6502557222470995
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 5,
+        "mae": 3.4232834892770376,
+        "rmse": 3.9322014213036116
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 10,
+        "mae": 3.7102501690792455,
+        "rmse": 4.208413090173984
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 20,
+        "mae": 4.642525902507634,
+        "rmse": 5.012074951978152
+      },
+      {
+        "procedure": "nested_selected",
+        "horizon": 30,
+        "mae": 5.477213024917265,
+        "rmse": 5.820177884577028
+      }
+    ],
+    "cutoff_cycles": {
+      "B0005": 85,
+      "B0006": 85,
+      "B0007": 85,
+      "B0018": 67
+    },
+    "selected": "delta_short",
+    "inner_mae": {}
+  },
+  "final_package": "delta_short",
+  "final_selection_mae": {},
+  "dataset_sha256": "5f48f32fcdd11f368e767466d84efbc07943387f254b9575af6a4bd085bb764d",
+  "baseline_artifacts": {
+    "xgboost_soh_current.json": "1acb08ef6df6a1beb381556aecbadcaac5b3e9b793677ca33f02705a8c77f977",
+    "xgboost_soh_plus_5.json": "4175f7197620c9a632a8fcd5157d1d2f0b5da5f856ea95873cb6b6a6b6382cc9",
+    "xgboost_soh_plus_10.json": "17a38d58b5429e2b8f061a88658933556e4644e414f3e2616b2c5d653d80b816",
+    "xgboost_soh_plus_20.json": "5e356f45c1b4651d93d27629ced8f5f1a82685b8f6079b3b82a4840bd559a5ca",
+    "xgboost_soh_plus_30.json": "d05dce290b798aa7dc21b35dddc360a93fb65a032debbdc82e281ed91b1d440b"
+  },
+  "packages": [
+    "baseline",
+    "delta_short"
+  ],
+  "scope": "Exploratory fixed short-horizon follow-up motivated by the first comparison; same held-out datasets reused, not a new independent test. Pilot battery holdouts and purged temporal holdout on previously studied datasets. Not independent external validation. All scores include production reconciliation; baseline configurations refit only on training batteries/cycles.",
+  "acceptance": {
+    "accepted": true,
+    "reasons": []
+  }
+}

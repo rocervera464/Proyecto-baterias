@@ -2,7 +2,6 @@
 export default function PageNavigation({ hasResults }: { hasResults: boolean }) {
   const links = [
     ["inicio", "Inicio"],
-    ["parametros", "Configuraci\u00f3n"],
     ["telemetria", "Telemetr\u00eda"],
     ["resultados", "Resultados"],
     ...(hasResults ? [["usos-bateria", "Posibles usos"], ["grafica", "Gr\u00e1fica"]] : []),

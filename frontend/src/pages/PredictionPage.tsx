@@ -1,4 +1,5 @@
 import BatteryHealthCard from "../components/BatteryHealthCard";
+import PredictionProgress from "../components/PredictionProgress";
 import { useState } from "react";
 import { getForecastIncreases } from "../utils/forecastConsistency";
 import PredictionChart from "../components/PredictionChart";
@@ -29,7 +30,16 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
     setLoading(true); setError(null); setPrediction(null); setCompatibility(null); setBlockedRequest(null);
     onResultsChange(false);
     setImportWarnings(context?.warnings ?? []);
-    try { setPrediction(await predictBattery(telemetry)); onResultsChange(true); }
+    const startedAt = performance.now();
+    try {
+      const result = await predictBattery(telemetry);
+      // Keep the explanatory sequence visible even when inference is fast.
+      // This is presentation time, independent of the model's execution time.
+      const remaining = Math.max(0, 9000 - (performance.now() - startedAt));
+      if (remaining > 0) await new Promise<void>(resolve => window.setTimeout(resolve, remaining));
+      setPrediction(result);
+      onResultsChange(true);
+    }
     catch (error) {
       if (error instanceof CompatibilityError) {
         setCompatibility(error.report);
@@ -41,9 +51,13 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
     finally { setLoading(false); }
   }
   const soh = prediction?.current_soh_percent ?? NaN;
-  const exploratoryResult = prediction?.compatibility && !prediction.compatibility.can_estimate_in_strict_mode;
+  const exploratoryResult = importWarnings.some(warning => /SIMULADO|supuest|exploratorio/i.test(warning)) || (prediction?.compatibility && !prediction.compatibility.can_estimate_in_strict_mode);
   const usage = getBatteryUsage(soh);
   const increases = prediction ? getForecastIncreases(prediction) : [];
+  const flattenedForecast = prediction !== null && prediction.future_predictions.length > 0
+    && prediction.future_predictions.every(item => Math.abs(item.predicted_soh_percent - prediction.current_soh_percent) < 1e-6)
+    && prediction.future_predictions.some(item => item.adjusted);
+  const cycleDeviation = prediction?.compatibility?.feature_deviations.find(item => item.feature === "cycle");
   return <div className="prediction-content">
     <section className="card analyzer" id="analizador" aria-label="Analizador de baterías"
       onChangeCapture={() => { setBlockedRequest(null); setCompatibility(null); }}
@@ -51,6 +65,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
       onClickCapture={(event) => { if ((event.target as Element).closest("button")) { setBlockedRequest(null); setCompatibility(null); } }}>
       <TelemetryForm onSubmit={handlePrediction} loading={loading} />
     </section>
+    {loading && <PredictionProgress key={analysisSequence} />}
     {error && <section className="error-card" role="alert"><strong>No fue posible realizar el análisis</strong><p>{error}</p><p>Los datos ingresados se conservan. Revisa el mensaje y vuelve a intentarlo.</p></section>}
     {compatibility && <section className="compatibility-recovery" aria-labelledby="compatibility-recovery-title">
       <h3 id="compatibility-recovery-title">Tu archivo se pudo leer; falta confirmar la compatibilidad</h3>
@@ -71,6 +86,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
           <BatteryHealthCard key={analysisSequence} soh={soh} cycle={prediction.current_cycle} rawSoh={prediction.raw_current_soh_percent} />
           <section id="proyecciones" className="forecast-section" aria-labelledby="forecast-title">
             <h3 id="forecast-title">Proyecciones futuras</h3><p className="panel-description">Proyecciones ajustadas a una tendencia de degradación no creciente.</p>
+            {flattenedForecast && <aside className="import-warnings" role="note"><strong>Proyección plana por ajuste de coherencia</strong><p>Las estimaciones originales indican aumentos de salud. Al impedir esos aumentos, el ajuste iguala las proyecciones al SoH actual. Esto no demuestra que la batería conserve su salud ni permite estimar una tasa de degradación.</p>{cycleDeviation && <p>El ciclo {prediction.current_cycle} está fuera del intervalo observado para el modelo seleccionado ({cycleDeviation.observed_min}–{cycleDeviation.observed_max}). La proyección es exploratoria.</p>}</aside>}
             <div className="prediction-grid">{[5, 10, 20, 30].map((horizon) => {
               const item = prediction.future_predictions.find((item) => item.horizon_cycles === horizon);
               const experimental = item?.experimental ?? horizon >= 20;
@@ -88,7 +104,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
           </section>
         </div>
         {increases.length > 0 && <aside className="import-warnings consistency-warning" role="note" data-reveal><strong>Las estimaciones no siguen una secuencia decreciente</strong><p>Se espera una tendencia de degradación con el uso, pero estos cinco modelos son independientes y no garantizan coherencia entre horizontes. Los aumentos estimados no demuestran recuperación de la batería. Se conservan los valores originales; +20 y +30 son experimentales.</p></aside>}
-        {exploratoryResult ? <section id="usos-bateria" className="import-warnings" role="note"><strong>Posibles usos pendientes de una evaluación compatible</strong><p>No se asignan recomendaciones de segunda vida a esta estimación exploratoria. Revisa el tipo de batería, las señales y las condiciones de entrenamiento.</p></section> : <BatteryUsageCard key={analysisSequence} soh={soh} />}
+        <BatteryUsageCard key={analysisSequence} soh={soh} exploratory={Boolean(exploratoryResult)} />
         <PredictionChart prediction={prediction} />
         <section data-reveal className="interpretation" aria-labelledby="interpretation-title"><Icon name="chart" /><div><h3 id="interpretation-title">Interpretación del resultado</h3><p>{usage ? `${usage.state} · rango orientativo ${usage.range}.` : "El resultado no se encuentra en el intervalo orientativo de 0–100 %. Revisa la predicción."} {validSoh(soh) && soh < 60 ? "Se recomienda una evaluación especializada antes de considerar reutilización o reciclaje." : "Estas categorías son orientativas y requieren evaluación técnica adicional."}</p></div></section>
       </> : <div data-reveal className="empty-results" role="status"><span className="empty-icon"><Icon name="chart" /></span><h3>{loading ? "Analizando la batería…" : "Tu análisis comienza con los datos"}</h3><p>{loading ? "Procesando la telemetría mediante los modelos predictivos." : "Carga la telemetría y ejecuta el análisis para ver el SoH actual, las cuatro proyecciones y su interpretación."}</p></div>}

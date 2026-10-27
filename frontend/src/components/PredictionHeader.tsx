@@ -13,7 +13,7 @@ export default function PredictionHeader() {
         <svg className="hero-energy-line" viewBox="0 0 320 36" fill="none" aria-hidden="true"><path className="energy-track" d="M1 18h105l12-10 15 20 18-26 17 32 15-24 13 8h123" /><path className="energy-pulse" d="M1 18h105l12-10 15 20 18-26 17 32 15-24 13 8h123" /></svg>
         <p data-reveal data-reveal-delay="2">Evalúa el estado de salud de una batería a partir de su telemetría de descarga y explora su evolución mediante modelos predictivos.</p>
         <div className="hero-actions" data-reveal data-reveal-delay="3">
-          <a className="hero-primary-action" href="#parametros">Analizar mi batería <span aria-hidden="true">→</span></a>
+          <a className="hero-primary-action" href="#telemetria">Analizar mi batería <span aria-hidden="true">→</span></a>
           <a className="hero-secondary-action" href="#metodologia">Conocer el modelo <span aria-hidden="true">↗</span></a>
         </div>
         <div data-reveal data-reveal-delay="3" className="hero-facts">

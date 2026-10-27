@@ -2,7 +2,7 @@
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .skip-link { position: absolute; top: -100px; left: 16px; z-index: 10; background: white; padding: 12px; }
 .skip-link:focus { top: 8px; }
-.app-header { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 20px max(24px, calc((100% - 1280px) / 2)); background: white; border-bottom: 1px solid var(--border); }
+.app-header { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 20px var(--page-gutter); background: white; border-bottom: 1px solid var(--border); }
 .brand { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 750; text-decoration: none; line-height: 1.3; }
 .brand small { display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); letter-spacing: .035em; }
 .brand-mark { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; color: white; background: var(--primary); }
@@ -11,7 +11,7 @@
 .app-header nav a:hover { background: #eaf5f1; color: #126c5e; }
 .hero {
   text-align: center;
-  padding: 64px max(24px, calc((100% - 1280px) / 2)) 56px;
+  padding: 64px var(--page-gutter) 56px;
   background-color: #edf5f5;
   background-image:
     linear-gradient(90deg, rgba(244, 250, 251, .78), rgba(244, 250, 251, .94) 50%, rgba(244, 250, 251, .78)),
@@ -28,7 +28,7 @@
 .hero-facts { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 24px; }
 .hero-facts span { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--primary); }
 .hero-facts svg { color: #178b78; width: 18px; }
-.prediction-page { width: min(1280px, calc(100% - 48px)); margin: 0 auto; padding-bottom: 32px; }
+.prediction-page { width: calc(100% - var(--page-gutter) - var(--page-gutter)); margin: 0 auto; padding-bottom: 32px; }
 .card, .results, .error-card { background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 3px 12px #123c4b04; padding: 32px; }
 .card.analyzer { padding: 0; background: transparent; border: 0; box-shadow: none; }
 .analysis-columns { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
@@ -110,7 +110,7 @@ tr:last-child td { border-bottom: 0; }
 .analysis-submit button:hover:not(:disabled) { background: #126c5e; }
 .analysis-submit button:disabled { background: #dce6e7; color: #536875; cursor: not-allowed; }
 .analysis-submit p { text-align: center; font-size: 12px; color: var(--text-muted); margin: 12px 0 0; }
-.telemetry-form[aria-busy="true"] .analysis-submit button::before { content: ""; display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; margin-right: 10px; vertical-align: middle; animation: spin 1s linear infinite; }
+.analysis-submit-spinner { display: block; width: 20px; height: 20px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .85s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .results { margin-top: 32px; }
 .results-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
@@ -254,7 +254,6 @@ tr:last-child td { border-bottom: 0; }
   .hero { padding: 40px 20px; }
   .hero h1 { font-size: clamp(36px, 7vw, 48px); }
   .hero-facts { gap: 12px 20px; }
-  .prediction-page { width: calc(100% - 32px); }
   .card, .results, .error-card { padding: 24px; }
   .analysis-columns, .results-overview { grid-template-columns: 1fr; }
   .parameter-panel, .telemetry-import, .csv-preview, .analysis-submit { padding: 24px; }

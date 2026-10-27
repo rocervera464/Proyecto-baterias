@@ -11,15 +11,17 @@
   border-bottom: 1px solid #123c4b12;
   box-shadow: none;
   padding-block: 10px;
+  padding-inline: var(--page-gutter);
 }
 .page-navigation .brand { font-size: 20px; letter-spacing: -.04em; }
 .page-navigation .brand small { font-size: 10px; letter-spacing: .02em; }
 .page-navigation .brand-mark { width: 36px; height: 36px; }
 .page-navigation nav a { font-size: 12px; font-weight: 500; padding: 10px; border-radius: 20px; }
 .hero {
+  padding-inline: var(--page-gutter);
   padding-top: clamp(56px, 7vw, 100px);
   padding-bottom: 64px;
-  margin-bottom: 56px;
+  margin-bottom: 32px;
   border: 0;
   background-color: #f8faf9;
   background-image: linear-gradient(180deg, #f8faf9ed 5%, #f8faf9dc 65%, #eef4f1 94%), url("/images/header-background.jpg");
@@ -49,12 +51,12 @@
 .hero-secondary-action:hover { background: #e7f1ec; }
 .hero-facts { gap: 16px 32px; margin-top: 0; }
 .hero-facts span { font-size: 12px; color: #62716e; }
-.prediction-page { width: min(1200px, calc(100% - 64px)); padding-bottom: 48px; }
+.prediction-page { padding-bottom: 48px; }
 .parameter-panel, .telemetry-import, .csv-preview, .analysis-submit, .results, .methodology.card {
   border: 1px solid #ffffff;
   border-radius: 26px;
   box-shadow: 0 8px 36px #193e3006;
-  padding: clamp(24px, 3.5vw, 44px);
+  padding: clamp(24px, 3.5vw, 44px) clamp(20px, 2vw, 32px);
 }
 .analysis-columns { gap: 28px; }
 .parameter-heading, .telemetry-import-heading { margin-bottom: 28px; }
@@ -63,8 +65,22 @@
 .form-grid { gap: 24px; }
 .form-grid input, .csv-fields-grid select, .segment-selector select { border-radius: 12px; background: #fcfdfc; border-color: #d8e1dc; padding: 13px 14px; min-height: 48px; }
 .file-upload { border-radius: 20px; background: #f7faf8; border-color: #aac5b8; padding: 32px; }
-.analysis-submit { margin-top: 28px; }
-.analysis-submit button { border-radius: 999px; min-height: 52px; background: #126c5e; }
+.analysis-submit { display: flex; flex-direction: column; align-items: center; margin-top: 24px; padding: 24px 32px; }
+.analysis-submit .form-error { align-self: stretch; text-align: left; margin-bottom: 16px; }
+.analysis-submit button { display: flex; align-items: center; gap: 14px; width: min(100%, 400px); padding: 14px 18px; min-height: 78px; border: 1px solid #126c5e; border-radius: 17px; background: linear-gradient(135deg, #178b78, #126c5e); color: white; text-align: left; box-shadow: 0 5px 16px #126c5e1f; }
+.analysis-submit-icon { display: grid; place-items: center; flex-shrink: 0; width: 42px; height: 42px; border: 1px solid #ffffff30; border-radius: 13px; background: #ffffff17; }
+.analysis-submit-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.analysis-submit-copy strong { font-size: 14px; font-weight: 650; line-height: 1.4; }
+.analysis-submit-copy > span { font-size: 11px; font-weight: 400; line-height: 1.5; opacity: .85; }
+.analysis-submit-arrow { display: grid; place-items: center; flex-shrink: 0; width: 30px; height: 30px; margin-left: auto; border: 1px solid #ffffff30; border-radius: 50%; }
+.analysis-submit-arrow svg { width: 16px; height: 16px; }
+.analysis-submit button:disabled { background: #e8efeb; border-color: #dce6df; color: #71867b; box-shadow: none; }
+.analysis-submit button:disabled .analysis-submit-icon { border-color: #ceddd3; background: #dde8e1; }
+.analysis-submit button[aria-busy="true"] { background: linear-gradient(135deg, #178b78, #126c5e); border-color: #126c5e; color: white; cursor: progress; }
+.analysis-submit button[aria-busy="true"] .analysis-submit-icon { background: #ffffff17; border-color: #ffffff30; }
+.analysis-submit button[aria-busy="true"] .analysis-submit-arrow { opacity: 0; }
+.analysis-submit button:focus-visible { outline: 2px solid #178b78; outline-offset: 4px; }
+@media (hover: hover) { .analysis-submit button:hover:not(:disabled) { background: linear-gradient(135deg, #15816f, #0f5e51); border-color: #0f5e51; box-shadow: 0 8px 20px #126c5e26; } }
 .results { margin-top: 40px; }
 .results-heading { margin-bottom: 32px; }
 .health-card, .prediction-card, .empty-results { border-radius: 20px; }
@@ -85,11 +101,10 @@
 }
 @media (max-width: 1100px) { .page-navigation { padding-block: 10px; gap: 6px; } }
 @media (max-width: 760px) {
-  .hero { padding: 48px 20px 40px; margin-bottom: 28px; }
+  .hero { padding: 48px var(--page-gutter) 40px; margin-bottom: 28px; }
   .hero h1 { font-size: inherit; }
   .hero-actions { gap: 12px; margin: 24px 0 28px; }
   .hero-actions a { padding-inline: 20px; font-size: 13px; }
-  .prediction-page { width: calc(100% - 28px); }
   .parameter-panel, .telemetry-import, .csv-preview, .analysis-submit, .results, .methodology.card { padding: 24px 20px; border-radius: 22px; }
   .parameter-heading, .telemetry-import-heading { margin-bottom: 20px; }
   .file-upload { padding: 22px 18px; }

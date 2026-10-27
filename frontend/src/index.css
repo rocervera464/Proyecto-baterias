@@ -10,6 +10,7 @@
   --action: #178b78;
   --text-muted: #536875;
   --border: #dce6eb;
+  --page-gutter: clamp(12px, 1.2vw, 24px);
 }
 * { box-sizing: border-box; }
 html { min-width: 320px; scroll-padding-top: 24px; }

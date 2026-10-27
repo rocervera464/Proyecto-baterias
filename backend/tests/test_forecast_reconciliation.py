@@ -15,6 +15,12 @@ def test_crossing_horizons_are_pooled_without_reordering_cycles():
     assert result == pytest.approx({0: 90, 5: 85, 10: 81, 20: 81, 30: 70})
 
 
+def test_all_future_increases_produce_a_plateau_without_inventing_degradation():
+    raw = {0: 59.06, 5: 61.56, 10: 59.52, 20: 59.95, 30: 63.52}
+    assert reconcile_predictions(raw) == pytest.approx(dict.fromkeys(raw, 59.06))
+    assert raw[30] == 63.52
+
+
 @pytest.mark.parametrize('raw', [
     {0: 95, 5: 90, 10: 85, 20: 80, 30: 75},
     {0: 80, 5: 80, 10: 80, 20: 80, 30: 80},

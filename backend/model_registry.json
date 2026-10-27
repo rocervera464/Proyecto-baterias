@@ -2,7 +2,7 @@
   "families": [
     {
       "id": "nasa_room_2a",
-      "directory": "model_families/nasa_room_2a_v1",
+      "directory": "model_families/nasa_room_2a_short_v2",
       "enabled": true
     }
   ]
