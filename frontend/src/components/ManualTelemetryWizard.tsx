@@ -36,7 +36,7 @@ interface Props {
   onChange: (rows: ManualRow[]) => void;
   disabled: boolean;
   step: number;
-  onStepChange: (step: number) => void;
+  onStepChange: (step: number, rows?: ManualRow[]) => void;
   parameters: ReactNode;
   parametersValid: boolean;
   parameterSummary: { label: string; value: string }[];
@@ -84,7 +84,7 @@ export default function ManualTelemetryWizard({ rows, onChange, disabled, step, 
       const combined = [...(blank ? [] : rows), ...parsed];
       onChange(combined); setPaste(""); setPasteError(null); setTouched([]); setAttempted([]);
       const firstIssue = [0, 1, 2, 3].find(index => getManualStepIssue(combined, index));
-      onStepChange(firstIssue ?? 4);
+      onStepChange(firstIssue ?? 4, combined);
     } catch (error) { setPasteError(error instanceof Error ? error.message : "No se pudo pegar el bloque."); }
   }
 

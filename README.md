@@ -8,13 +8,29 @@ Integrar un modelo predictivo XGBoost dentro de una aplicación web que permita 
 
 ## Ejecutar en Windows
 
+La instalación reproducible utiliza **Python 3.12**. Para preparar el entorno por primera vez, desde la raíz del proyecto:
+
+```powershell
+.\backend\setup.ps1
+```
+
+El script crea `backend/.venv` si falta, instala las versiones de `requirements.txt` y comprueba dependencias y modelos. Puedes indicar el ejecutable con `-Python 'C:\ruta\python.exe'`.
+
 Desde la carpeta `backend`, usa el iniciador del proyecto:
 
 ```powershell
 .\start.ps1
 ```
 
-También funciona desde la raíz con `.\backend\start.ps1`. Selecciona automáticamente el Python del entorno virtual y el módulo ASGI correcto, y activa la recarga de los archivos de `backend/app`.
+También funciona desde la raíz con `.\backend\start.ps1`, sin activar el entorno virtual. Usa rutas absolutas, verifica los modelos y el catálogo de telemetría antes del arranque y activa la recarga del código y los artefactos. Para ejecutar sin recarga, añade `-NoReload`.
+
+Para diagnosticar la instalación sin abrir un servidor:
+
+```powershell
+.\backend\start.ps1 -Check
+```
+
+Si el puerto 8000 está ocupado, el iniciador lo indica sin detener otros procesos. Puedes usar `-Port 8001`; en ese caso configura `VITE_API_URL=http://127.0.0.1:8001` en `frontend/.env` y reinicia Vite.
 
 Si prefieres ejecutar Uvicorn directamente desde `backend`:
 
@@ -31,7 +47,9 @@ Desde la raíz `Proyecto-baterias`, ejecuta sin activar el entorno virtual:
 ```
 
 Abre http://127.0.0.1:8000/docs para probar la API y
-`POST /telemetry/features`. El estado del servicio está en `/health`.
+`POST /api/v1/predict`. `/health` indica que el servidor responde y `/health/ready` comprueba que los modelos y referencias están disponibles. El arranque se detiene con un mensaje de diagnóstico si faltan modelos obligatorios.
+
+En desarrollo se aceptan los orígenes `localhost` y `127.0.0.1`, incluido el puerto alternativo que seleccione Vite. Para otros orígenes, copia `backend/.env.example` a `backend/.env` y configura `BATTERY_CORS_ORIGINS`. `BATTERY_ALLOW_LOCAL_ORIGINS=false` restringe CORS a la lista explícita. Reinicia el backend después de cambiar la configuración.
 
 Si deseas activar el entorno desde la raíz:
 
@@ -60,7 +78,7 @@ El proyecto está dividido en:
 
 La arquitectura y validación actuales se documentan en
 [SoH v2](docs/precision-soh-v2.md). La API ejecuta únicamente los horizontes
-habilitados en el manifiesto, que pueden ser ninguno. El ciclo se debe declarar;
+habilitados en el manifiesto, que pueden ser ninguno. El ciclo se recupera de los datos declarados o de una referencia verificada; si no se identifica, se debe declarar;
 no se supone ciclo 1 y no se entregan predicciones fuera del dominio compatible.
 Los informes anteriores se conservan como evidencia histórica, no como métricas
 de la arquitectura v2.
@@ -79,7 +97,7 @@ El frontend admite archivos con encabezados, separados por coma, punto y coma o 
 
 Selecciona las unidades del archivo: segundos, milisegundos, minutos, horas o fecha y hora ISO; V/mV; A/mA; y °C/°F/K. Se admiten decimales con coma cuando el separador permite distinguirlos. Las fechas se convierten en segundos desde la primera medición. Para tiempos numéricos, desmarca la opción de contar desde la primera muestra si el archivo ya contiene el tiempo transcurrido desde el inicio de la descarga.
 
-Cada archivo debe corresponder a una batería y un ciclo de descarga. Completa el ciclo, temperatura ambiente y voltaje de corte en el formulario. Se requieren tiempo, voltaje, corriente y temperatura, con al menos dos instantes distintos dentro de los primeros 300 segundos. Los valores faltantes o inválidos se señalan; no se reemplazan por cero.
+Selecciona la descarga si el archivo contiene varias. Al leerla se completan los campos de ciclo, temperatura ambiente, voltaje de corte, nivel de medición y química a partir de los metadatos declarados o de una coincidencia verificada con el catálogo NASA. Los campos quedan visibles y editables; completa únicamente los que no se puedan identificar. La misma identificación se aplica al llegar al paso «Batería» del ingreso manual, incluidas las tablas pegadas. Se requieren tiempo, voltaje, corriente y temperatura, con al menos dos instantes distintos dentro de los primeros 300 segundos. Los valores faltantes o inválidos se señalan; no se reemplazan por cero. El voltaje de corte no se obtiene del último voltaje medido ni del rango del modelo.
 
 Aceptar distintos formatos no amplía el alcance del modelo: los modelos actuales se entrenaron con las baterías NASA B0045–B0048 y una ventana de descarga de 300 segundos. Los archivos que solo contienen SoC, capacidad o SoH no proporcionan las señales necesarias para estos modelos.
 

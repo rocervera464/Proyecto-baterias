@@ -32,10 +32,15 @@ def domain_distance(service, features):
     return distance
 
 
-def select_model_service(features):
+def get_registered_services():
     services = [get_model_service()]
     if REGISTRY.exists():
         for entry in json.loads(REGISTRY.read_text(encoding="utf-8")).get("families", []):
             if entry.get("enabled"):
                 services.append(load_family(entry["directory"]))
+    return services
+
+
+def select_model_service(features):
+    services = get_registered_services()
     return min(services, key=lambda service: domain_distance(service, features))

@@ -2,6 +2,11 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
 import logging
+from contextlib import asynccontextmanager
+from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
+from app.core.settings import get_settings, LOCAL_ORIGIN_PATTERN
+from app.services.runtime_status import check_runtime
 from app.api.routes.file_import import router as import_router
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,7 +21,19 @@ from app.api.routes.telemetry import (
 )
 
 
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    runtime = await run_in_threadpool(check_runtime)
+    if runtime["errors"]:
+        raise RuntimeError("No se pudo iniciar el backend. " + " ".join(runtime["errors"]) + " Ejecuta backend/start.ps1 -Check para diagnosticar.")
+    for warning in runtime["warnings"]:
+        logging.getLogger("app.runtime").warning(warning)
+    yield
+
+
+settings = get_settings()
 app = FastAPI(
+    lifespan=lifespan,
     title="Battery Prediction API",
 
     description=(
@@ -76,12 +93,16 @@ def health_check():
         "version": "0.1.0",
     }
 
+
+@app.get("/health/ready")
+def readiness_check():
+    runtime = check_runtime()
+    return JSONResponse(runtime, status_code=200 if runtime["status"] == "ready" else 503)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=list(settings.cors_origins),
+    allow_origin_regex=LOCAL_ORIGIN_PATTERN if settings.allow_local_origins else None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

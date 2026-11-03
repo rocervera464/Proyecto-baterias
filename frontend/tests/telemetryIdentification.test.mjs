@@ -17,6 +17,15 @@ test('unknown signals preserve declared values and do not default to cycle one',
   assert.deepEqual(mergeIdentifiedParameters({ ambient: '25' }, { matched: false, reference: null, context: {} }), { ambient: '25' });
 });
 
+test('a mistaken cutoff is replaced with verified context before filling the form', () => {
+  const detected = mergeIdentifiedParameters({ cutoff: '4.6', cycle: '999' }, { matched: true, reference,
+    context: { cycle: 30, ambient_temperature_c: 4, cutoff_voltage_v: 2, measurement_level: 'cell', chemistry: 'li-ion' } });
+  assert.equal(detected.cutoff, '2');
+  assert.equal(detected.cycle, '30');
+  const unknown = mergeIdentifiedParameters({ cutoff: '4.6' }, { matched: false, reference: null, context: {} });
+  assert.equal(unknown.cutoff, '4.6');
+});
+
 test('a restored cycle requires a matching source and adjustment audit', () => {
   const data = { status: 'success', model_family: 'XGBoost SoH v2', current_cycle: 30, current_soh_percent: 81.64468383789062,
     production_horizons: [], future_predictions: [], telemetry_reference: reference,

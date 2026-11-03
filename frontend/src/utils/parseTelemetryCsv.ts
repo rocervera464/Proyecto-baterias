@@ -186,7 +186,6 @@ export function getTelemetrySegments(data: CsvData, options?: Pick<ImportOptions
         segment = { id: `segment-${segments.length}`, label, mode: rowMode, rows: [],
           cycle: cycle ? parseCycleNumber(row[cycle]) : undefined, battery: battery ? row[battery] : undefined, timeReset };
         segments.push(segment);
-        increasing = false;
         previousTime = undefined;
       }
       segment.rows.push(row);

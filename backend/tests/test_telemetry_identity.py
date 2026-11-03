@@ -72,6 +72,18 @@ def test_positive_discharge_polarity_is_repaired_only_for_verified_match(source_
     assert response.json()["discharge_samples"] == source_samples
 
 
+def test_incorrect_cutoff_is_restored_from_telemetry_not_model_limits(source_samples):
+    identified = client.post("/api/v1/telemetry/identify", json={"discharge_samples": source_samples}).json()
+    assert identified["context"]["cutoff_voltage_v"] == 2
+    response = client.post("/api/v1/predict", json={"cycle": 30, "ambient_temperature_c": 25,
+        "cutoff_voltage_v": 4.6, "discharge_samples": source_samples})
+    assert response.status_code == 200, response.text
+    change = next(change for change in response.json()["input_normalization"] if change["field"] == "cutoff_voltage_v")
+    assert change["original_value"] == 4.6
+    assert change["normalized_value"] == 2
+    assert change["basis"] == "verified_reference"
+
+
 def test_real_out_of_domain_signal_is_never_clipped_into_training_range(source_samples):
     samples = deepcopy(source_samples)
     samples[2]["voltage_v"] = 20

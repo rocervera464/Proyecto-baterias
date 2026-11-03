@@ -142,7 +142,6 @@ export default function TelemetryForm({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [measurementLevel, setMeasurementLevel] = useState<NonNullable<TelemetryRequest["measurement_level"]>>("unknown");
   const [chemistry, setChemistry] = useState<NonNullable<TelemetryRequest["chemistry"]>>("unknown");
-  const [detectedParameters, setDetectedParameters] = useState<Record<string, string>>({});
   const [binaryFile, setBinaryFile] = useState<File | null>(null);
   const [sheets, setSheets] = useState<string[]>([]);
   const [selectedSheet, setSelectedSheet] = useState("");
@@ -158,7 +157,6 @@ export default function TelemetryForm({
   const telemetrySegments = useMemo(() => csvData ? getTelemetrySegments(csvData, importOptions ?? undefined) : [], [csvData, importOptions]);
   const importMetadata = useMemo(() => csvData && importOptions ? getImportMetadata(csvData, importOptions) : null, [csvData, importOptions]);
   function applyBatteryParameters(detected: Record<string, string>, updateHistory = true) {
-    setDetectedParameters(detected);
     setCycle(detected.cycle ?? ""); setAmbientTemperature(detected.ambient ?? ""); setCutoffVoltage(detected.cutoff ?? "");
     setMeasurementLevel((detected.level ?? "unknown") as typeof measurementLevel);
     setChemistry((detected.chemistry ?? "unknown") as typeof chemistry);
@@ -183,7 +181,7 @@ export default function TelemetryForm({
       try { identity = await identifyTelemetry(samples); }
       catch { if (revision === importRevision.current) setReferenceLookupError("La identificación automática no está disponible. Se conservan los datos declarados en el archivo."); }
       if (revision !== importRevision.current) return;
-      if (identity?.matched) applyBatteryParameters(mergeIdentifiedParameters(declared, identity), updateParameters);
+      applyBatteryParameters(identity ? mergeIdentifiedParameters(declared, identity) : declared, updateParameters);
       if (identity?.matched && identity.reference) {
         setAutomaticSource(`Registro identificado: NASA ${identity.reference.battery_id}, ciclo ${identity.reference.cycle}. Datos de ensayo recuperados de la fuente verificada.${identity.adjustments.length ? " Unidades normalizadas automáticamente." : ""}`);
       }
@@ -207,7 +205,7 @@ export default function TelemetryForm({
     setFileName(file?.name ?? "");
     setCsvError(null);
     setSheets([]); setSelectedSheet(""); setFileWarnings([]); setBinaryFile(null);
-    setCycle(""); setDetectedParameters({});
+    applyBatteryParameters({}, false);
     setAutomaticSource("");
     if (!file) return;
     setMeasurementLevel("unknown"); setChemistry("unknown");
@@ -248,6 +246,49 @@ export default function TelemetryForm({
       await applyImport(imported, getDefaultImportOptions(imported), true);
     } catch (error) { setCsvError(error instanceof Error ? error.message : "No se pudo leer la hoja."); }
     finally { setReadingFile(false); }
+  }
+
+  async function changeManualStep(step: number, rows = manualRows) {
+    setManualStep(step);
+    const telemetry = validateManualTelemetry(rows);
+    if (step !== 4 || telemetry.error || telemetry.samples.length < 2) return;
+    const revision = ++importRevision.current;
+    setReadingFile(true);
+    setAutomaticSource("");
+    setReferenceLookupError("");
+    try {
+      const identity = await identifyTelemetry(telemetry.samples);
+      if (revision !== importRevision.current || !identity.matched) return;
+      applyBatteryParameters(mergeIdentifiedParameters({}, identity), false);
+      // Keep the measurements displayed in the wizard in the same units sent to the model.
+      setManualRows(identity.discharge_samples.map(sample => ({
+        time_s: String(sample.time_s), voltage_v: String(sample.voltage_v),
+        current_a: String(sample.current_a), temperature_c: String(sample.temperature_c),
+      })));
+      if (identity.reference) setAutomaticSource(`Datos completados automáticamente: NASA ${identity.reference.battery_id}, ciclo ${identity.reference.cycle}.`);
+    } catch {
+      if (revision === importRevision.current) setReferenceLookupError("No se pudo consultar la identificación automática. Completa los datos del ensayo.");
+    } finally {
+      if (revision === importRevision.current) setReadingFile(false);
+    }
+  }
+
+  function changeManualRows(rows: ManualRow[]) {
+    setManualRows(rows);
+    if (automaticSource) {
+      applyBatteryParameters({}, false);
+      setAutomaticSource("");
+    }
+  }
+
+  function changeInputMode(mode: "csv" | "manual") {
+    if (mode === inputMode) return;
+    setInputMode(mode);
+    setSubmitError(null);
+    setAutomaticSource("");
+    applyBatteryParameters({}, false);
+    if (mode === "csv" && csvData && importOptions) void applyImport(csvData, importOptions, true);
+    if (mode === "manual" && manualStep >= 4) void changeManualStep(4);
   }
 
   async function handleSubmit(
@@ -395,7 +436,6 @@ export default function TelemetryForm({
 
 
   const parametersValid = ["cycle", "ambient", "cutoff", "level", "chemistry"].every(hasValidParameter);
-  const missingFileParameters = ["cycle", "ambient", "cutoff", "level", "chemistry"].filter(key => detectedParameters[key] === undefined);
   const parameterFields = (keys?: string[]) => <div className="form-grid">
     {(!keys || keys.includes("cycle")) && <label>Ciclo de descarga<input type="number" min="1" step="1" required placeholder="Ciclo actual" value={cycle} onChange={event => { setCycle(event.target.value); }} /></label>}
     {(!keys || keys.includes("ambient")) && <label>Temperatura ambiente (°C)<input type="number" step="any" required value={ambientTemperature} onChange={event => { setAmbientTemperature(event.target.value); }} /></label>}
@@ -404,8 +444,11 @@ export default function TelemetryForm({
     {(!keys || keys.includes("chemistry")) && <label>Química<select value={chemistry} onChange={event => { setChemistry(event.target.value as typeof chemistry); }}><option value="unknown">Selecciona una opción</option><option value="li-ion">Ion litio</option><option value="LFP">LFP</option><option value="lead-acid">Plomo ácido</option><option value="other">Otra</option></select></label>}
   </div>;
   const batteryParameters = (
-      <fieldset className="battery-context" id={inputMode === "manual" ? "parametros" : "parametros-detectados"} disabled={loading || readingFile}>
+      <fieldset className="battery-context" id="parametros" disabled={loading || readingFile}>
         <legend>Datos de la batería</legend>
+        {readingFile && <p role="status">Identificando los datos del ensayo…</p>}
+        {automaticSource && <p role="status">{automaticSource}</p>}
+        {referenceLookupError && <p>{referenceLookupError}</p>}
         {parameterFields()}
       </fieldset>
   );
@@ -436,19 +479,19 @@ export default function TelemetryForm({
 
 
       <div className="telemetry-source-selector" role="group" aria-label="Método de ingreso de telemetría">
-        <button type="button" aria-pressed={inputMode === "csv"} disabled={loading || readingFile} onClick={() => { setInputMode("csv"); setSubmitError(null); }}>
+        <button type="button" aria-pressed={inputMode === "csv"} disabled={loading || readingFile} onClick={() => changeInputMode("csv")}>
           <span className="source-option-icon"><Icon name="upload" /></span>
           <span className="source-option-copy"><strong>Cargar archivo</strong><span>Importa tu telemetría</span></span>
           <span className="source-option-check" aria-hidden="true"><Icon name="check" /></span>
         </button>
-        <button type="button" aria-pressed={inputMode === "manual"} disabled={loading || readingFile} onClick={() => { setInputMode("manual"); setSubmitError(null); }}>
+        <button type="button" aria-pressed={inputMode === "manual"} disabled={loading || readingFile} onClick={() => changeInputMode("manual")}>
           <span className="source-option-icon"><Icon name="edit" /></span>
           <span className="source-option-copy"><strong>Ingresar datos manualmente</strong><span>Sigue una guía paso a paso</span></span>
           <span className="source-option-check" aria-hidden="true"><Icon name="check" /></span>
         </button>
       </div>
       {inputMode === "manual" && <TelemetryInformationGuide />}
-      {inputMode === "manual" && <ManualTelemetryWizard rows={manualRows} onChange={setManualRows} disabled={loading || readingFile} step={manualStep} onStepChange={setManualStep} parameters={batteryParameters} parametersValid={parametersValid} parameterWarnings={parameterWarnings} parameterSummary={[
+      {inputMode === "manual" && <ManualTelemetryWizard rows={manualRows} onChange={changeManualRows} disabled={loading || readingFile} step={manualStep} onStepChange={changeManualStep} parameters={batteryParameters} parametersValid={parametersValid} parameterWarnings={parameterWarnings} parameterSummary={[
         { label: "Ciclo", value: cycle },
         { label: "Temperatura ambiente", value: `${ambientTemperature} \u00b0C` },
         { label: "Voltaje de corte", value: `${cutoffVoltage} V` },
@@ -491,7 +534,7 @@ export default function TelemetryForm({
             {telemetrySegments.map((segment) => <option key={segment.id} value={segment.id}>{segment.label} · {segment.rows.length} muestras</option>)}
           </select>
         </label></div>}
-        <details id={missingFileParameters.length === 0 ? "parametros" : undefined} className="csv-settings" key={fileName} open={samples.length === 0}>
+        <details className="csv-settings" key={fileName} open={samples.length === 0}>
           <summary>Opciones avanzadas</summary>
         <fieldset className="csv-mapping" disabled={loading || readingFile}>
           <legend>Lectura del archivo</legend>
@@ -569,8 +612,7 @@ export default function TelemetryForm({
           <p className="csv-window-note">Se utilizan los primeros <strong>300 segundos</strong> de la descarga.
             Si tu archivo empieza a mitad de la descarga, desactiva la opción anterior para conservar el tiempo original.</p>
         </fieldset>
-        {batteryParameters}
-        {(fileWarnings.length > 0 || !!importMetadata?.warnings.length || automaticSource || referenceLookupError) && <div className="import-file-notes">{[...new Set([...fileWarnings, ...(automaticSource ? [automaticSource] : importMetadata?.warnings ?? []), ...(referenceLookupError ? [referenceLookupError] : [])])].map(note => <p key={note}>{note}</p>)}</div>}
+        {(fileWarnings.length > 0 || !!importMetadata?.warnings.length) && <div className="import-file-notes">{[...new Set([...fileWarnings, ...(!automaticSource ? importMetadata?.warnings ?? [] : [])])].map(note => <p key={note}>{note}</p>)}</div>}
         </details>
         </div>
       )}
@@ -621,7 +663,7 @@ export default function TelemetryForm({
 
       </fieldset>
       </div>
-      {inputMode === "csv" && samples.length > 0 && missingFileParameters.length > 0 && <fieldset className="battery-context" id="parametros" disabled={loading || readingFile}><legend>Completa los datos que faltan</legend>{parameterFields(missingFileParameters)}</fieldset>}
+      {inputMode === "csv" && samples.length > 0 && batteryParameters}
       </section>
 
 
