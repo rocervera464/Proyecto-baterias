@@ -4,6 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from app.services.model_service import BACKEND_DIR, ModelService, get_model_service
+from app.services.compatibility import assess_compatibility
 
 REGISTRY = BACKEND_DIR / "model_registry.json"
 
@@ -41,6 +42,11 @@ def get_registered_services():
     return services
 
 
-def select_model_service(features):
+def select_model_service(features, request=None):
     services = get_registered_services()
+    if request is not None:
+        compatible = [service for service in services
+                      if assess_compatibility(request, features, service.model_dir)["can_estimate_in_strict_mode"]]
+        if compatible:
+            return min(compatible, key=lambda service: domain_distance(service, features))
     return min(services, key=lambda service: domain_distance(service, features))

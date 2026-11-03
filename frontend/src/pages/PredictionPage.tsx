@@ -72,7 +72,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
     {loading && analysisTelemetry && <PredictionProgress key={analysisSequence} telemetry={analysisTelemetry} />}
     {error && <section ref={failurePanel} tabIndex={-1} className="error-card" role="alert"><strong>No se pudo completar el análisis</strong><p>{error}</p></section>}
     {compatibility && <section ref={failurePanel} tabIndex={-1} role="alert" className="compatibility-recovery" aria-labelledby="compatibility-recovery-title">
-      <h3 id="compatibility-recovery-title">No se pudo analizar la batería</h3>
+      <h3 id="compatibility-recovery-title">{compatibility.status === "out_of_range" ? "Archivo leído · mediciones fuera del alcance del modelo" : "Revisa los datos del ensayo"}</h3>
       <p>{compatibilityMessage}</p>
       <details><summary>Ver detalles</summary><ModelCompatibility report={compatibility} hasPrediction={false} /></details>
       <a href="#parametros">Revisar los parámetros de la batería</a>

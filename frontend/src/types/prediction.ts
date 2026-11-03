@@ -2,6 +2,7 @@ export interface Compatibility {
   status: "within_observed_ranges" | "out_of_range" | "unverified" | "incompatible";
   model_id: string;
   model_description?: string;
+  message?: string | null;
   can_estimate_in_strict_mode: boolean;
   reasons: string[];
   quality_warnings: string[];

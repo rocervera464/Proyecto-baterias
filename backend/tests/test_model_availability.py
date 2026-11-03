@@ -11,7 +11,7 @@ from app.api.routes import prediction, telemetry
 )
 @pytest.mark.parametrize("error", [FileNotFoundError("modelo ausente"), ValueError("JSON inválido"), RuntimeError("modelo inválido")])
 def test_unavailable_models_return_service_unavailable(monkeypatch, route, module, error):
-    def unavailable(features):
+    def unavailable(features, request=None):
         raise error
 
     monkeypatch.setattr(module, "select_model_service", unavailable)

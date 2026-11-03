@@ -20,7 +20,7 @@ def predict_battery_health(request: TelemetryRequest):
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
     try:
-        service = select_model_service(features)
+        service = select_model_service(features, request)
     except (OSError, RuntimeError, ValueError) as error:
         raise HTTPException(status_code=503, detail=f"Los modelos predictivos no están disponibles: {error}") from error
 

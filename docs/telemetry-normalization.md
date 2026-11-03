@@ -54,3 +54,34 @@ El catálogo reproducible y su alcance se documentan en
 `backend/reference_data/README.md`. Las pruebas cubren conversiones, fuente
 ambigua, señales desconocidas, conservación de datos, recuperación de los cinco
 campos y coherencia entre los endpoints y la predicción.
+
+## Compatibilidad antes de predecir
+
+Un `200` en `/identify` confirma que se pudo evaluar el registro. Solo
+`matched: true` significa que se identificó una referencia; con `matched: false`
+se conservan las mediciones y el contexto declarados.
+
+La interfaz consulta `/api/v1/telemetry/compatibility` antes de enviar `/predict`.
+Si no hay compatibilidad, muestra una explicación y no solicita una predicción
+que el servidor rechazaría. La selección comprueba todas las familias habilitadas
+y prioriza una que cumpla los rangos y requisitos de muestreo disponibles. La
+comprobación y la predicción usan la misma selección y normalización.
+
+El informe incluye `message` con el contexto y los grupos de señales que impiden
+predecir. Por ejemplo, un ambiente declarado de 22 °C queda fuera de la referencia
+de entrenamiento de 24 °C de la familia de 2 A; cambiarlo a 24 °C no corrige una
+corriente medida de 1 A ni su transitorio. Los 22 °C no son una lectura inválida:
+el modelo disponible no cubre esas condiciones. La aplicación no convierte una
+temperatura real a la del entrenamiento para forzar una salida.
+
+Los clientes que llamen directamente a `/predict` con datos incompatibles siguen
+recibiendo `422` y el informe detallado. No se amplían rangos de entrenamiento ni
+se habilitan horizontes sin evaluación adicional para eliminar ese rechazo.
+
+Caso de regresión: `backend/tests/fixtures/bateria_degradacion_avanzada_prueba.csv`
+conserva el CSV indicado por el usuario (301 mediciones, voltaje 3,0052–3,917 V,
+corriente −1,487 a −1,4152 A y temperatura 30,5–37,857 °C). No consta una fuente
+de ensayo que permita recuperar su contexto. Con ciclo 30, ambiente declarado
+22 °C y corte 2,2 V, el archivo se importa pero no tiene una familia compatible.
+La prueba conserva sus valores, verifica que no se le atribuya una identidad NASA
+y no utiliza el archivo como datos de entrenamiento ni como evidencia de precisión.

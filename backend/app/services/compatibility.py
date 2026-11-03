@@ -10,14 +10,23 @@ def compatibility_rejection_message(report: dict) -> str:
         return report["reasons"][0]
     labels = {"ambient_temperature": ("Temperatura ambiente", "°C"),
               "cutoff_voltage": ("Voltaje de corte", "V"), "cycle": ("Ciclo", "")}
+    signal_groups = [("voltage_", "voltaje"), ("current_", "corriente"), ("temperature_", "temperatura medida")]
+    outside = [label for prefix, label in signal_groups
+               if any(item["feature"].startswith(prefix) for item in report["feature_deviations"])]
+    signals = f" También quedan fuera de rango señales de {', '.join(outside)}." if outside else ""
     for name, (label, unit) in labels.items():
         deviation = next((item for item in report["feature_deviations"] if item["feature"] == name), None)
         if deviation:
             low, high = deviation["observed_min"], deviation["observed_max"]
             reference = f"{low:g}" if low == high else f"{low:g}–{high:g}"
-            return (f"{label}: {deviation['value']:g} {unit}. El modelo seleccionado se validó con {reference} {unit}. "
-                    "Confirma los datos registrados del ensayo.")
-    return "Las señales medidas están fuera del rango validado del modelo. Revisa las condiciones del ensayo."
+            return (f"{label}: {deviation['value']:g} {unit}. La referencia de entrenamiento del modelo seleccionado es {reference} {unit}."
+                    f"{signals} Solo se pueden corregir estos datos con información del ensayo o una referencia identificada.")
+    if outside:
+        return (f"Las señales de {', '.join(outside)} quedan fuera de los rangos de entrenamiento del modelo seleccionado. "
+                "Se necesita un modelo evaluado para estas condiciones; cambiar los parámetros del formulario no corrige las mediciones.")
+    if report["reasons"]:
+        return report["reasons"][0]
+    return "No se ha podido confirmar la compatibilidad de las mediciones con el modelo seleccionado."
 
 
 def assess_compatibility(request: TelemetryRequest, features: dict, model_dir: Path) -> dict:

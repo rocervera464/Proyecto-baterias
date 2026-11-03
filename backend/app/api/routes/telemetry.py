@@ -7,7 +7,7 @@ from app.services.feature_engineering import (
     WINDOW_SECONDS,
     extract_features,
 )
-from app.services.compatibility import assess_compatibility
+from app.services.compatibility import assess_compatibility, compatibility_rejection_message
 from app.services.model_registry import select_model_service
 
 
@@ -32,8 +32,9 @@ def check_compatibility(request: TelemetryRequest):
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
     try:
-        model_service = select_model_service(features)
-        return {**assess_compatibility(request, features, model_service.model_dir),
+        model_service = select_model_service(features, request)
+        report = assess_compatibility(request, features, model_service.model_dir)
+        return {**report, "message": None if report["can_estimate_in_strict_mode"] else compatibility_rejection_message(report),
                 "input_normalization": normalization, "telemetry_reference": reference}
     except (OSError, RuntimeError, ValueError) as error:
         raise HTTPException(
