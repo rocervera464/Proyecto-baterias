@@ -62,18 +62,16 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
       <TelemetryForm onSubmit={handlePrediction} loading={loading} />
     </section>
     {loading && analysisTelemetry && <PredictionProgress key={analysisSequence} telemetry={analysisTelemetry} />}
-    {error && <section className="error-card" role="alert"><strong>No fue posible realizar el análisis</strong><p>{error}</p><p>Los datos ingresados se conservan. Revisa el mensaje y vuelve a intentarlo.</p></section>}
+    {error && <section className="error-card" role="alert"><strong>No se pudo completar el análisis</strong><p>{error}</p></section>}
     {compatibility && <section className="compatibility-recovery" aria-labelledby="compatibility-recovery-title">
-      <h3 id="compatibility-recovery-title">Tu archivo se pudo leer; falta confirmar la compatibilidad</h3>
-      <p>Revisa los parámetros y las mediciones antes de volver a analizar. El sistema solo entrega estimaciones para condiciones compatibles.</p>
+      <h3 id="compatibility-recovery-title">Revisa los datos de la batería</h3>
       <ModelCompatibility report={compatibility} hasPrediction={false} />
       <a href="#parametros">Revisar los parámetros de la batería</a>
     </section>}
     <section id="resultados" className="results" aria-labelledby="results-title" aria-busy={loading}>
       <div data-reveal className="results-heading"><div><p className="section-kicker">RESULTADOS DEL ANÁLISIS</p><h2 id="results-title">Salud actual y proyección</h2></div>{prediction && <span className="badge">Ciclo {prediction.current_cycle} analizado</span>}</div>
       {prediction ? <>
-        {prediction.compatibility && <ModelCompatibility report={prediction.compatibility} />}
-        {importWarnings.length > 0 && <div className="import-warnings" role="note"><strong>Alcance de esta predicción</strong>{importWarnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
+        {(prediction.compatibility || importWarnings.length > 0) && <details className="analysis-notes"><summary>Detalles del análisis</summary>{prediction.compatibility && <ModelCompatibility report={prediction.compatibility} />}{[...new Set(importWarnings)].map(note => <p key={note}>{note}</p>)}</details>}
         <div className="results-overview">
           <BatteryHealthCard key={analysisSequence} soh={soh} cycle={prediction.current_cycle} />
           <section id="proyecciones" className="forecast-section" aria-labelledby="forecast-title">

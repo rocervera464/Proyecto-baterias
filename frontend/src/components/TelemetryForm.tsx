@@ -142,8 +142,6 @@ export default function TelemetryForm({
   const [measurementLevel, setMeasurementLevel] = useState<NonNullable<TelemetryRequest["measurement_level"]>>("unknown");
   const [chemistry, setChemistry] = useState<NonNullable<TelemetryRequest["chemistry"]>>("unknown");
   const [detectedParameters, setDetectedParameters] = useState<Record<string, string>>({});
-  const [editedParameters, setEditedParameters] = useState<string[]>([]);
-  const [recoveryWarnings, setRecoveryWarnings] = useState<string[]>([]);
   const [binaryFile, setBinaryFile] = useState<File | null>(null);
   const [sheets, setSheets] = useState<string[]>([]);
   const [selectedSheet, setSelectedSheet] = useState("");
@@ -154,16 +152,14 @@ export default function TelemetryForm({
   const [readingFile, setReadingFile] = useState(false);
   const [dragging, setDragging] = useState(false);
   const telemetrySegments = useMemo(() => csvData ? getTelemetrySegments(csvData, importOptions ?? undefined) : [], [csvData, importOptions]);
-  const detectedCycles = new Set(telemetrySegments.filter(segment => segment.cycle !== undefined).map(segment => JSON.stringify([segment.battery, segment.cycle]))).size;
   const importMetadata = useMemo(() => csvData && importOptions ? getImportMetadata(csvData, importOptions) : null, [csvData, importOptions]);
   function applyImport(data: CsvData, options: ImportOptions, updateParameters = false) {
     setImportOptions(options);
     setSamples([]);
     setCsvError(null);
-    setRecoveryWarnings([]);
     if (updateParameters) {
       const detected = detectBatteryParameters(data, options);
-      setDetectedParameters(detected); setEditedParameters([]);
+      setDetectedParameters(detected);
       setCycle(detected.cycle ?? ""); setAmbientTemperature(detected.ambient ?? ""); setCutoffVoltage(detected.cutoff ?? "");
       setMeasurementLevel((detected.level ?? "unknown") as typeof measurementLevel);
       setChemistry((detected.chemistry ?? "unknown") as typeof chemistry);
@@ -188,10 +184,9 @@ export default function TelemetryForm({
     setCsvData(null);
     setImportOptions(null);
     setFileName(file?.name ?? "");
-    setRecoveryWarnings([]);
     setCsvError(null);
     setSheets([]); setSelectedSheet(""); setFileWarnings([]); setBinaryFile(null);
-    setCycle(""); setDetectedParameters({}); setEditedParameters([]);
+    setCycle(""); setDetectedParameters({});
     if (!file) return;
     setMeasurementLevel("unknown"); setChemistry("unknown");
     if (historyFromFile) {
@@ -342,14 +337,13 @@ export default function TelemetryForm({
     submitting.current = true;
     try {
       await onSubmit(telemetry, { warnings: [
-        ...(inputMode === "manual" ? manual.warnings : [...fileWarnings, ...recoveryWarnings, ...(csvData && importOptions ? getImportMetadata(csvData, importOptions).warnings : [])]),
+        ...(inputMode === "manual" ? manual.warnings : [...fileWarnings, ...(csvData && importOptions ? getImportMetadata(csvData, importOptions).warnings : [])]),
         ...parameterWarnings,
       ] });
     } finally { submitting.current = false; }
   }
 
 
-  function markEdited(key: string) { setEditedParameters(values => values.includes(key) ? values : [...values, key]); }
   const parameterValues: Record<string, string> = {
     cycle, ambient: ambientTemperature, cutoff: cutoffVoltage,
     level: measurementLevel, chemistry,
@@ -360,14 +354,6 @@ export default function TelemetryForm({
     if (key === "level" || key === "chemistry") return true;
     const number = Number(value);
     return Number.isFinite(number) && (key !== "cycle" || (Number.isInteger(number) && number >= 1)) && (key !== "cutoff" || number > 0);
-  }
-  function parameterSource(key: string) {
-    if (editedParameters.includes(key)) {
-      if (hasValidParameter(key)) return null;
-      return "Completa este campo con un valor válido";
-    }
-    if (detectedParameters[key] !== undefined) return "Detectado en el archivo";
-    return "Dato obligatorio: introduce el valor registrado";
   }
   const parameterWarnings = [
     ...(!hasValidParameter("cycle") ? ["Completa el ciclo con un número entero mayor que cero."] : []),
@@ -387,20 +373,18 @@ export default function TelemetryForm({
 
 
   const parametersValid = ["cycle", "ambient", "cutoff", "level", "chemistry"].every(hasValidParameter);
+  const missingFileParameters = ["cycle", "ambient", "cutoff", "level", "chemistry"].filter(key => detectedParameters[key] === undefined);
+  const parameterFields = (keys?: string[]) => <div className="form-grid">
+    {(!keys || keys.includes("cycle")) && <label>Ciclo de descarga<input type="number" min="1" step="1" required placeholder="Ciclo actual" value={cycle} onChange={event => { setCycle(event.target.value); }} /></label>}
+    {(!keys || keys.includes("ambient")) && <label>Temperatura ambiente (°C)<input type="number" step="any" required value={ambientTemperature} onChange={event => { setAmbientTemperature(event.target.value); }} /></label>}
+    {(!keys || keys.includes("cutoff")) && <label>Voltaje de corte (V)<input type="number" step="any" required value={cutoffVoltage} onChange={event => { setCutoffVoltage(event.target.value); }} /></label>}
+    {(!keys || keys.includes("level")) && <label>Nivel de medición<select value={measurementLevel} onChange={event => { setMeasurementLevel(event.target.value as typeof measurementLevel); }}><option value="unknown">Selecciona una opción</option><option value="cell">Celda</option><option value="module">Módulo</option><option value="pack">Paquete</option></select></label>}
+    {(!keys || keys.includes("chemistry")) && <label>Química<select value={chemistry} onChange={event => { setChemistry(event.target.value as typeof chemistry); }}><option value="unknown">Selecciona una opción</option><option value="li-ion">Ion litio</option><option value="LFP">LFP</option><option value="lead-acid">Plomo ácido</option><option value="other">Otra</option></select></label>}
+  </div>;
   const batteryParameters = (
-      <fieldset className="battery-context" id="parametros" disabled={loading || readingFile}>
+      <fieldset className="battery-context" id={inputMode === "manual" ? "parametros" : "parametros-detectados"} disabled={loading || readingFile}>
         <legend>Datos de la batería</legend>
-        <p>{inputMode === "manual" ? "Completa los parámetros registrados de esta descarga." : "Se reconocen los valores declarados al cargar el archivo o cambiar de tramo. Puedes corregirlos antes de analizar."} El voltaje se expresa en V y la temperatura en °C.</p>
-        <div className="form-grid">
-          <label>Ciclo de descarga<input type="number" min="1" step="1" required placeholder="Ciclo registrado" value={cycle} onChange={event => { setCycle(event.target.value); markEdited("cycle"); }} /><small>{parameterSource("cycle")}</small></label>
-          <label>Temperatura ambiente (°C)<input type="number" step="any" required value={ambientTemperature} onChange={event => { setAmbientTemperature(event.target.value); markEdited("ambient"); }} /><small>{parameterSource("ambient")}</small></label>
-          <label>Voltaje de corte (V)<input type="number" step="any" required value={cutoffVoltage} onChange={event => { setCutoffVoltage(event.target.value); markEdited("cutoff"); }} /><small>{parameterSource("cutoff")}</small></label>
-          <label>Nivel de medición<select value={measurementLevel} onChange={event => { setMeasurementLevel(event.target.value as typeof measurementLevel); markEdited("level"); }}><option value="unknown">Desconocido</option><option value="cell">Celda</option><option value="module">Módulo</option><option value="pack">Paquete</option></select><small>{parameterSource("level")}</small></label>
-          <label>Química<select value={chemistry} onChange={event => { setChemistry(event.target.value as typeof chemistry); markEdited("chemistry"); }}><option value="unknown">Desconocida</option><option value="li-ion">Ion litio</option><option value="LFP">LFP</option><option value="lead-acid">Plomo ácido</option><option value="other">Otra</option></select><small>{parameterSource("chemistry")}</small></label>
-        </div>
-        {(parameterWarnings.length > 0 || (inputMode === "csv" && recoveryWarnings.length > 0)) && <p className="csv-help">Completa las condiciones registradas y revisa las señales importadas. La predicción requiere mediciones reales y compatibles con el modelo.</p>}
-        {parameterWarnings.length > 0 && <div className="import-warnings" role="note">{parameterWarnings.map(warning => <p key={warning}>{warning}</p>)}</div>}
-        {inputMode === "csv" && recoveryWarnings.length > 0 && <div className="import-warnings" role="note">{recoveryWarnings.map(warning => <p key={warning}>{warning}</p>)}</div>}
+        {parameterFields()}
       </fieldset>
   );
 
@@ -453,19 +437,18 @@ export default function TelemetryForm({
       <div hidden={inputMode !== "csv"}>
       <fieldset className="csv-source-fields" disabled={inputMode !== "csv"}>
       {sheets.length > 1 && <div className="form-grid binary-sheet-select"><label>Hoja o batería del archivo<select value={selectedSheet} disabled={readingFile || loading} onChange={(event) => void changeSheet(event.target.value)}><option value="" disabled>Selecciona una tabla</option>{sheets.map((sheet) => <option key={sheet} value={sheet}>{sheet}</option>)}</select></label></div>}
-      {!!fileWarnings.length && <div className="import-warnings">{fileWarnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
       <label className={`file-upload${dragging ? " is-dragging" : ""}`}
         onDragOver={(event) => { event.preventDefault(); if (!loading && !readingFile) setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={(event) => { event.preventDefault(); setDragging(false); void loadFile(event.dataTransfer.files[0]); }}>
 
         <span className="csv-upload-title">Arrastra tu telemetría o selecciona un archivo</span>
-        <span className="csv-upload-description">CSV, Excel (XLSX/XLS), Parquet, MAT, TSV, TXT o JSON. Puedes elegir la batería, el ciclo y el tramo de descarga.</span>
+        <span className="csv-upload-description">CSV, Excel, MAT, Parquet, TSV, TXT o JSON.</span>
 
         <input
           type="file"
           accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.mat,.parquet"
-          aria-describedby="csv-import-help csv-status"
+          aria-describedby="csv-status"
           aria-invalid={!!csvError}
           disabled={readingFile || loading}
           onChange={
@@ -476,37 +459,26 @@ export default function TelemetryForm({
       </label>
 
 
-      <p id="csv-status" className="csv-status" role="status">{readingFile ? "Adaptando y validando telemetría…" : csvError ? "La importación necesita ajustes. Revisa el mensaje y las columnas." : samples.length ? "Telemetría adaptada · lista para analizar" : "Sin archivo seleccionado"}</p>
-      <p className="csv-help" id="csv-import-help">
-        Reconoce nombres comunes, unidades y fechas. Puedes asignar columnas personalizadas;
-        solo se usan tiempo, voltaje, corriente y temperatura para la telemetría del modelo.
-      </p>
+      <p id="csv-status" className="csv-status" role="status">{readingFile ? "Leyendo archivo…" : ""}</p>
 
-      {csvData && importOptions && (
+      {inputMode === "csv" && csvData && importOptions && (
         <div className="csv-configuration">
-        <div className="import-warnings" role="status"><strong>{detectedCycles > 0 ? `${detectedCycles} ${detectedCycles === 1 ? "ciclo identificado" : "ciclos identificados"} en la telemetría` : `${telemetrySegments.length} ${telemetrySegments.length === 1 ? "tramo identificado" : "tramos identificados"} · contador no declarado en el archivo`}</strong><p>{editedParameters.includes("cycle") && hasValidParameter("cycle") ? `Ciclo indicado: ${cycle}, revisado manualmente.` : importMetadata?.cycle !== undefined ? `Ciclo seleccionado: ${importMetadata.cycle}. Se completa automáticamente en los datos de la batería.` : "Indica el ciclo real de la batería para analizar el tramo seleccionado."}</p></div>
-        <div className="form-grid"><label>Columna que identifica el ciclo<select value={importOptions.cycleColumn ?? ""} disabled={loading || readingFile} onChange={event => {
-          const next = { ...importOptions, cycleColumn: event.target.value || undefined };
-          const segments = getTelemetrySegments(csvData, next);
-          next.segmentId = (segments.find(segment => isDischarge(segment.mode)) ?? segments[0])?.id;
-          applyImport(csvData, next, true);
-        }}><option value="">{getCycleColumns(csvData).length > 1 ? "Selecciona el contador correcto" : "Sin columna detectada"}</option>{csvData.fields.map(column => <option key={column} value={column}>{column}</option>)}</select><small>Reconoce nombres habituales o permite elegir una columna personalizada.</small></label></div>
-        {importMetadata?.ambient !== undefined && <p className="csv-help">Temperatura ambiente detectada: {importMetadata.ambient} °C.</p>}
         {telemetrySegments.length > 1 && <div className="form-grid segment-selector"><label>
-          Batería, ciclo y tramo que se analizarán
+          Descarga que se analizará
           <select value={importOptions.segmentId ?? ""} disabled={loading || readingFile} onChange={(event) => applyImport(csvData, { ...importOptions, segmentId: event.target.value }, true)}>
             {telemetrySegments.map((segment) => <option key={segment.id} value={segment.id}>{segment.label} · {segment.rows.length} muestras</option>)}
           </select>
-        </label><p>Se analiza un tramo a la vez. Los periodos de carga y reposo se mantienen separados de la descarga.</p></div>}
-        {!!importMetadata?.warnings.length && <div className="import-warnings" role="note">{importMetadata.warnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
-        <div className="column-chips" aria-label="Columnas asignadas">
-          {TELEMETRY_FIELDS.map((field) => <span key={field} className={importOptions.mapping[field] ? "" : "column-missing"}>{field}<strong>{importOptions.mapping[field] || "Sin asignar"}</strong></span>)}
-        </div>
-        <details className="csv-settings" key={fileName} open={samples.length === 0}>
-          <summary>Revisar columnas y unidades <span>{importOptions.timeUnit} · {importOptions.voltageUnit} · {importOptions.currentUnit} · {importOptions.temperatureUnit === "K" ? "K" : `°${importOptions.temperatureUnit}`} · {importOptions.relativeTime || importOptions.timeUnit === "datetime" ? "Desde la primera muestra" : "Tiempo original"}</span></summary>
+        </label></div>}
+        <details id={missingFileParameters.length === 0 ? "parametros" : undefined} className="csv-settings" key={fileName} open={samples.length === 0}>
+          <summary>Opciones avanzadas</summary>
         <fieldset className="csv-mapping" disabled={loading || readingFile}>
-          <legend>Columnas y unidades del CSV</legend>
-          <p className="csv-mapping-intro">Revisa las columnas detectadas y confirma las unidades de tus mediciones.</p>
+          <legend>Lectura del archivo</legend>
+          <div className="form-grid"><label>Columna de ciclo<select value={importOptions.cycleColumn ?? ""} onChange={event => {
+            const next = { ...importOptions, cycleColumn: event.target.value || undefined };
+            const segments = getTelemetrySegments(csvData, next);
+            next.segmentId = (segments.find(segment => isDischarge(segment.mode)) ?? segments[0])?.id;
+            applyImport(csvData, next, true);
+          }}><option value="">{getCycleColumns(csvData).length > 1 ? "Selecciona el contador correcto" : "Automática"}</option>{csvData.fields.map(column => <option key={column} value={column}>{column}</option>)}</select></label></div>
           <h4 className="csv-group-title">1. Asigna las columnas</h4>
           <div className="form-grid csv-fields-grid">
             {TELEMETRY_FIELDS.map((field) => (
@@ -562,7 +534,7 @@ export default function TelemetryForm({
               <input type="number" min="1" step="1" value={importOptions.parallelStrings ?? 1} onChange={(event) => applyImport(csvData, { ...importOptions, parallelStrings: Number(event.target.value) })} />
             </label>
           </div>
-          <p className="csv-window-note">El valor 1 conserva las mediciones originales. Usa otros divisores solo si conoces la configuración y el reparto de corriente del paquete. La conversión a valores equivalentes por celda no reproduce una prueba de descarga NASA ni valida el modelo para otra química. El voltaje de corte se toma del archivo cuando está disponible; de lo contrario se utiliza 2,2 V. Debe estar en la misma escala que el voltaje convertido.</p>
+          <p className="csv-window-note">Usa divisores distintos de 1 solo si conoces la configuración del paquete. El voltaje de corte debe estar en la misma escala que el voltaje convertido.</p>
           <label className="time-origin"><input type="checkbox" checked={importOptions.invertCurrent ?? false} onChange={(event) => applyImport(csvData, { ...importOptions, invertCurrent: event.target.checked })} /><span>Invertir el signo de corriente<span className="time-origin-description">Actívalo si tu equipo registra la descarga positiva y necesitas expresarla negativa. Conserva el signo relativo de la regeneración.</span></span></label>
           <label className="time-origin">
             <input type="checkbox" checked={importOptions.relativeTime}
@@ -575,6 +547,8 @@ export default function TelemetryForm({
           <p className="csv-window-note">Se utilizan los primeros <strong>300 segundos</strong> de la descarga.
             Si tu archivo empieza a mitad de la descarga, desactiva la opción anterior para conservar el tiempo original.</p>
         </fieldset>
+        {batteryParameters}
+        {(fileWarnings.length > 0 || !!importMetadata?.warnings.length) && <div className="import-file-notes">{[...new Set([...fileWarnings, ...(importMetadata?.warnings ?? [])])].map(note => <p key={note}>{note}</p>)}</div>}
         </details>
         </div>
       )}
@@ -625,20 +599,20 @@ export default function TelemetryForm({
 
       </fieldset>
       </div>
-      {inputMode === "csv" && batteryParameters}
+      {inputMode === "csv" && samples.length > 0 && missingFileParameters.length > 0 && <fieldset className="battery-context" id="parametros" disabled={loading || readingFile}><legend>Completa los datos que faltan</legend>{parameterFields(missingFileParameters)}</fieldset>}
       </section>
 
 
 
 
       </div>
-      {inputMode === "csv" && samples.length > 0 && <section data-reveal className="csv-preview" aria-labelledby="preview-title">
+      {inputMode === "csv" && samples.length > 0 && <details className="csv-preview"><summary>Ver mediciones del archivo</summary>
         <div className="preview-heading"><h3 id="preview-title">Vista previa de telemetría</h3><span>Primeras {Math.min(5, samples.length)} muestras · unidades normalizadas</span></div>
         <div className="table-scroll" tabIndex={0} role="region" aria-label="Vista previa del CSV. Desplázate para ver todas las columnas.">
           <table><thead><tr>{TELEMETRY_FIELDS.map((field) => <th key={field} scope="col">{field}</th>)}</tr></thead>
           <tbody>{samples.slice(0, 5).map((sample, index) => <tr key={index}>{TELEMETRY_FIELDS.map((field) => <td key={field}>{Number(sample[field].toFixed(4))}</td>)}</tr>)}</tbody></table>
         </div>
-      </section>}
+      </details>}
       {(inputMode === "csv" || manualStep === 5) && <div className="analysis-submit">
       {submitError && <p className="form-error" role="alert">{submitError}</p>}
       <button
@@ -658,7 +632,7 @@ export default function TelemetryForm({
         <span className="analysis-submit-arrow" aria-hidden="true"><Icon name="arrow" /></span>
 
       </button>
-      <p role="status">{loading ? "Análisis en curso. Los modelos están procesando la telemetría." : "Carga y valida la telemetría para iniciar el análisis."}</p>
+      {loading && <p role="status">Análisis en curso…</p>}
       </div>}
 
     </form>
