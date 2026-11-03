@@ -1,7 +1,7 @@
 import BatteryHealthCard from "../components/BatteryHealthCard";
 import PredictionProgress from "../components/PredictionProgress";
 import { ANALYSIS_PRESENTATION_DURATION_MS } from "../utils/analysisPresentation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PredictionChart from "../components/PredictionChart";
 import BatteryUsageCard from "../components/BatteryUsageCard";
 import TelemetryForm from "../components/TelemetryForm";
@@ -21,6 +21,13 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [compatibility, setCompatibility] = useState<Compatibility | null>(null);
+  const [compatibilityMessage, setCompatibilityMessage] = useState("");
+  const failurePanel = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!error && !compatibility) return;
+    failurePanel.current?.focus({ preventScroll: true });
+    failurePanel.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "center" });
+  }, [error, compatibility]);
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
   const [analysisSequence, setAnalysisSequence] = useState(0);
   const [analysisTelemetry, setAnalysisTelemetry] = useState<TelemetryRequest | null>(null);
@@ -30,7 +37,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
     setAnalysisTelemetry(telemetry);
     setForecastView("cards");
     setAnalysisSequence((sequence) => sequence + 1);
-    setLoading(true); setError(null); setPrediction(null); setCompatibility(null);
+    setLoading(true); setError(null); setPrediction(null); setCompatibility(null); setCompatibilityMessage("");
     onResultsChange(false);
     setImportWarnings(context?.warnings ?? []);
     const startedAt = performance.now();
@@ -46,6 +53,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
     catch (error) {
       if (error instanceof CompatibilityError) {
         setCompatibility(error.report);
+        setCompatibilityMessage(error.message);
       } else {
         setError(error instanceof TypeError ? "No se pudo conectar con el servicio de predicción. Comprueba que el backend esté disponible." : error instanceof Error ? error.message : "Ocurrió un error inesperado.");
       }
@@ -62,10 +70,11 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
       <TelemetryForm onSubmit={handlePrediction} loading={loading} />
     </section>
     {loading && analysisTelemetry && <PredictionProgress key={analysisSequence} telemetry={analysisTelemetry} />}
-    {error && <section className="error-card" role="alert"><strong>No se pudo completar el análisis</strong><p>{error}</p></section>}
-    {compatibility && <section className="compatibility-recovery" aria-labelledby="compatibility-recovery-title">
-      <h3 id="compatibility-recovery-title">Revisa los datos de la batería</h3>
-      <ModelCompatibility report={compatibility} hasPrediction={false} />
+    {error && <section ref={failurePanel} tabIndex={-1} className="error-card" role="alert"><strong>No se pudo completar el análisis</strong><p>{error}</p></section>}
+    {compatibility && <section ref={failurePanel} tabIndex={-1} role="alert" className="compatibility-recovery" aria-labelledby="compatibility-recovery-title">
+      <h3 id="compatibility-recovery-title">No se pudo analizar la batería</h3>
+      <p>{compatibilityMessage}</p>
+      <details><summary>Ver detalles</summary><ModelCompatibility report={compatibility} hasPrediction={false} /></details>
       <a href="#parametros">Revisar los parámetros de la batería</a>
     </section>}
     <section id="resultados" className="results" aria-labelledby="results-title" aria-busy={loading}>

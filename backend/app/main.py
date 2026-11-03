@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
+import logging
 from app.api.routes.file_import import router as import_router
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,6 +27,14 @@ app = FastAPI(
 
     version="0.1.0",
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def log_prediction_validation_failure(request: Request, error: RequestValidationError):
+    if request.url.path == "/api/v1/predict":
+        fields = "; ".join(f"{'.'.join(map(str, item['loc']))}: {item['msg']}" for item in error.errors())
+        logging.getLogger("app.prediction").warning("prediction_rejected code=invalid_request fields=%s", fields)
+    return await request_validation_exception_handler(request, error)
 
 
 # ============================================================

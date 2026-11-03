@@ -1,12 +1,14 @@
 from fastapi import APIRouter, HTTPException
+import logging
 
 from app.schemas.prediction import FuturePrediction, PredictionResponse
 from app.schemas.telemetry import TelemetryRequest
-from app.services.compatibility import assess_compatibility
+from app.services.compatibility import assess_compatibility, compatibility_rejection_message
 from app.services.feature_engineering import extract_features
 from app.services.model_registry import select_model_service
 
 router = APIRouter(prefix="/api/v1", tags=["prediction"])
+logger = logging.getLogger("app.prediction")
 
 
 @router.post("/predict", response_model=PredictionResponse)
@@ -23,8 +25,12 @@ def predict_battery_health(request: TelemetryRequest):
     compatibility = assess_compatibility(request, features, service.model_dir)
     # Older clients may send exploratory, but cannot bypass production checks.
     if not compatibility["can_estimate_in_strict_mode"]:
+        message = compatibility_rejection_message(compatibility)
+        logger.warning("prediction_rejected code=incompatible_telemetry cycle=%s model=%s reason=%s",
+                       request.cycle, compatibility["model_id"], message)
         raise HTTPException(status_code=422, detail={
-            "message": "No hay un modelo compatible con estas mediciones. Revisa el nivel de medición, la química y las condiciones registradas.",
+            "code": "incompatible_telemetry",
+            "message": message,
             "compatibility": compatibility,
         })
     try:

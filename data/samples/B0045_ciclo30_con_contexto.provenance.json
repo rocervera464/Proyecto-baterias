@@ -1,0 +1,19 @@
+{
+  "original_filename": "05_XLSX_degradada_B0045_ciclo30.xlsx",
+  "original_sha256": "cb54e88ae64f42bb16b38964219cfb6835b8129be28ae7211e3de03ce9303a52",
+  "matched_source": "NASA B0045.mat, discharge 30, time <=300 s",
+  "source_sha256": "dc8e4cc149fe87f4ff855f30f0d31155ada6f467d06f5365550bab9370670fe3",
+  "source_protocol": "data/raw/nasa_45_48/README_45_46_47_48.txt",
+  "original_rows": 22,
+  "exact_signal_match_before_export": true,
+  "changes": "Added verified context columns; measured signals preserved; no reference SoH or synthetic values added",
+  "metadata": {
+    "battery_id": "B0045",
+    "cycle": 30,
+    "ambient_temperature_c": 4.0,
+    "cutoff_voltage_v": 2.0,
+    "measurement_level": "cell",
+    "chemistry": "li-ion",
+    "operating_mode": "discharge"
+  }
+}

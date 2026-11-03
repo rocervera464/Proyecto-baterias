@@ -4,6 +4,22 @@ from pathlib import Path
 from app.schemas.telemetry import TelemetryRequest
 
 
+def compatibility_rejection_message(report: dict) -> str:
+    """One actionable explanation; detailed deviations stay in the report."""
+    if report["status"] in {"unverified", "incompatible"} and report["reasons"]:
+        return report["reasons"][0]
+    labels = {"ambient_temperature": ("Temperatura ambiente", "°C"),
+              "cutoff_voltage": ("Voltaje de corte", "V"), "cycle": ("Ciclo", "")}
+    for name, (label, unit) in labels.items():
+        deviation = next((item for item in report["feature_deviations"] if item["feature"] == name), None)
+        if deviation:
+            low, high = deviation["observed_min"], deviation["observed_max"]
+            reference = f"{low:g}" if low == high else f"{low:g}–{high:g}"
+            return (f"{label}: {deviation['value']:g} {unit}. El modelo seleccionado se validó con {reference} {unit}. "
+                    "Confirma los datos registrados del ensayo.")
+    return "Las señales medidas están fuera del rango validado del modelo. Revisa las condiciones del ensayo."
+
+
 def assess_compatibility(request: TelemetryRequest, features: dict, model_dir: Path) -> dict:
     reasons = []
     deviations = []
