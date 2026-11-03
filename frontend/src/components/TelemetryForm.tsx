@@ -8,12 +8,15 @@ import type { ManualRow } from "../utils/manualTelemetry";
 import {
   useState,
   useRef,
+  useMemo,
 } from "react";
 
 import {
   readTelemetryCsv,
   getDefaultImportOptions,
   getTelemetrySegments,
+  getCycleColumns,
+  isDischarge,
   getImportMetadata,
   convertTelemetryCsv,
   TELEMETRY_FIELDS,
@@ -150,6 +153,9 @@ export default function TelemetryForm({
   const [importOptions, setImportOptions] = useState<ImportOptions | null>(null);
   const [readingFile, setReadingFile] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const telemetrySegments = useMemo(() => csvData ? getTelemetrySegments(csvData, importOptions ?? undefined) : [], [csvData, importOptions]);
+  const detectedCycles = new Set(telemetrySegments.filter(segment => segment.cycle !== undefined).map(segment => JSON.stringify([segment.battery, segment.cycle]))).size;
+  const importMetadata = useMemo(() => csvData && importOptions ? getImportMetadata(csvData, importOptions) : null, [csvData, importOptions]);
   function applyImport(data: CsvData, options: ImportOptions, updateParameters = false) {
     setImportOptions(options);
     setSamples([]);
@@ -185,6 +191,7 @@ export default function TelemetryForm({
     setRecoveryWarnings([]);
     setCsvError(null);
     setSheets([]); setSelectedSheet(""); setFileWarnings([]); setBinaryFile(null);
+    setCycle(""); setDetectedParameters({}); setEditedParameters([]);
     if (!file) return;
     setMeasurementLevel("unknown"); setChemistry("unknown");
     if (historyFromFile) {
@@ -477,14 +484,21 @@ export default function TelemetryForm({
 
       {csvData && importOptions && (
         <div className="csv-configuration">
-        {(getImportMetadata(csvData, importOptions).cycle !== undefined || getImportMetadata(csvData, importOptions).ambient !== undefined) && <p className="csv-help">Datos detectados en el archivo: {getImportMetadata(csvData, importOptions).cycle !== undefined ? `ciclo ${getImportMetadata(csvData, importOptions).cycle}` : "ciclo no especificado"} · {getImportMetadata(csvData, importOptions).ambient !== undefined ? `ambiente ${getImportMetadata(csvData, importOptions).ambient} °C` : "temperatura ambiente no especificada"}. Se aplican automáticamente al cargar o cambiar de tramo.</p>}
-        {getTelemetrySegments(csvData).length > 1 && <div className="form-grid segment-selector"><label>
+        <div className="import-warnings" role="status"><strong>{detectedCycles > 0 ? `${detectedCycles} ${detectedCycles === 1 ? "ciclo identificado" : "ciclos identificados"} en la telemetría` : `${telemetrySegments.length} ${telemetrySegments.length === 1 ? "tramo identificado" : "tramos identificados"} · contador no declarado en el archivo`}</strong><p>{editedParameters.includes("cycle") && hasValidParameter("cycle") ? `Ciclo indicado: ${cycle}, revisado manualmente.` : importMetadata?.cycle !== undefined ? `Ciclo seleccionado: ${importMetadata.cycle}. Se completa automáticamente en los datos de la batería.` : "Indica el ciclo real de la batería para analizar el tramo seleccionado."}</p></div>
+        <div className="form-grid"><label>Columna que identifica el ciclo<select value={importOptions.cycleColumn ?? ""} disabled={loading || readingFile} onChange={event => {
+          const next = { ...importOptions, cycleColumn: event.target.value || undefined };
+          const segments = getTelemetrySegments(csvData, next);
+          next.segmentId = (segments.find(segment => isDischarge(segment.mode)) ?? segments[0])?.id;
+          applyImport(csvData, next, true);
+        }}><option value="">{getCycleColumns(csvData).length > 1 ? "Selecciona el contador correcto" : "Sin columna detectada"}</option>{csvData.fields.map(column => <option key={column} value={column}>{column}</option>)}</select><small>Reconoce nombres habituales o permite elegir una columna personalizada.</small></label></div>
+        {importMetadata?.ambient !== undefined && <p className="csv-help">Temperatura ambiente detectada: {importMetadata.ambient} °C.</p>}
+        {telemetrySegments.length > 1 && <div className="form-grid segment-selector"><label>
           Batería, ciclo y tramo que se analizarán
           <select value={importOptions.segmentId ?? ""} disabled={loading || readingFile} onChange={(event) => applyImport(csvData, { ...importOptions, segmentId: event.target.value }, true)}>
-            {getTelemetrySegments(csvData).map((segment) => <option key={segment.id} value={segment.id}>{segment.label} · {segment.rows.length} muestras</option>)}
+            {telemetrySegments.map((segment) => <option key={segment.id} value={segment.id}>{segment.label} · {segment.rows.length} muestras</option>)}
           </select>
         </label><p>Se analiza un tramo a la vez. Los periodos de carga y reposo se mantienen separados de la descarga.</p></div>}
-        {getImportMetadata(csvData, importOptions).warnings.length > 0 && <div className="import-warnings" role="note">{getImportMetadata(csvData, importOptions).warnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
+        {!!importMetadata?.warnings.length && <div className="import-warnings" role="note">{importMetadata.warnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
         <div className="column-chips" aria-label="Columnas asignadas">
           {TELEMETRY_FIELDS.map((field) => <span key={field} className={importOptions.mapping[field] ? "" : "column-missing"}>{field}<strong>{importOptions.mapping[field] || "Sin asignar"}</strong></span>)}
         </div>

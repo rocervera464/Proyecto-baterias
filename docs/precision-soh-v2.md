@@ -115,6 +115,15 @@ importación de CSV/TSV/TXT/JSON/XLSX/XLS/Parquet/MAT y la conversión de unidad
 la interfaz principal exige señales completas. La gráfica une puntos de la
 API por segmentos lineales y permite mostrar solo el estado actual.
 
+La importación reconoce contadores como `cycle`, `Cycle_Index`, `cycle_count`,
+`discharge_cycle` y `Número de ciclo`, y permite asignar una columna personalizada.
+Los ciclos se separan por batería y el campo se completa con el ciclo del tramo
+seleccionado. Si hay varios contadores posibles, se exige elegir la columna.
+Los reinicios numéricos del tiempo entre registros iniciados en cero separan
+tramos, sin convertir su posición dentro del archivo en un contador absoluto.
+Si no se declara el ciclo real, se solicita introducirlo; no se estima a partir
+del voltaje ni se supone ciclo 1.
+
 ## Reproducción
 
 Desde la raíz, usando Python del entorno local:

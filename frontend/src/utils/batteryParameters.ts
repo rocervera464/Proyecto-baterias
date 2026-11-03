@@ -14,7 +14,7 @@ const aliases = {
 const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 export function detectBatteryParameters(data: CsvData, options: ImportOptions): Record<string, string> {
-  const rows = getTelemetrySegments(data).find(segment => segment.id === options.segmentId)?.rows ?? data.rows;
+  const rows = getTelemetrySegments(data, options).find(segment => segment.id === options.segmentId)?.rows ?? data.rows;
   const metadata = getImportMetadata(data, options);
   const result: Record<string, string> = {};
   if (metadata.cycle !== undefined) result.cycle = String(metadata.cycle);

@@ -16,6 +16,7 @@ export interface ImportOptions {
   temperatureUnit: "C" | "F" | "K";
   relativeTime: boolean;
   segmentId?: string;
+  cycleColumn?: string;
   seriesCells?: number;
   parallelStrings?: number;
   invertCurrent?: boolean;
@@ -89,51 +90,87 @@ export function detectImportOptions(fields: string[]): ImportOptions {
 
 const metadataAliases = {
   battery: ["vehicle_id", "battery_id", "pack_id", "device_id", "id_bateria", "bateria", "vehiculo"],
-  cycle: ["charge_cycles", "cycle", "cycle_index", "cycle_number", "ciclo", "ciclos", "ciclo_actual"],
+  cycle: ["charge_cycles", "cycle", "cycle_index", "cycle_number", "cycle_count", "cycle_counter", "cycle_id", "cycle_no", "cycle_num", "discharge_cycle", "discharge_cycles", "discharge_cycle_index", "discharge_cycle_number", "ciclo", "ciclos", "ciclo_actual", "numero_ciclo", "numero_de_ciclo", "n_ciclo", "ciclo_descarga", "ciclo_de_descarga", "contador_ciclos"],
   mode: ["operating_mode", "mode", "estado_operacion", "modo", "step_type", "operation", "phase"],
   ambient: ["ambient_temp_c", "ambient_temperature_c", "ambient_temperature", "temperatura_ambiente_c"],
 };
-function metadataField(data: CsvData, kind: keyof typeof metadataAliases): string | undefined {
-  return data.fields.find((field) => metadataAliases[kind].some((alias) => normalize(alias) === normalize(field)));
+export function getCycleColumns(data: CsvData): string[] {
+  return data.fields.filter(field => metadataAliases.cycle.some(alias => normalize(alias) === normalize(field)));
+}
+function metadataField(data: CsvData, kind: keyof typeof metadataAliases, options?: Pick<ImportOptions, "cycleColumn">): string | undefined {
+  if (kind === "cycle" && options?.cycleColumn) return data.fields.includes(options.cycleColumn) ? options.cycleColumn : undefined;
+  const fields = data.fields.filter(field => metadataAliases[kind].some(alias => normalize(alias) === normalize(field)));
+  return fields.length === 1 ? fields[0] : undefined;
+}
+export function parseCycleNumber(raw: string | undefined): number | undefined {
+  const text = (raw ?? "").trim().replace(/^(?:cycle|ciclo)(?:[ _-]*(?:number|index|de descarga|descarga))?\s*[:#_-]?\s*/i, "");
+  if (!/^[+]?\d+(?:[.,]0+)?$/.test(text)) return undefined;
+  const value = Number(text.replace(",", "."));
+  return Number.isSafeInteger(value) && value >= 1 ? value : undefined;
 }
 export interface TelemetrySegment {
   id: string;
   label: string;
   mode: string;
   rows: CsvData["rows"];
+  cycle?: number;
+  battery?: string;
+  timeReset?: boolean;
 }
-function isDischarge(mode: string): boolean {
+export function isDischarge(mode: string): boolean {
   return ["driving", "discharge", "discharging", "descarga", "conduccion", "drive"].includes(normalize(mode));
 }
-export function getTelemetrySegments(data: CsvData): TelemetrySegment[] {
+export function getTelemetrySegments(data: CsvData, options?: Pick<ImportOptions, "cycleColumn" | "mapping">): TelemetrySegment[] {
   const battery = metadataField(data, "battery");
-  const cycle = metadataField(data, "cycle");
+  const cycle = metadataField(data, "cycle", options);
   const mode = metadataField(data, "mode");
+  const time = options?.mapping.time_s || detectImportOptions(data.fields).mapping.time_s;
+  const elapsed = (row: CsvData["rows"][number] | undefined): number | undefined => {
+    const raw = time ? row?.[time]?.trim().replace(",", ".") : undefined;
+    if (!raw || !/^\+?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(raw)) return undefined;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : undefined;
+  };
   const groups = new Map<string, CsvData["rows"]>();
   for (const row of data.rows) {
-    const key = JSON.stringify([battery ? row[battery] : "", cycle ? row[cycle] : ""]);
+    const key = JSON.stringify([battery ? row[battery] : "", cycle ? parseCycleNumber(row[cycle]) ?? row[cycle] : ""]);
     const group = groups.get(key) ?? [];
     group.push(row); groups.set(key, group);
   }
   const segments: TelemetrySegment[] = [];
   for (const rows of groups.values()) {
     let segment: TelemetrySegment | undefined;
-    for (const row of rows) {
+    let previousTime: number | undefined;
+    let increasing = false;
+    for (const [index, row] of rows.entries()) {
       const rowMode = mode ? row[mode] : "";
-      if (!segment || segment.mode !== rowMode) {
-        const label = [battery && row[battery], cycle && `Ciclo ${row[cycle]}`, rowMode, `Tramo ${segments.length + 1}`].filter(Boolean).join(" · ");
-        segment = { id: `segment-${segments.length}`, label, mode: rowMode, rows: [] };
+      const currentTime = elapsed(row);
+      const nextTime = elapsed(rows[index + 1]);
+      // A fresh zero followed by another reading after an increasing recording
+      // that began at zero is evidence of a restart, not an absolute cycle ID.
+      // An isolated zero in unsorted rows is left for normal chronological sorting.
+      const timeReset = !!segment && elapsed(segment.rows[0]) === 0 && increasing && currentTime === 0 && previousTime !== undefined && previousTime > 0 && nextTime !== undefined && nextTime > 0;
+      if (!segment || segment.mode !== rowMode || timeReset) {
+        const label = [battery && row[battery], cycle && `Ciclo ${parseCycleNumber(row[cycle]) ?? row[cycle]}`, rowMode, `Tramo ${segments.length + 1}`].filter(Boolean).join(" · ");
+        segment = { id: `segment-${segments.length}`, label, mode: rowMode, rows: [],
+          cycle: cycle ? parseCycleNumber(row[cycle]) : undefined, battery: battery ? row[battery] : undefined, timeReset };
         segments.push(segment);
+        increasing = false;
+        previousTime = undefined;
       }
       segment.rows.push(row);
+      increasing = currentTime !== undefined && previousTime !== undefined && currentTime > previousTime;
+      previousTime = currentTime;
     }
   }
   return segments;
 }
 export function getDefaultImportOptions(data: CsvData): ImportOptions {
-  const segments = getTelemetrySegments(data);
-  const selected = segments.find((segment) => isDischarge(segment.mode)) ?? segments[0];
   const options = detectImportOptions(data.fields);
+  const columns = getCycleColumns(data);
+  if (columns.length === 1) options.cycleColumn = columns[0];
+  const segments = getTelemetrySegments(data, options);
+  const selected = segments.find((segment) => isDischarge(segment.mode)) ?? segments[0];
   const firstTime = selected?.rows[0]?.[options.mapping.time_s]?.trim();
   if (firstTime && /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}/.test(firstTime)) options.timeUnit = "datetime";
   if (firstTime && /^\d+:\d{2}:\d{2}(?:[.,]\d+)?$/.test(firstTime)) options.timeUnit = "clock";
@@ -143,17 +180,22 @@ export function getDefaultImportOptions(data: CsvData): ImportOptions {
   return { ...options, segmentId: selected?.id, seriesCells: 1, parallelStrings: 1, invertCurrent: false };
 }
 export function getImportMetadata(data: CsvData, options: ImportOptions): { cycle?: number; ambient?: number; warnings: string[] } {
-  const segment = getTelemetrySegments(data).find((segment) => segment.id === options.segmentId);
+  const segments = getTelemetrySegments(data, options);
+  const segment = segments.find((segment) => segment.id === options.segmentId);
   const rows = segment?.rows ?? data.rows;
   const uniqueNumber = (kind: "cycle" | "ambient") => {
-    const field = metadataField(data, kind);
+    const field = metadataField(data, kind, options);
     if (!field) return undefined;
-    const values = [...new Set(rows.map((row) => row[field]?.trim()).filter(Boolean))];
-    if (values.length !== 1) return undefined;
-    const value = Number(values[0].replace(",", "."));
-    return Number.isFinite(value) ? value : undefined;
+    const values = rows.map(row => row[field]?.trim()).filter(Boolean).map(value => kind === "cycle" ? parseCycleNumber(value) : Number(value.replace(",", ".")));
+    if (!values.length || values.some(value => value === undefined || !Number.isFinite(value)) || new Set(values).size !== 1) return undefined;
+    return values[0];
   };
   const warnings: string[] = [];
+  if (getCycleColumns(data).length > 1 && !options.cycleColumn) warnings.push("Hay varias columnas de ciclo. Selecciona la que corresponde al contador de ciclos de descarga.");
+  const cycleField = metadataField(data, "cycle", options);
+  if (!cycleField) warnings.push("El archivo no declara un número de ciclo identificable. Introduce el ciclo registrado; las señales por sí solas no determinan el contador absoluto.");
+  else if (uniqueNumber("cycle") === undefined) warnings.push("El ciclo del tramo no es un entero positivo único. Revisa la columna seleccionada y declara el ciclo registrado.");
+  if (segments.some(item => item.timeReset)) warnings.push("Se separaron tramos por reinicios del tiempo. Su orden dentro del archivo no equivale al número absoluto de ciclo.");
   if (normalize(options.mapping.voltage_v).includes("pack") || normalize(options.mapping.current_a).includes("pack")) {
     warnings.push("Se detectaron medidas de un paquete. Las familias disponibles se entrenaron con celdas NASA. Sin validación propia del paquete, no se entrega una predicción; importar el archivo no valida su aplicabilidad.");
   }
@@ -174,6 +216,7 @@ export function numberValue(raw: string | undefined, row: number, field: string)
 }
 
 export function convertTelemetryCsv(data: CsvData, options: ImportOptions): TelemetrySample[] {
+  if (options.cycleColumn && !data.fields.includes(options.cycleColumn)) throw new Error("La columna de ciclo seleccionada no existe en este archivo.");
   const { mapping } = options;
   for (const field of TELEMETRY_FIELDS) {
     if (!mapping[field] || !data.fields.includes(mapping[field])) {
@@ -183,7 +226,8 @@ export function convertTelemetryCsv(data: CsvData, options: ImportOptions): Tele
   if (new Set(Object.values(mapping)).size !== TELEMETRY_FIELDS.length) {
     throw new Error("Cada medición debe usar una columna diferente.");
   }
-  const segments = getTelemetrySegments(data);
+  if (getCycleColumns(data).length > 1 && !options.cycleColumn) throw new Error("Hay varias columnas de ciclo. Selecciona la columna de ciclo antes de analizar.");
+  const segments = getTelemetrySegments(data, options);
   const segment = options.segmentId ? segments.find((segment) => segment.id === options.segmentId) : undefined;
   if (options.segmentId && !segment) throw new Error("El tramo seleccionado ya no está disponible.");
   if (segment && ["charging", "charge", "carga", "idle", "rest", "reposo"].includes(normalize(segment.mode))) {
@@ -235,7 +279,7 @@ export function convertTelemetryCsv(data: CsvData, options: ImportOptions): Tele
 }
 
 export function recoverTelemetry(data: CsvData, options: ImportOptions): { samples: TelemetrySample[]; warnings: string[] } {
-  const selected = getTelemetrySegments(data).find(segment => segment.id === options.segmentId);
+  const selected = getTelemetrySegments(data, options).find(segment => segment.id === options.segmentId);
   const rows = (selected?.rows ?? data.rows).map(row => ({ ...row }));
   const fields = [...data.fields];
   const adapted = { ...options, mapping: { ...options.mapping } };
