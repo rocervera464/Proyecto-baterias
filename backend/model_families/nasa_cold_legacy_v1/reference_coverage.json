@@ -1,0 +1,59 @@
+{
+  "definition": "capacity / median(first 5 valid capacities) * 100",
+  "min": 68.56665153060774,
+  "max": 122.23081795851368,
+  "rows": 277,
+  "range_counts": [
+    {
+      "lower": 0,
+      "upper": 10,
+      "count": 0
+    },
+    {
+      "lower": 10,
+      "upper": 20,
+      "count": 0
+    },
+    {
+      "lower": 20,
+      "upper": 30,
+      "count": 0
+    },
+    {
+      "lower": 30,
+      "upper": 40,
+      "count": 0
+    },
+    {
+      "lower": 40,
+      "upper": 50,
+      "count": 0
+    },
+    {
+      "lower": 50,
+      "upper": 60,
+      "count": 0
+    },
+    {
+      "lower": 60,
+      "upper": 70,
+      "count": 4
+    },
+    {
+      "lower": 70,
+      "upper": 80,
+      "count": 102
+    },
+    {
+      "lower": 80,
+      "upper": 90,
+      "count": 107
+    },
+    {
+      "lower": 90,
+      "upper": 100,
+      "count": 56
+    }
+  ],
+  "caveat": "Observed training references, not validated coverage of the full 0-100% health range."
+}

@@ -15,7 +15,7 @@ import {
   getDefaultImportOptions,
   getTelemetrySegments,
   getImportMetadata,
-  recoverTelemetry,
+  convertTelemetryCsv,
   TELEMETRY_FIELDS,
 } from "../utils/parseTelemetryCsv";
 
@@ -46,21 +46,21 @@ export default function TelemetryForm({
     cycle,
     setCycle,
   ] = useState(
-    "1",
+    "",
   );
 
   const [
     ambientTemperature,
     setAmbientTemperature,
   ] = useState(
-    "25",
+    "",
   );
 
   const [
     cutoffVoltage,
     setCutoffVoltage,
   ] = useState(
-    "2.2",
+    "",
   );
 
 
@@ -138,7 +138,6 @@ export default function TelemetryForm({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [measurementLevel, setMeasurementLevel] = useState<NonNullable<TelemetryRequest["measurement_level"]>>("unknown");
   const [chemistry, setChemistry] = useState<NonNullable<TelemetryRequest["chemistry"]>>("unknown");
-  const exploratory = true;
   const [detectedParameters, setDetectedParameters] = useState<Record<string, string>>({});
   const [editedParameters, setEditedParameters] = useState<string[]>([]);
   const [recoveryWarnings, setRecoveryWarnings] = useState<string[]>([]);
@@ -159,7 +158,7 @@ export default function TelemetryForm({
     if (updateParameters) {
       const detected = detectBatteryParameters(data, options);
       setDetectedParameters(detected); setEditedParameters([]);
-      setCycle(detected.cycle ?? "1"); setAmbientTemperature(detected.ambient ?? "25"); setCutoffVoltage(detected.cutoff ?? "2.2");
+      setCycle(detected.cycle ?? ""); setAmbientTemperature(detected.ambient ?? ""); setCutoffVoltage(detected.cutoff ?? "");
       setMeasurementLevel((detected.level ?? "unknown") as typeof measurementLevel);
       setChemistry((detected.chemistry ?? "unknown") as typeof chemistry);
       setHistoryFromFile(true);
@@ -167,9 +166,7 @@ export default function TelemetryForm({
       setChargeTempStart(detected.chargeStart ?? ""); setChargeTempMax(detected.chargeMax ?? ""); setChargeTempDelta(detected.chargeDelta ?? "");
     }
     try {
-      const recovered = recoverTelemetry(data, options);
-      setSamples(recovered.samples);
-      setRecoveryWarnings(recovered.warnings);
+      setSamples(convertTelemetryCsv(data, options));
     } catch (error) {
       setCsvError(error instanceof Error ? error.message : "No fue posible procesar el archivo.");
     }
@@ -257,7 +254,7 @@ export default function TelemetryForm({
 
         measurement_level: measurementLevel,
         chemistry: chemistry,
-        analysis_mode: exploratory ? "exploratory" : "strict",
+        analysis_mode: "strict",
         cycle: Number(cycle),
 
         ambient_temperature_c:
@@ -360,15 +357,17 @@ export default function TelemetryForm({
   function parameterSource(key: string) {
     if (editedParameters.includes(key)) {
       if (hasValidParameter(key)) return null;
-      return ["cycle", "ambient", "cutoff"].includes(key) ? "Completa este campo con un valor válido" : "No declarado: opcional";
+      return "Completa este campo con un valor válido";
     }
     if (detectedParameters[key] !== undefined) return "Detectado en el archivo";
-    return ["cycle", "ambient", "cutoff"].includes(key) ? "Valor supuesto: puedes cambiarlo" : "No declarado: opcional";
+    return "Dato obligatorio: introduce el valor registrado";
   }
   const parameterWarnings = [
-    ...(!hasValidParameter("cycle") ? ["Completa el ciclo con un número entero mayor que cero."] : !editedParameters.includes("cycle") && detectedParameters.cycle === undefined ? [`Ciclo no declarado: se usa ${cycle} como supuesto.`] : []),
-    ...(!hasValidParameter("ambient") ? ["Completa la temperatura ambiente con un valor válido."] : !editedParameters.includes("ambient") && detectedParameters.ambient === undefined ? [`Temperatura ambiente no declarada: se usa ${ambientTemperature} °C como supuesto.`] : []),
-    ...(!hasValidParameter("cutoff") ? ["Completa el voltaje de corte con un valor mayor que cero."] : !editedParameters.includes("cutoff") && detectedParameters.cutoff === undefined ? [`Voltaje de corte no declarado: se usa ${cutoffVoltage} V como supuesto.`] : []),
+    ...(!hasValidParameter("cycle") ? ["Completa el ciclo con un número entero mayor que cero."] : []),
+    ...(!hasValidParameter("ambient") ? ["Completa la temperatura ambiente con un valor válido."] : []),
+    ...(!hasValidParameter("cutoff") ? ["Completa el voltaje de corte con un valor mayor que cero."] : []),
+    ...(!hasValidParameter("level") ? ["Identifica si las mediciones son de una celda, módulo o paquete."] : []),
+    ...(!hasValidParameter("chemistry") ? ["Declara la química de la batería para comprobar la compatibilidad."] : []),
   ];
 
   const samplesInWindow =
@@ -380,19 +379,19 @@ export default function TelemetryForm({
     ).length;
 
 
-  const parametersValid = ["cycle", "ambient", "cutoff"].every(hasValidParameter);
+  const parametersValid = ["cycle", "ambient", "cutoff", "level", "chemistry"].every(hasValidParameter);
   const batteryParameters = (
       <fieldset className="battery-context" id="parametros" disabled={loading || readingFile}>
         <legend>Datos de la batería</legend>
-        <p>{inputMode === "manual" ? "Completa los parámetros de esta descarga y revisa los valores supuestos." : "Se reconocen los valores declarados al cargar el archivo o cambiar de tramo. Puedes corregirlos antes de analizar."} El voltaje se expresa en V y la temperatura en °C.</p>
+        <p>{inputMode === "manual" ? "Completa los parámetros registrados de esta descarga." : "Se reconocen los valores declarados al cargar el archivo o cambiar de tramo. Puedes corregirlos antes de analizar."} El voltaje se expresa en V y la temperatura en °C.</p>
         <div className="form-grid">
-          <label>Ciclo de descarga<input type="number" step="1" required value={cycle} onChange={event => { setCycle(event.target.value); markEdited("cycle"); }} /><small>{parameterSource("cycle")}</small></label>
+          <label>Ciclo de descarga<input type="number" min="1" step="1" required placeholder="Ciclo registrado" value={cycle} onChange={event => { setCycle(event.target.value); markEdited("cycle"); }} /><small>{parameterSource("cycle")}</small></label>
           <label>Temperatura ambiente (°C)<input type="number" step="any" required value={ambientTemperature} onChange={event => { setAmbientTemperature(event.target.value); markEdited("ambient"); }} /><small>{parameterSource("ambient")}</small></label>
           <label>Voltaje de corte (V)<input type="number" step="any" required value={cutoffVoltage} onChange={event => { setCutoffVoltage(event.target.value); markEdited("cutoff"); }} /><small>{parameterSource("cutoff")}</small></label>
           <label>Nivel de medición<select value={measurementLevel} onChange={event => { setMeasurementLevel(event.target.value as typeof measurementLevel); markEdited("level"); }}><option value="unknown">Desconocido</option><option value="cell">Celda</option><option value="module">Módulo</option><option value="pack">Paquete</option></select><small>{parameterSource("level")}</small></label>
           <label>Química<select value={chemistry} onChange={event => { setChemistry(event.target.value as typeof chemistry); markEdited("chemistry"); }}><option value="unknown">Desconocida</option><option value="li-ion">Ion litio</option><option value="LFP">LFP</option><option value="lead-acid">Plomo ácido</option><option value="other">Otra</option></select><small>{parameterSource("chemistry")}</small></label>
         </div>
-        {(parameterWarnings.length > 0 || (inputMode === "csv" && recoveryWarnings.length > 0)) && <p className="csv-help">El análisis es exploratorio. Las señales ausentes pueden reconstruirse o simularse con supuestos visibles; el resultado no certifica la salud real de la batería.</p>}
+        {(parameterWarnings.length > 0 || (inputMode === "csv" && recoveryWarnings.length > 0)) && <p className="csv-help">Completa las condiciones registradas y revisa las señales importadas. La predicción requiere mediciones reales y compatibles con el modelo.</p>}
         {parameterWarnings.length > 0 && <div className="import-warnings" role="note">{parameterWarnings.map(warning => <p key={warning}>{warning}</p>)}</div>}
         {inputMode === "csv" && recoveryWarnings.length > 0 && <div className="import-warnings" role="note">{recoveryWarnings.map(warning => <p key={warning}>{warning}</p>)}</div>}
       </fieldset>
@@ -636,7 +635,7 @@ export default function TelemetryForm({
           || readingFile
           ||
           activeSamples.length < 2
-          || (inputMode === "manual" && !parametersValid)
+          || !parametersValid
         }
       >
 

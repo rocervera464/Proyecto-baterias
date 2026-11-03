@@ -4,9 +4,9 @@ import "./modelCompatibility.css";
 export default function ModelCompatibility({ report, hasPrediction = true }: { report: Compatibility; hasPrediction?: boolean }) {
   const matches = report.status === "within_observed_ranges";
   return <aside className={`model-compatibility${matches ? " observed" : " exploratory"}`} role="note">
-    <strong>{matches ? "Entrada dentro de los rangos observados" : hasPrediction ? "Estimación exploratoria" : "Telemetría importada · sin predicción en modo estricto"}</strong>
+    <strong>{matches ? "Entrada dentro de los rangos observados" : hasPrediction ? "Compatibilidad no confirmada" : "Telemetría importada · sin predicción compatible"}</strong>
     <details className="compatibility-explanation">
-    <summary>{matches ? "Ver detalles de compatibilidad" : hasPrediction ? "¿Por qué es una estimación exploratoria?" : "Ver por qué no se pudo realizar la predicción"}</summary>
+    <summary>{matches ? "Ver detalles de compatibilidad" : "Ver por qué no se pudo realizar la predicción"}</summary>
     {report.model_description && <p>Modelo seleccionado: {report.model_description}.</p>}
     <p>{report.limitation}</p>
     {report.reasons.map((reason) => <p key={reason}>{reason}</p>)}

@@ -32,5 +32,54 @@
 .forecast-horizons span, .forecast-horizons small { font-size: 11px; color: #536875; }
 .forecast-horizons strong { font-size: clamp(14px, 1.6vw, 20px); color: #123c4b; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .forecast-horizons .is-experimental small { color: #87520e; }
+.forecast-results-heading { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.forecast-results-heading > div:first-child { flex: 1 1 220px; }
+.forecast-results-heading h3 { margin: 0; }
+.forecast-results-heading .panel-description { margin-bottom: 0; }
+.forecast-results-switch { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #eaf2ee; }
+.forecast-results-switch button { display: flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 9px; background: transparent; color: #536875; font-size: 12px; }
+.forecast-results-switch button[aria-pressed="true"] { background: white; color: #087e70; box-shadow: 0 2px 8px #123c4b0c; font-weight: 700; }
+.forecast-results-switch svg { width: 16px; height: 16px; }
+.interactive-forecast.forecast-embedded { margin: 0; padding: 0; border: 0; border-radius: 0; }
+.forecast-embedded .chart-header { flex-wrap: wrap; gap: 10px; }
+.forecast-embedded .chart-header h3 { font-size: 18px; }
+.forecast-embedded .forecast-toolbar { gap: 10px; margin: 0 0 16px; }
+.forecast-embedded .forecast-toggles { gap: 10px; }
+.forecast-embedded .forecast-selected { padding: 16px; gap: 12px; margin-bottom: 12px; }
+.forecast-embedded .forecast-selected strong { font-size: 26px; }
+.forecast-embedded .forecast-selected .forecast-delta { font-size: 18px; }
+.forecast-embedded .chart-container { height: 240px; }
+.forecast-embedded .forecast-horizons { gap: 6px; margin-top: 12px; }
+.forecast-embedded .forecast-horizons button { padding: 10px 8px; align-items: center; justify-content: center; min-height: 40px; border-radius: 8px; }
+.forecast-embedded .forecast-horizons strong { font-size: 15px; }
+.forecast-embedded .chart-disclaimer { grid-template-columns: 1fr; }
+.results-overview { align-items: stretch; gap: 20px; }
+.results-overview > .battery-health-card, .results-overview > .forecast-section { border-radius: 16px; padding: 24px; }
+.results-overview > .forecast-section { display: flex; flex-direction: column; background: white; border: 1px solid #d8e8e2; }
+.results-overview .forecast-results-heading h3 { font-size: 19px; line-height: 1.3; }
+.results-overview .forecast-results-heading .panel-description { font-size: 12px; line-height: 1.6; margin-top: 8px; }
+.results-overview #forecast-results-view { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.results-overview .prediction-grid { flex: 1; gap: 12px; grid-auto-rows: 1fr; }
+.results-overview .prediction-card { min-width: 0; padding: 18px; gap: 7px; border-radius: 12px; }
+.results-overview .prediction-card strong { font-size: clamp(24px, 2.5vw, 30px); line-height: 1.2; }
+.results-overview .prediction-card p { line-height: 1.6; }
+.results-overview .prediction-card > span:first-child { font-size: 13px; }
+.results-overview .battery-health-display { padding: 28px 0; gap: 22px; }
+.results-overview .health-battery { width: min(100%, 230px); }
+.results-overview .health-battery-body { height: 108px; border-radius: 20px; }
+.results-overview .battery-health-reading > strong { font-size: clamp(40px, 4vw, 54px); }
+.forecast-options { position: relative; margin-left: auto; font-size: 12px; color: #536875; }
+.forecast-options summary, .forecast-reading-guide summary { cursor: pointer; padding: 10px 0; }
+.forecast-options .forecast-toggles { position: absolute; z-index: 5; right: 0; top: 100%; display: flex; flex-direction: column; align-items: flex-start; width: 210px; padding: 12px 16px; background: white; border: 1px solid #d8e8e2; border-radius: 12px; box-shadow: 0 8px 24px #123c4b15; }
+.forecast-simple-note { margin: 12px 0 8px; font-size: 11px; line-height: 1.6; color: #62716e; }
+.forecast-reading-guide { color: #536875; font-size: 12px; border-top: 1px solid #e1eae5; }
+.forecast-reading-guide .chart-disclaimer { margin-top: 4px; gap: 8px; }
+.forecast-embedded .forecast-selected { background: #f1f7f3; }
+.forecast-embedded .forecast-selected > div { gap: 4px; }
+.forecast-embedded .forecast-selected strong { font-size: 24px; }
+.forecast-embedded .forecast-selected .forecast-delta { font-size: 16px; }
+.forecast-embedded .forecast-horizons { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 1000px) and (min-width: 761px) { .results-overview > .battery-health-card, .results-overview > .forecast-section { padding: 20px; } .forecast-results-switch { width: 100%; } .forecast-results-switch button { flex: 1; justify-content: center; } }
+@media (max-width: 760px) { .results-overview > .battery-health-card, .results-overview > .forecast-section { padding: 20px; } .forecast-embedded .chart-container { height: 230px; } .forecast-embedded .forecast-horizons { display: flex; flex-wrap: wrap; } .forecast-embedded .forecast-horizons button { flex: 1 1 75px; } }
 @media (max-width: 760px) { .interactive-forecast { padding: 20px 14px; border-radius: 20px; } .forecast-horizons { grid-template-columns: repeat(3, minmax(0, 1fr)); } .forecast-horizons button { padding: 12px; } .forecast-toggles { gap: 8px 14px; } .interactive-forecast .chart-container { height: 300px; } }
 @media (max-width: 420px) { .forecast-horizons { grid-template-columns: repeat(2, minmax(0, 1fr)); } .forecast-selected { padding: 16px; } }

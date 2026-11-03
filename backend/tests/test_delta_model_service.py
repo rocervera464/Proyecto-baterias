@@ -23,7 +23,9 @@ def test_delta_models_are_anchored_to_raw_current_before_reconciliation(monkeypa
     service.target_modes = {"5": "delta_from_current", "10": "delta_from_current"}
     monkeypatch.setattr(service, "prepare_input", lambda features: features)
     assert service.predict_raw_all({}) == {0: 80, 5: 78, 10: 76, 20: 75, 30: 72}
-    assert service.predict_all({}) == {0: 80, 5: 78, 10: 76, 20: 75, 30: 72}
+    # Historical signed-delta interpretation is retained only for audit calls.
+    service.production_horizons = []
+    assert service.predict_all({}) == {0: 80}
 
 
 @pytest.mark.parametrize("modes", [{"0": "delta_from_current"}, {"5": "unknown"}, {"99": "absolute"}, []])

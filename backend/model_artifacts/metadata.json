@@ -1,76 +1,392 @@
 {
-  "model_family": "XGBoost",
-  "task": "State of Health prediction",
-  "target": "SoH_percent",
-  "window_seconds": 300,
-  "horizons_cycles": [
-    0,
-    5,
-    10,
-    20,
-    30
-  ],
+  "model_family": "XGBoost SoH v2",
+  "model_version": "precision_soh_v2",
+  "trained_at_utc": "2026-11-03T01:30:59.354683+00:00",
   "training_batteries": [
     "B0045",
     "B0046",
     "B0047",
     "B0048"
   ],
-  "number_of_features": 29,
-  "training_rows": {
-    "0": 277,
-    "5": 246,
-    "10": 230,
-    "20": 197,
-    "30": 157
-  },
+  "features": [
+    "cycle",
+    "ambient_temperature",
+    "cutoff_voltage",
+    "voltage_start",
+    "voltage_mean",
+    "voltage_std",
+    "voltage_min",
+    "voltage_max",
+    "voltage_end",
+    "voltage_delta",
+    "current_start",
+    "current_mean",
+    "current_std",
+    "current_min",
+    "current_max",
+    "current_end",
+    "current_delta",
+    "temperature_start",
+    "temperature_mean",
+    "temperature_std",
+    "temperature_min",
+    "temperature_max",
+    "temperature_end",
+    "temperature_delta",
+    "Re_prev",
+    "Rct_prev",
+    "charge_temp_start_prev",
+    "charge_temp_max_prev",
+    "charge_temp_delta_prev"
+  ],
+  "future_features": [
+    "cycle",
+    "ambient_temperature",
+    "cutoff_voltage",
+    "voltage_start",
+    "voltage_mean",
+    "voltage_std",
+    "voltage_min",
+    "voltage_max",
+    "voltage_end",
+    "voltage_delta",
+    "current_start",
+    "current_mean",
+    "current_std",
+    "current_min",
+    "current_max",
+    "current_end",
+    "current_delta",
+    "temperature_start",
+    "temperature_mean",
+    "temperature_std",
+    "temperature_min",
+    "temperature_max",
+    "temperature_end",
+    "temperature_delta",
+    "Re_prev",
+    "Rct_prev",
+    "charge_temp_start_prev",
+    "charge_temp_max_prev",
+    "charge_temp_delta_prev",
+    "horizon_cycles"
+  ],
+  "window_seconds": 300,
   "soh_definition": "capacity / median(first 5 valid capacities) * 100",
-  "xgboost_version": "3.4.1",
-  "sklearn_version": "1.6.1",
-  "notes": {
-    "plus_5": "validated pilot horizon",
-    "plus_10": "validated pilot horizon",
-    "plus_20": "experimental: pilot validation showed weak long-horizon generalization",
-    "plus_30": "experimental: pilot validation showed weak long-horizon generalization"
+  "future_target": "max(0, current real SoH - real SoH at exact cycle+h)",
+  "current_hyperparameters": {
+    "n_estimators": 500,
+    "learning_rate": 0.03,
+    "max_depth": 4,
+    "min_child_weight": 3,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "reg_alpha": 0.0,
+    "reg_lambda": 1.0
   },
-  "candidate_evaluation": {
-    "protocol": "Nested leave-one-battery-out; inner macro MAE selects configuration; outer battery never used to select.",
-    "dataset_sha256": "c4832ce550c68e2a61e997f0f356253f901313b36be618f2077902c63543a4fb",
-    "decisions": {
-      "0": {
-        "nested_comparison_accepted": false,
-        "configuration": "original_configuration",
-        "changed": false
-      },
-      "5": {
-        "nested_comparison_accepted": true,
-        "configuration": "regularized_cycle_constraint",
-        "changed": true
-      },
-      "10": {
-        "nested_comparison_accepted": true,
-        "configuration": "regularized",
-        "changed": true
-      },
-      "20": {
-        "nested_comparison_accepted": true,
-        "configuration": "regularized",
-        "changed": true
-      },
-      "30": {
-        "nested_comparison_accepted": false,
-        "configuration": "original_configuration",
-        "changed": false
-      }
+  "future_selection": {
+    "ablation": "without_cycle",
+    "monotonic": true,
+    "config": {
+      "subsample": 0.9,
+      "reg_lambda": 1.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 52,
+      "min_child_weight": 8,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "colsample_bytree": 0.9
     },
-    "scope": "Pilot nested cross-validation only, not an independent external validation."
+    "mae": 3.0792130237352895,
+    "mae_se": 0.46576938200552004,
+    "rmse": 3.823979318451806,
+    "worst_battery_mae": 4.456349092818256,
+    "absolute_bias": 1.8289636243217997,
+    "violation_rate": 0.0
   },
-  "model_version": "nasa_nested_v1",
-  "evaluation_reports": {
-    "raw": "docs/training-comparison.json",
-    "reconciled": "docs/reconciled-comparison.json",
-    "data_provenance": "docs/training-data-provenance.json"
+  "xgboost_version": "3.4.1",
+  "horizons_evaluated": [
+    5,
+    10,
+    20,
+    30
+  ],
+  "production_horizons": [],
+  "validation_method": "Nested Leave-One-Battery-Out; inner group validation and early stopping only; outer labels never used to tune hyperparameters.",
+  "validation_metrics_file": "validation_metrics.json",
+  "dataset_sha256": "c4832ce550c68e2a61e997f0f356253f901313b36be618f2077902c63543a4fb",
+  "model_description": "Celdas NASA B0045-B0048, 4 \u00b0C, 1 A",
+  "model_id": "nasa_cells_45_48",
+  "validation_summary": {
+    "horizons": [
+      {
+        "horizon": 0,
+        "n": 277,
+        "mae": 2.970606377120111,
+        "rmse": 3.8152095228381073,
+        "r2": 0.8002756736156145,
+        "mean_error": 0.28051172627849236,
+        "median_absolute_error": 2.7141818107624687,
+        "macro_mae": 2.9708127050409843,
+        "macro_rmse": 3.7395495520600317,
+        "worst_battery_mae": 4.098730014342181
+      },
+      {
+        "horizon": 5,
+        "n": 246,
+        "mae": 3.063113227123963,
+        "rmse": 3.9869403869304394,
+        "r2": 0.6616653074836414,
+        "mean_error": -1.4723884149196143,
+        "median_absolute_error": 2.6376923030357347,
+        "macro_mae": 3.0706811556572458,
+        "macro_rmse": 3.852637536975763,
+        "worst_battery_mae": 4.658642331514223
+      },
+      {
+        "horizon": 10,
+        "n": 230,
+        "mae": 3.1027884332642994,
+        "rmse": 4.147087881570353,
+        "r2": 0.5323283349569085,
+        "mean_error": -1.1168268270571036,
+        "median_absolute_error": 2.520759439843715,
+        "macro_mae": 3.1110704597334102,
+        "macro_rmse": 3.9848018586377894,
+        "worst_battery_mae": 4.542587872130672
+      },
+      {
+        "horizon": 20,
+        "n": 197,
+        "mae": 3.1775282472222033,
+        "rmse": 4.417184798457521,
+        "r2": 0.10879429680081543,
+        "mean_error": -1.0145630718173908,
+        "median_absolute_error": 2.61390904131261,
+        "macro_mae": 3.1813359428904793,
+        "macro_rmse": 4.210142691954088,
+        "worst_battery_mae": 4.803935962124222
+      },
+      {
+        "horizon": 30,
+        "n": 157,
+        "mae": 3.5683604334970864,
+        "rmse": 4.528696826976542,
+        "r2": -0.20567785467053956,
+        "mean_error": -0.47496807747740794,
+        "median_absolute_error": 2.969894100108334,
+        "macro_mae": 3.5681012939440047,
+        "macro_rmse": 4.470076128778959,
+        "worst_battery_mae": 5.036734202323132
+      }
+    ],
+    "by_battery": [
+      {
+        "battery_id": "B0045",
+        "horizon": 0,
+        "n": 70,
+        "mae": 2.91365987095919,
+        "rmse": 4.15198203339412,
+        "r2": 0.8067558679257981,
+        "mean_error": 0.4251659853431666,
+        "median_absolute_error": 2.3900603044311026
+      },
+      {
+        "battery_id": "B0045",
+        "horizon": 5,
+        "n": 63,
+        "mae": 2.1398259460634943,
+        "rmse": 2.68821294602289,
+        "r2": 0.828203313117141,
+        "mean_error": -0.033227647233171106,
+        "median_absolute_error": 2.161108795324779
+      },
+      {
+        "battery_id": "B0045",
+        "horizon": 10,
+        "n": 59,
+        "mae": 2.158637415785731,
+        "rmse": 2.710483778003374,
+        "r2": 0.760742081870633,
+        "mean_error": 0.6519224660401675,
+        "median_absolute_error": 1.8640878661456384
+      },
+      {
+        "battery_id": "B0045",
+        "horizon": 20,
+        "n": 50,
+        "mae": 2.4312198962402216,
+        "rmse": 3.074823948464926,
+        "r2": 0.39615798039424444,
+        "mean_error": 2.28565136424064,
+        "median_absolute_error": 2.0851374186869336
+      },
+      {
+        "battery_id": "B0045",
+        "horizon": 30,
+        "n": 40,
+        "mae": 3.608786203777771,
+        "rmse": 4.229839144863992,
+        "r2": -0.698539728075499,
+        "mean_error": 3.5886908307362075,
+        "median_absolute_error": 3.4022027848898446
+      },
+      {
+        "battery_id": "B0046",
+        "horizon": 0,
+        "n": 69,
+        "mae": 1.5508574554928405,
+        "rmse": 2.573953199935422,
+        "r2": 0.9035096675820422,
+        "mean_error": 0.2670084733787838,
+        "median_absolute_error": 0.8667069674026777
+      },
+      {
+        "battery_id": "B0046",
+        "horizon": 5,
+        "n": 61,
+        "mae": 3.009119942470695,
+        "rmse": 4.211744451946506,
+        "r2": 0.6196063448877965,
+        "mean_error": -1.75730566696711,
+        "median_absolute_error": 2.5850658027139133
+      },
+      {
+        "battery_id": "B0046",
+        "horizon": 10,
+        "n": 57,
+        "mae": 3.3498208236398472,
+        "rmse": 4.727638564869538,
+        "r2": 0.38260100250139506,
+        "mean_error": -1.8966632479166632,
+        "median_absolute_error": 3.0514186413901143
+      },
+      {
+        "battery_id": "B0046",
+        "horizon": 20,
+        "n": 49,
+        "mae": 3.3490178800942703,
+        "rmse": 5.191784625918726,
+        "r2": -0.39911326041194806,
+        "mean_error": -1.9821328336815727,
+        "median_absolute_error": 2.868612117607398
+      },
+      {
+        "battery_id": "B0046",
+        "horizon": 30,
+        "n": 39,
+        "mae": 2.4224454108518776,
+        "rmse": 4.150614551641481,
+        "r2": -0.7764230534563501,
+        "mean_error": -1.4534588441152163,
+        "median_absolute_error": 1.7827549201491308
+      },
+      {
+        "battery_id": "B0047",
+        "horizon": 0,
+        "n": 69,
+        "mae": 4.098730014342181,
+        "rmse": 4.5825766232881495,
+        "r2": 0.6753954405190696,
+        "mean_error": 3.7477794872245753,
+        "median_absolute_error": 3.818942792063851
+      },
+      {
+        "battery_id": "B0047",
+        "horizon": 5,
+        "n": 61,
+        "mae": 2.4751364025805698,
+        "rmse": 3.096280376455733,
+        "r2": 0.7651185505312118,
+        "mean_error": 0.5124363870955089,
+        "median_absolute_error": 2.104485293609656
+      },
+      {
+        "battery_id": "B0047",
+        "horizon": 10,
+        "n": 57,
+        "mae": 2.39323572737739,
+        "rmse": 2.964558538673594,
+        "r2": 0.6884323832001391,
+        "mean_error": 1.2579599670735853,
+        "median_absolute_error": 1.8364597997903473
+      },
+      {
+        "battery_id": "B0047",
+        "horizon": 20,
+        "n": 49,
+        "mae": 2.1411700331032035,
+        "rmse": 2.6923421272650123,
+        "r2": 0.34802980107121084,
+        "mean_error": 0.37481382927399853,
+        "median_absolute_error": 1.8833524827548729
+      },
+      {
+        "battery_id": "B0047",
+        "horizon": 30,
+        "n": 39,
+        "mae": 3.2044393588232394,
+        "rmse": 3.7853598383455354,
+        "r2": -1.3058511973255875,
+        "mean_error": 0.897433523530621,
+        "median_absolute_error": 2.9005876550826883
+      },
+      {
+        "battery_id": "B0048",
+        "horizon": 0,
+        "n": 69,
+        "mae": 3.320003479369725,
+        "rmse": 3.6496863516224343,
+        "r2": 0.6931587803218655,
+        "mean_error": -3.320003479369725,
+        "median_absolute_error": 3.3700338437554223
+      },
+      {
+        "battery_id": "B0048",
+        "horizon": 5,
+        "n": 61,
+        "mae": 4.658642331514223,
+        "rmse": 5.414312373477922,
+        "r2": -0.06011238355465842,
+        "mean_error": -4.658642331514223,
+        "median_absolute_error": 3.629747713454748
+      },
+      {
+        "battery_id": "B0048",
+        "horizon": 10,
+        "n": 57,
+        "mae": 4.542587872130672,
+        "rmse": 5.536526553004652,
+        "r2": -0.5996329724775846,
+        "mean_error": -4.542587872130672,
+        "median_absolute_error": 3.938911868508768
+      },
+      {
+        "battery_id": "B0048",
+        "horizon": 20,
+        "n": 49,
+        "mae": 4.803935962124222,
+        "rmse": 5.881620066167687,
+        "r2": -3.2706720349705023,
+        "mean_error": -4.803935962124222,
+        "median_absolute_error": 5.040646062293504
+      },
+      {
+        "battery_id": "B0048",
+        "horizon": 30,
+        "n": 39,
+        "mae": 5.036734202323132,
+        "rmse": 5.714490980264828,
+        "r2": -4.929238609555531,
+        "mean_error": -5.036734202323132,
+        "median_absolute_error": 4.606498862518976
+      }
+    ],
+    "monotonic_violation_rate": 0.0,
+    "violations": 0,
+    "comparisons": 563
   },
-  "validation_scope": "Pilot nested leave-one-battery-out on B0045-B0048; package chosen on these comparisons. No independent external or forward-temporal test.",
-  "domain_profile_file": "domain_profile.json"
+  "current_replaced": false,
+  "training_rows": 277,
+  "future_training_rows": 830
 }

@@ -43,7 +43,7 @@ test('paste supports Excel tabs and decimal commas, headers and semicolon CSV', 
 });
 test('API response validation rejects missing horizons and invalid values', () => {
   const valid = { status: 'success', model_family: 'XGBoost', current_cycle: 25, current_soh_percent: 90,
-    future_predictions: [5, 10, 20, 30].map(h => ({ horizon_cycles: h, target_cycle: 25 + h, predicted_soh_percent: 88, experimental: h >= 20 })) };
+    production_horizons: [5, 10], future_predictions: [5, 10].map(h => ({ horizon_cycles: h, target_cycle: 25 + h, predicted_soh_percent: 88 })) };
   assert.equal(validatePrediction(valid, 25), valid);
   assert.throws(() => validatePrediction({ ...valid, future_predictions: [] }, 25), /incompleta/);
   assert.throws(() => validatePrediction({ ...valid, current_soh_percent: Infinity }, 25), /inválidos/);

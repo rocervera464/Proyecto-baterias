@@ -65,6 +65,8 @@ MODEL_FEATURES = [
     "charge_temp_delta_prev",
 ]
 
+FUTURE_FEATURES = [*MODEL_FEATURES, "horizon_cycles"]
+
 
 # ============================================================
 # RESUMEN DE UNA SEÑAL

@@ -155,7 +155,7 @@ export function getImportMetadata(data: CsvData, options: ImportOptions): { cycl
   };
   const warnings: string[] = [];
   if (normalize(options.mapping.voltage_v).includes("pack") || normalize(options.mapping.current_a).includes("pack")) {
-    warnings.push("Se detectaron medidas de un paquete. Las familias disponibles se entrenaron con celdas NASA. Sin validación propia del paquete, el resultado es exploratorio; importar el archivo no valida su aplicabilidad.");
+    warnings.push("Se detectaron medidas de un paquete. Las familias disponibles se entrenaron con celdas NASA. Sin validación propia del paquete, no se entrega una predicción; importar el archivo no valida su aplicabilidad.");
   }
   if (segment?.mode && !isDischarge(segment.mode)) warnings.push(`El tramo seleccionado está marcado como ${segment.mode}. El modelo espera telemetría de descarga.`);
   if (data.fields.some((field) => ["soh", "sohpct", "sohpercent", "soc", "socpct"].includes(normalize(field)))) warnings.push("Las columnas SoH y SoC del archivo no se usan como entrada ni sustituyen la predicción del modelo.");

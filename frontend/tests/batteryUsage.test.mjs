@@ -8,8 +8,8 @@ test('each boundary belongs to the upper range without gaps or overlap', () => {
     [80, 'Bueno'], [79.999, 'Degradación moderada'],
     [70, 'Degradación moderada'], [69.999, 'Degradación alta'],
     [60, 'Degradación alta'], [59.999, 'Muy degradada'],
-    [40, 'Muy degradada'], [39.999, 'Fin de vida práctico'],
-    [0, 'Fin de vida práctico'],
+    [40, 'Muy degradada'], [39.999, 'Degradación muy severa'],
+    [0, 'Degradación muy severa'],
   ];
   for (const [soh, state] of cases) assert.equal(getBatteryUsage(soh)?.state, state);
 });

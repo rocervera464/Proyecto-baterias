@@ -1,34 +1,20 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class FuturePrediction(BaseModel):
-    horizon_cycles: int
-
-    target_cycle: int
-
-    predicted_soh_percent: float
-
-    raw_predicted_soh_percent: float | None = None
-
-    adjusted: bool = False
-
-    experimental: bool = False
+    model_config = ConfigDict(allow_inf_nan=False)
+    horizon_cycles: int = Field(gt=0)
+    target_cycle: int = Field(ge=1)
+    predicted_soh_percent: float = Field(ge=0, le=100)
 
 
 class PredictionResponse(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
     compatibility: dict = Field(default_factory=dict)
     status: str
-
     model_family: str
-
     current_cycle: int
-
-    raw_current_soh_percent: float | None = None
-
-    forecast_method: str = "anchored_isotonic"
-
-    current_soh_percent: float
-
-    future_predictions: list[
-        FuturePrediction
-    ]
+    forecast_method: str = "accumulated_degradation"
+    current_soh_percent: float = Field(ge=0, le=100)
+    production_horizons: list[int] = Field(default_factory=list)
+    future_predictions: list[FuturePrediction]

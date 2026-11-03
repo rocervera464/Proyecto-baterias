@@ -272,5 +272,7 @@
       "p95": 0.7942792345422087,
       "max": 1.9887831383032104
     }
-  }
+  },
+  "minimum_window_samples": 21,
+  "sampling_requirement_source": "Minimum observed first-300s sample count in the source cohort; not an input to XGBoost."
 }

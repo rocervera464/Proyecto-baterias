@@ -32,9 +32,8 @@ test('methodology uses live values without mutation, reordering input or mixing 
     ]),
   });
   const result = getMethodologyResults(live);
-  assert.deepEqual(result.map(p => p.h), [0, 5, 10, 20, 30]);
-  assert.deepEqual(result.map(p => p.value), [76.35, 76.35, undefined, undefined, 75.83]);
-  assert.equal(result[1].raw, 78.5);
+  assert.deepEqual(result.map(p => p.h), [0, 5, 30]);
+  assert.deepEqual(result.map(p => p.value), [76.35, 76.35, 75.83]);
   assert.equal(live.future_predictions[0].horizon_cycles, 30);
   assert.equal(getMethodologyResults(null)[0].value, 88);
 });

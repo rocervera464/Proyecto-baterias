@@ -37,7 +37,8 @@ class TelemetryRequest(TelemetryModel):
     source_units: TelemetryUnits | None = Field(default=None, exclude=True)
     measurement_level: Literal["unknown", "cell", "module", "pack"] = "unknown"
     chemistry: Literal["unknown", "li-ion", "LFP", "lead-acid", "other"] = "unknown"
-    analysis_mode: Literal["strict", "exploratory"] = "exploratory"
+    # Keep the old input flag for compatibility; it never bypasses production.
+    analysis_mode: Literal["strict", "exploratory"] = "strict"
     cycle: int = Field(ge=1)
     ambient_temperature_c: float
     cutoff_voltage_v: float = Field(gt=0)

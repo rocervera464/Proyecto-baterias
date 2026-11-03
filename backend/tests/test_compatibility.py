@@ -13,15 +13,15 @@ def payload(**overrides):
             "discharge_samples": [{"time_s": 0, "voltage_v": 4.1, "current_a": -1, "temperature_c": 4}, {"time_s": 300, "voltage_v": 3.8, "current_a": -1, "temperature_c": 5}], **overrides}
 
 
-def test_strict_unknown_and_pack_abstain_but_exploratory_remains_available():
+def test_strict_unknown_and_pack_abstain_and_exploratory_cannot_bypass():
     client = TestClient(app)
     for level in ["unknown", "pack"]:
         response = client.post("/api/v1/predict", json=payload(analysis_mode="strict", measurement_level=level))
         assert response.status_code == 422
         assert "compatibility" in response.json()["detail"]
     response = client.post("/api/v1/predict", json=payload(analysis_mode="exploratory", measurement_level="pack"))
-    assert response.status_code == 200
-    assert response.json()["compatibility"]["status"] == "incompatible"
+    assert response.status_code == 422
+    assert response.json()["detail"]["compatibility"]["status"] == "incompatible"
 
 
 def test_observed_range_status_does_not_claim_accuracy(tmp_path):

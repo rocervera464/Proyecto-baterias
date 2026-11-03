@@ -39,5 +39,5 @@ console.log(JSON.stringify({manual:validateManualTelemetry(data.rows).samples,cs
     client = TestClient(app)
     manual_result = client.post("/api/v1/predict", json=manual)
     csv_result = client.post("/api/v1/predict", json=csv)
-    assert manual_result.status_code == csv_result.status_code == 200
+    assert manual_result.status_code == csv_result.status_code == 422
     assert manual_result.json() == csv_result.json()

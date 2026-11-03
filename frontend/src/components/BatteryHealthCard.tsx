@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { getBatteryUsage } from "../utils/batteryUsage";
 import "./batteryHealthCard.css";
 
-export default function BatteryHealthCard({ soh, cycle, rawSoh }: { soh: number; cycle: number; rawSoh?: number }) {
+export default function BatteryHealthCard({ soh, cycle }: { soh: number; cycle: number }) {
   const batteryRef = useRef<HTMLDivElement>(null);
   const levelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -62,7 +62,6 @@ export default function BatteryHealthCard({ soh, cycle, rawSoh }: { soh: number;
       <div className="battery-health-reading"><span>Salud estimada · SoH</span><strong>{Number.isFinite(soh) ? soh.toFixed(2) : "—"}<small>{Number.isFinite(soh) ? "%" : ""}</small></strong><span className="battery-health-status"><i aria-hidden="true" />{usage?.state ?? "Fuera del intervalo orientativo"}</span></div>
     </div>
     <div className="battery-health-scale" aria-hidden="true"><span>0 %</span><span>Capacidad relativa estimada</span><span>100 %</span></div>
-    {rawSoh != null && Math.abs(rawSoh - soh) > 1e-9 && <p>Estimación acotada a 0–100 %. Salida original: {rawSoh.toFixed(2)} %.</p>}
     {!valid && <p>Valor fuera de 0–100 %. No se representa un nivel en la batería.</p>}
     <p className="battery-health-note">El nivel representa el estado de salud (SoH), no la carga disponible (SoC). No es un porcentaje de seguridad.</p>
   </article>;

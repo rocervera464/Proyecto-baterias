@@ -1,200 +1,62 @@
-import math
+from copy import deepcopy
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-
+from app.services.feature_engineering import extract_features
+from app.schemas.telemetry import TelemetryRequest
+from app.services.model_registry import select_model_service
 
 client = TestClient(app)
 
 
-PAYLOAD = {
-    "cycle": 25,
-
-    "ambient_temperature_c": 4.0,
-
-    "cutoff_voltage_v": 2.2,
-
-    "discharge_samples": [
-        {
-            "time_s": 0,
-            "voltage_v": 4.10,
-            "current_a": -1.01,
-            "temperature_c": 4.2,
-        },
-        {
-            "time_s": 100,
-            "voltage_v": 3.95,
-            "current_a": -1.00,
-            "temperature_c": 4.6,
-        },
-        {
-            "time_s": 200,
-            "voltage_v": 3.85,
-            "current_a": -0.99,
-            "temperature_c": 4.9,
-        },
-        {
-            "time_s": 300,
-            "voltage_v": 3.78,
-            "current_a": -1.00,
-            "temperature_c": 5.2,
-        },
-    ],
-
-    "previous_eis": {
-        "re_ohm": 0.085,
-        "rct_ohm": 0.15,
-    },
-
-    "previous_charge": {
-        "temperature_start_c": 4.1,
-        "temperature_max_c": 5.4,
-        "temperature_delta_c": 1.3,
-    },
-}
-
-
-def test_prediction_endpoint():
-    response = client.post(
-        "/api/v1/predict",
-        json=PAYLOAD,
-    )
-
-    assert response.status_code == 200
-
+def test_prediction_matches_service_without_frontend_or_isotonic_correction(real_payload):
+    response = client.post("/api/v1/predict", json=real_payload)
+    assert response.status_code == 200, response.text
     data = response.json()
-
+    features, _ = extract_features(TelemetryRequest(**real_payload))
+    service = select_model_service(features)
+    expected = service.predict_all(features)
     assert data["status"] == "success"
-
-    assert (
-        data["model_family"]
-        == "XGBoost"
-    )
-
-    assert data["current_cycle"] == 25
-
-    assert math.isfinite(
-        data[
-            "current_soh_percent"
-        ]
-    )
-
-    assert len(
-        data[
-            "future_predictions"
-        ]
-    ) == 4
+    assert data["current_cycle"] == real_payload["cycle"]
+    assert data["current_soh_percent"] == expected[0]
+    assert data["production_horizons"] == service.production_horizons
+    assert [item["horizon_cycles"] for item in data["future_predictions"]] == service.production_horizons
+    previous = data["current_soh_percent"]
+    for item in data["future_predictions"]:
+        assert item["target_cycle"] == real_payload["cycle"] + item["horizon_cycles"]
+        assert item["predicted_soh_percent"] == expected[item["horizon_cycles"]]
+        assert 0 <= item["predicted_soh_percent"] <= previous <= 100
+        assert not {"experimental", "adjusted", "raw_predicted_soh_percent"} & set(item)
+        assert item["horizon_cycles"] not in service.research_horizons
+        previous = item["predicted_soh_percent"]
+    assert "raw_current_soh_percent" not in data
 
 
-def test_prediction_horizons():
-    response = client.post(
-        "/api/v1/predict",
-        json=PAYLOAD,
-    )
+def test_missing_optional_history_is_supported_without_inventing_it(real_payload):
+    real_payload.pop("previous_eis")
+    real_payload.pop("previous_charge")
+    response = client.post("/api/v1/predict", json=real_payload)
+    assert response.status_code == 200, response.text
+    assert 0 <= response.json()["current_soh_percent"] <= 100
 
-    assert response.status_code == 200
 
-    data = response.json()
+@pytest.mark.parametrize("cycle", [None, "", 0, -1, 1.5])
+def test_cycle_must_be_positive_integer(real_payload, cycle):
+    payload = deepcopy(real_payload)
+    payload["cycle"] = cycle
+    assert client.post("/api/v1/predict", json=payload).status_code == 422
 
-    predictions = data[
-        "future_predictions"
-    ]
 
-    horizons = [
-        prediction[
-            "horizon_cycles"
-        ]
-        for prediction
-        in predictions
-    ]
+def test_missing_cycle_does_not_default_to_one(real_payload):
+    real_payload.pop("cycle")
+    assert client.post("/api/v1/predict", json=real_payload).status_code == 422
 
-    assert horizons == [
-        5,
-        10,
-        20,
-        30,
-    ]
 
-    for prediction in predictions:
-
-        assert math.isfinite(
-            prediction[
-                "predicted_soh_percent"
-            ]
-        )
-
-        assert (
-            prediction[
-                "target_cycle"
-            ]
-            ==
-            25
-            +
-            prediction[
-                "horizon_cycles"
-            ]
-        )
-
-def test_long_horizons_are_experimental():
-    response = client.post(
-        "/api/v1/predict",
-        json=PAYLOAD,
-    )
-
-    predictions = (
-        response.json()[
-            "future_predictions"
-        ]
-    )
-
-    by_horizon = {
-        prediction[
-            "horizon_cycles"
-        ]:
-        prediction
-        for prediction
-        in predictions
-    }
-
-    assert (
-        by_horizon[5][
-            "experimental"
-        ]
-        is False
-    )
-
-    assert (
-        by_horizon[10][
-            "experimental"
-        ]
-        is False
-    )
-
-    assert (
-        by_horizon[20][
-            "experimental"
-        ]
-        is True
-    )
-
-    assert (
-        by_horizon[30][
-            "experimental"
-        ]
-        is True
-    )
-
-def test_api_returns_consistent_forecast_and_raw_outputs():
-    response = client.post('/api/v1/predict', json=PAYLOAD)
-    assert response.status_code == 200
-    data = response.json()
-    assert data['forecast_method'] == 'anchored_isotonic'
-    assert math.isfinite(data['raw_current_soh_percent'])
-    previous = data['current_soh_percent']
-    for item in data['future_predictions']:
-        value = item['predicted_soh_percent']
-        assert 0 <= value <= previous <= 100
-        assert math.isfinite(item['raw_predicted_soh_percent'])
-        assert item['adjusted'] == (abs(value - item['raw_predicted_soh_percent']) > 1e-9)
-        previous = value
+def test_sparse_sampling_is_not_treated_as_validated(real_payload):
+    real_payload["discharge_samples"] = [real_payload["discharge_samples"][0], real_payload["discharge_samples"][-1]]
+    response = client.post("/api/v1/predict", json=real_payload)
+    assert response.status_code == 422
+    reasons = response.json()["detail"]["compatibility"]["reasons"]
+    assert any("21" in reason and "muestreo" in reason for reason in reasons)

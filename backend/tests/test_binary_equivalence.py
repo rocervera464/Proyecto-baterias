@@ -39,5 +39,6 @@ console.log(JSON.stringify(samples));
     assert features[0] == features[1] == features[2]
     client = TestClient(app)
     responses = [client.post("/api/v1/predict", json=payload) for payload in payloads]
-    assert all(response.status_code == 200 for response in responses)
+    # Identical unverified inputs are identically rejected, irrespective of format.
+    assert all(response.status_code == 422 for response in responses)
     assert responses[0].json() == responses[1].json() == responses[2].json()

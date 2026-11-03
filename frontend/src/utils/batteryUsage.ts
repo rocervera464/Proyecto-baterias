@@ -29,7 +29,7 @@ export function getBatteryUsage(soh: number): BatteryUsage | null {
     uses: ["Aplicaciones muy controladas y de baja demanda", "Aprovechamiento de módulos o celdas después de pruebas individuales"],
   };
   return {
-    state: "Fin de vida práctico", range: "Menos de 40 %",
+    state: "Degradación muy severa", range: "Menos de 40 %",
     uses: ["Priorizar reciclaje", "Recuperación de materiales", "Descarte especializado"],
   };
 }

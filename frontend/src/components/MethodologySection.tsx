@@ -51,7 +51,7 @@ export default function MethodologySection({ prediction }: { prediction: Predict
       <div className="ai-journey-controls"><button type="button" disabled={active === 0} onClick={() => select(active - 1)}><span aria-hidden="true">←</span> Anterior</button><span>{active + 1} / 6</span><button type="button" disabled={active === 5} onClick={() => select(active + 1)}>Siguiente <span aria-hidden="true">→</span></button></div>
     </div>
     <aside className="ai-limitations"><h3>Qué debes tener en cuenta</h3>
-      <p>La precisión depende de la calidad y compatibilidad de los datos. Las proyecciones a 20 y 30 ciclos son experimentales; los resultados orientan una evaluación, no certifican la seguridad de la batería.</p>
+      <p>La precisión depende de la calidad y compatibilidad de los datos. Solo se muestran horizontes habilitados por la validación; los resultados orientan una evaluación, no certifican la seguridad de la batería.</p>
     </aside>
     <p className="ai-visual-caption">Entrenado con datos experimentales de baterías del repositorio público de la NASA.</p>
     </div>

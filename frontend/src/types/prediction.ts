@@ -16,23 +16,19 @@ export interface FuturePrediction {
 
   predicted_soh_percent: number;
 
-  raw_predicted_soh_percent?: number;
-
-  adjusted?: boolean;
-
-  experimental: boolean;
+  // Rejected by validation if an older server tries to expose research.
+  experimental?: boolean;
 }
 
 
 export interface PredictionResponse {
+  production_horizons: number[];
   compatibility?: Compatibility;
   status: string;
 
   model_family: string;
 
   forecast_method?: string;
-
-  raw_current_soh_percent?: number;
 
   current_cycle: number;
 

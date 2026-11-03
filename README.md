@@ -58,6 +58,13 @@ El proyecto está dividido en:
 
 ## Modelo predictivo
 
+La arquitectura y validación actuales se documentan en
+[SoH v2](docs/precision-soh-v2.md). La API ejecuta únicamente los horizontes
+habilitados en el manifiesto, que pueden ser ninguno. El ciclo se debe declarar;
+no se supone ciclo 1 y no se entregan predicciones fuera del dominio compatible.
+Los informes anteriores se conservan como evidencia histórica, no como métricas
+de la arquitectura v2.
+
 Durante la fase experimental se compararon:
 
 - XGBoost

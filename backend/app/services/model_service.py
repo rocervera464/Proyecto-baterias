@@ -1,4 +1,5 @@
 import json
+import hashlib
 from functools import lru_cache
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from sklearn.isotonic import IsotonicRegression
 
 from app.services.feature_engineering import (
     MODEL_FEATURES,
+    FUTURE_FEATURES,
 )
 
 
@@ -94,6 +96,43 @@ class ModelService:
             "metadata.json"
         )
 
+        self.production_horizons = self.manifest.get("production_horizons", [])
+        self.research_horizons = self.manifest.get("research_horizons", [5, 10, 20, 30])
+        for horizons in [self.production_horizons, self.research_horizons]:
+            if not isinstance(horizons, list) or any(type(h) is not int or h not in {5, 10, 20, 30} for h in horizons) or horizons != sorted(set(horizons)):
+                raise RuntimeError("Contrato de horizontes inválido.")
+        if set(self.production_horizons) & set(self.research_horizons):
+            raise RuntimeError("Horizontes de producción y de investigación superpuestos.")
+        self.is_degradation = self.manifest.get("schema_version") == 2
+        self.future_model = None
+        if self.is_degradation:
+            if self.manifest.get("current", {}).get("horizon") != 0 or set(self.production_horizons + self.research_horizons) != {5, 10, 20, 30}:
+                raise RuntimeError("El manifiesto v2 no define los horizontes esperados.")
+            self._validate_features()
+            self.future_features = self._load_json("future_features.json")
+            if self.future_features != FUTURE_FEATURES:
+                raise RuntimeError("Contrato futuro: se requieren las 30 features en el orden exacto.")
+            self.models = {0: self._load_contracted_model(self.manifest["current"]["file"], self.features)}
+            future = self.manifest["future"]
+            self.masked_features = future.get("masked_features", [])
+            if not isinstance(self.masked_features, list) or any(name not in {"cycle", "cutoff_voltage"} for name in self.masked_features):
+                raise RuntimeError("Máscara de ablación inválida.")
+            self.future_model = self._load_contracted_model(future["file"], self.future_features)
+            if future.get("target") != "soh_degradation" or self.future_model.get_booster().attr("prediction_target") != "soh_degradation":
+                raise RuntimeError("El objetivo futuro no coincide con el contrato de degradación.")
+            validation = self._load_json("validation_metrics.json")
+            if validation.get("production_horizons") != self.production_horizons or self.metadata.get("production_horizons") != self.production_horizons:
+                raise RuntimeError("El manifiesto no coincide con la evaluación de producción.")
+            if any(not validation.get("production_decisions", {}).get(str(h), {}).get("production") for h in self.production_horizons):
+                raise RuntimeError("Un horizonte no tiene evidencia de aprobación.")
+            for name, expected in self.manifest.get("artifact_sha256", {}).items():
+                path = (self.model_dir / name).resolve()
+                if path.parent != self.model_dir.resolve() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                    raise RuntimeError("La integridad de los artefactos no coincide con el manifiesto.")
+            # No legacy independent forecasts participate in serving.
+            self.target_modes = {}
+            return
+
         self.target_modes = self.metadata.get("forecast_target_modes", {})
         if not isinstance(self.target_modes, dict) or any(
             key not in {"0", "5", "10", "20", "30"}
@@ -108,6 +147,16 @@ class ModelService:
         self.models = (
             self._load_models()
         )
+
+    def _load_contracted_model(self, filename, columns):
+        path = (self.model_dir / filename).resolve()
+        if path.parent != self.model_dir.resolve():
+            raise RuntimeError("Ruta del modelo fuera de su directorio.")
+        fitted = XGBRegressor(n_jobs=1)
+        fitted.load_model(path)
+        if fitted.get_booster().feature_names != columns or fitted.n_features_in_ != len(columns):
+            raise RuntimeError("Las columnas del artefacto no coinciden con el contrato de features.")
+        return fitted
 
 
     # ========================================================
@@ -213,6 +262,9 @@ class ModelService:
             self.manifest.values()
         ):
 
+            if not isinstance(model_info, dict) or "horizon" not in model_info:
+                continue
+
             horizon = int(
                 model_info[
                     "horizon"
@@ -237,7 +289,7 @@ class ModelService:
                     f"{model_path}"
                 )
 
-            model = XGBRegressor()
+            model = XGBRegressor(n_jobs=1)
 
             model.load_model(
                 str(
@@ -405,8 +457,34 @@ class ModelService:
 
 
     def predict_all(self, features: dict[str, float | None]) -> dict[int, float]:
-        """Return bounded forecasts consistent with cumulative degradation."""
-        return reconcile_predictions(self.predict_raw_all(features))
+        """Only approved horizons; no isotonic repair or minimum invented loss.
+
+        Legacy artifacts remain usable for current SoH and offline comparison.
+        They cannot silently expose their independent research forecasts.
+        """
+        inputs = self.prepare_input(features)
+        raw_current = float(self.models[0].predict(inputs)[0])
+        if not np.isfinite(raw_current):
+            raise RuntimeError("El modelo actual produjo un valor no finito.")
+        current = float(np.clip(raw_current, 0, 100))
+        outputs = {0: current}
+        if not self.production_horizons:
+            return outputs
+        if not self.is_degradation or self.future_model is None:
+            raise RuntimeError("No hay un modelo de degradación validado para producción.")
+        rows = pd.concat([inputs.assign(horizon_cycles=h) for h in self.production_horizons], ignore_index=True)
+        rows[self.masked_features] = np.nan
+        losses = self.future_model.predict(rows[self.future_features]).astype(float)
+        if not np.isfinite(losses).all():
+            raise RuntimeError("El modelo futuro produjo valores no finitos.")
+        previous = current
+        for horizon, loss in zip(self.production_horizons, losses):
+            future = float(np.clip(current - max(0., loss), 0., current))
+            if future > previous + 1e-6:
+                raise RuntimeError("Incoherencia temporal del modelo: no se corrige una proyección inválida.")
+            outputs[horizon] = min(previous, future)  # numerical tolerance only
+            previous = outputs[horizon]
+        return outputs
 
 
 # ============================================================

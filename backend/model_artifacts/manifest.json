@@ -1,22 +1,28 @@
 {
+  "schema_version": 2,
   "current": {
-    "horizon": 0,
-    "file": "xgboost_soh_current.json"
+    "file": "xgboost_soh_current.json",
+    "horizon": 0
   },
-  "plus_5": {
-    "horizon": 5,
-    "file": "xgboost_soh_plus_5.json"
+  "future": {
+    "file": "xgboost_soh_degradation_monotonic.json",
+    "target": "soh_degradation",
+    "monotonic": true,
+    "masked_features": [
+      "cycle"
+    ]
   },
-  "plus_10": {
-    "horizon": 10,
-    "file": "xgboost_soh_plus_10.json"
-  },
-  "plus_20": {
-    "horizon": 20,
-    "file": "xgboost_soh_plus_20.json"
-  },
-  "plus_30": {
-    "horizon": 30,
-    "file": "xgboost_soh_plus_30.json"
+  "production_horizons": [],
+  "research_horizons": [
+    5,
+    10,
+    20,
+    30
+  ],
+  "artifact_sha256": {
+    "xgboost_soh_current.json": "0de66da87a91b124db956829d71eadc0dadb730231e8db6ca4e3be98e0e8d8e7",
+    "xgboost_soh_degradation_monotonic.json": "b779cef9b17a726eb6f1fbbdfefe152132c4f2140f3d5376637d9c0358d2d298",
+    "features.json": "b2687b7246da2c269c0dbf6b522fc9bb5686be52e8e02832c83869ef73c525c5",
+    "future_features.json": "10b95e3fbcc4b8d830bcb042192390a12d631855dfcddd7b9a488ea05bbddec7"
   }
 }

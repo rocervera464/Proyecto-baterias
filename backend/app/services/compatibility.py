@@ -19,6 +19,9 @@ def assess_compatibility(request: TelemetryRequest, features: dict, model_dir: P
     profile_path = model_dir / "domain_profile.json"
     if profile_path.exists():
         profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        minimum_samples = profile.get("minimum_window_samples")
+        if minimum_samples is not None and len({sample.time_s for sample in request.discharge_samples if sample.time_s <= 300}) < minimum_samples:
+            unknowns.append(f"La ventana tiene menos de {minimum_samples} instantes de medición, el mínimo observado en la cohorte de entrenamiento. No se ha validado este muestreo más escaso.")
         for name, limits in profile.get("ranges", {}).items():
             value = features.get(name)
             low, high = limits.get("min"), limits.get("max")

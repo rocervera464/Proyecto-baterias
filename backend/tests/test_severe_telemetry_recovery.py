@@ -38,10 +38,7 @@ console.log(JSON.stringify(convertTelemetryCsv(table, getDefaultImportOptions(ta
     assert report["feature_deviations"]
     assert not report["can_estimate_in_strict_mode"]
     exploratory = client.post("/api/v1/predict", json={**request, "analysis_mode": "exploratory"})
-    assert exploratory.status_code == 200
+    assert exploratory.status_code == 422
     result = exploratory.json()
-    assert result["compatibility"] == report
-    values = [result["current_soh_percent"], *[item["predicted_soh_percent"] for item in result["future_predictions"]]]
-    assert len(values) == 5
-    assert all(0 <= value <= 100 for value in values)
-    assert all(first >= second for first, second in zip(values, values[1:]))
+    assert result["detail"]["compatibility"] == report
+    assert "current_soh_percent" not in result

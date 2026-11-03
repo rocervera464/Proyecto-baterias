@@ -1,4 +1,6 @@
 {
+  "production_horizons": [],
+  "research_horizons": [5, 10, 20, 30],
   "current": {
     "horizon": 0,
     "file": "xgboost_soh_current.json"
