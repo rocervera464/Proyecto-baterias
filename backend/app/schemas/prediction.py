@@ -18,3 +18,5 @@ class PredictionResponse(BaseModel):
     current_soh_percent: float = Field(ge=0, le=100)
     production_horizons: list[int] = Field(default_factory=list)
     future_predictions: list[FuturePrediction]
+    input_normalization: list[dict] = Field(default_factory=list)
+    telemetry_reference: dict | None = None

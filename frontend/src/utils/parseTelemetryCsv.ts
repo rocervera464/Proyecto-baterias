@@ -42,7 +42,17 @@ export function readTelemetryCsv(text: string): CsvData {
     let metadata: Record<string, unknown> = {};
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
       const object = parsed as Record<string, unknown>;
-      metadata = Object.fromEntries(Object.entries(object).filter(([, value]) => typeof value === "string" || typeof value === "number"));
+      const rootMetadata = Object.fromEntries(Object.entries(object).filter(([, value]) => typeof value === "string" || typeof value === "number"));
+      for (const name of ["metadata", "context", "parameters", "battery", "previous_eis", "previous_charge"]) {
+        const container = object[name];
+        if (!container || typeof container !== "object" || Array.isArray(container)) continue;
+        for (const [key, value] of Object.entries(container)) {
+          if (typeof value !== "string" && typeof value !== "number") continue;
+          if (metadata[key] !== undefined && metadata[key] !== value && rootMetadata[key] === undefined) throw new Error(`El JSON declara valores contradictorios para ${key}. Revisa sus metadatos.`);
+          metadata[key] = value;
+        }
+      }
+      metadata = { ...metadata, ...rootMetadata };
       parsed = object.samples ?? object.discharge_samples ?? object.telemetry ?? object.data ?? object.rows;
     }
     if (!Array.isArray(parsed) || parsed.length < 2 || parsed.some((row) => !row || typeof row !== "object" || Array.isArray(row))) {
@@ -92,8 +102,29 @@ const metadataAliases = {
   battery: ["vehicle_id", "battery_id", "pack_id", "device_id", "id_bateria", "bateria", "vehiculo"],
   cycle: ["charge_cycles", "cycle", "cycle_index", "cycle_number", "cycle_count", "cycle_counter", "cycle_id", "cycle_no", "cycle_num", "discharge_cycle", "discharge_cycles", "discharge_cycle_index", "discharge_cycle_number", "ciclo", "ciclos", "ciclo_actual", "numero_ciclo", "numero_de_ciclo", "n_ciclo", "ciclo_descarga", "ciclo_de_descarga", "contador_ciclos"],
   mode: ["operating_mode", "mode", "estado_operacion", "modo", "step_type", "operation", "phase"],
-  ambient: ["ambient_temp_c", "ambient_temperature_c", "ambient_temperature", "temperatura_ambiente_c"],
+  ambient: ["ambient_temp_c", "ambient_temperature_c", "ambient_temperature", "temperatura_ambiente_c", "temperatura_ambiente", "ambient_temp_f", "ambient_temperature_f", "temperatura_ambiente_f", "ambient_temp_k", "ambient_temperature_k", "temperatura_ambiente_k"],
 };
+
+export function parseContextNumber(raw: string, field: string, kind: "temperature" | "temperature_delta" | "voltage" | "resistance"): number | undefined {
+  const match = raw.trim().replace(/\u2212/g, "-").match(/^([+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)(?:e[+-]?\d+)?)\s*([a-zA-Z°Ωω\s]*)$/i);
+  if (!match) return undefined;
+  const value = Number(match[1].replace(",", "."));
+  if (!Number.isFinite(value)) return undefined;
+  const explicit = normalize(match[2].replace(/[Ωω]/g, "ohm"));
+  const name = normalize(field);
+  if (kind === "temperature" || kind === "temperature_delta") {
+    if (explicit && !["c", "f", "k", "degc", "degf"].includes(explicit)) return undefined;
+    const unit = explicit || (name.endsWith("f") ? "f" : name.endsWith("k") ? "k" : "c");
+    if (unit === "f" || unit === "degf") return (kind === "temperature_delta" ? value : value - 32) * 5 / 9;
+    return unit === "k" && kind !== "temperature_delta" ? value - 273.15 : value;
+  }
+  if (kind === "voltage") {
+    if (explicit && !["v", "mv"].includes(explicit)) return undefined;
+    return (explicit || (name.endsWith("mv") ? "mv" : "v")) === "mv" ? value / 1000 : value;
+  }
+  if (explicit && !["ohm", "mohm"].includes(explicit)) return undefined;
+  return (explicit || (name.endsWith("mohm") ? "mohm" : "ohm")) === "mohm" ? value / 1000 : value;
+}
 export function getCycleColumns(data: CsvData): string[] {
   return data.fields.filter(field => metadataAliases.cycle.some(alias => normalize(alias) === normalize(field)));
 }
@@ -186,7 +217,7 @@ export function getImportMetadata(data: CsvData, options: ImportOptions): { cycl
   const uniqueNumber = (kind: "cycle" | "ambient") => {
     const field = metadataField(data, kind, options);
     if (!field) return undefined;
-    const values = rows.map(row => row[field]?.trim()).filter(Boolean).map(value => kind === "cycle" ? parseCycleNumber(value) : Number(value.replace(",", ".")));
+    const values = rows.map(row => row[field]?.trim()).filter(Boolean).map(value => kind === "cycle" ? parseCycleNumber(value) : parseContextNumber(value, field, "temperature"));
     if (!values.length || values.some(value => value === undefined || !Number.isFinite(value)) || new Set(values).size !== 1) return undefined;
     return values[0];
   };

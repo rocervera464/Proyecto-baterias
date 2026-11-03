@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class FeatureExtractionResponse(
@@ -18,3 +18,5 @@ class FeatureExtractionResponse(
         str,
         float | None,
     ]
+    input_normalization: list[dict] = Field(default_factory=list)
+    telemetry_reference: dict | None = None

@@ -1,12 +1,13 @@
-import { getImportMetadata, getTelemetrySegments } from "./parseTelemetryCsv.ts";
+import { getImportMetadata, getTelemetrySegments, parseContextNumber } from "./parseTelemetryCsv.ts";
 import type { CsvData, ImportOptions } from "./parseTelemetryCsv";
+import type { TelemetryIdentification } from "../types/telemetry";
 
 const aliases = {
-  cutoff: ["cutoff_voltage_v", "cutoff_voltage", "voltaje_corte", "voltaje_corte_v"],
-  level: ["measurement_level", "nivel_medicion", "nivel"],
-  chemistry: ["chemistry", "quimica", "quimica_bateria"],
-  re: ["re_ohm", "Re_prev", "resistencia_ohmica"],
-  rct: ["rct_ohm", "Rct_prev"],
+  cutoff: ["cutoff_voltage_v", "cutoff_voltage", "voltaje_corte", "voltaje_corte_v", "cutoff_voltage_mv", "voltaje_corte_mv", "discharge_cutoff_voltage"],
+  level: ["measurement_level", "nivel_medicion", "nivel", "battery_level"],
+  chemistry: ["chemistry", "quimica", "quimica_bateria", "battery_chemistry", "tipo_quimica"],
+  re: ["re_ohm", "Re_prev", "resistencia_ohmica", "re_mohm"],
+  rct: ["rct_ohm", "Rct_prev", "rct_mohm"],
   chargeStart: ["charge_temp_start_prev", "temperature_start_c"],
   chargeMax: ["charge_temp_max_prev", "temperature_max_c"],
   chargeDelta: ["charge_temp_delta_prev", "temperature_delta_c"],
@@ -26,15 +27,28 @@ export function detectBatteryParameters(data: CsvData, options: ImportOptions): 
     if (values.length !== 1) continue;
     const value = values[0];
     if (key === "level") {
-      const levels: Record<string, string> = { cell: "cell", celda: "cell", module: "module", modulo: "module", pack: "pack", paquete: "pack" };
+      const levels: Record<string, string> = { cell: "cell", celda: "cell", singlecell: "cell", module: "module", modulo: "module", pack: "pack", batterypack: "pack", paquete: "pack" };
       if (levels[normalize(value)]) result[key] = levels[normalize(value)];
     } else if (key === "chemistry") {
-      const chemistries: Record<string, string> = { liion: "li-ion", lfp: "LFP", leadacid: "lead-acid", plomoacido: "lead-acid", other: "other", otra: "other" };
+      const chemistries: Record<string, string> = { liion: "li-ion", lithiumion: "li-ion", ionlitio: "li-ion", ionesdelitio: "li-ion", litioion: "li-ion", lfp: "LFP", lifepo4: "LFP", leadacid: "lead-acid", plomoacido: "lead-acid", other: "other", otra: "other" };
       if (chemistries[normalize(value)]) result[key] = chemistries[normalize(value)];
     } else {
-      const number = Number(value.replace(",", "."));
-      if (Number.isFinite(number) && (key !== "cutoff" || number > 0)) result[key] = String(number);
+      const kind = key === "cutoff" ? "voltage" : key === "re" || key === "rct" ? "resistance" : key === "chargeDelta" ? "temperature_delta" : "temperature";
+      const number = parseContextNumber(value, columns[0], kind);
+      if (number !== undefined && (key !== "cutoff" || number > 0)) result[key] = String(number);
     }
+  }
+  return result;
+}
+
+export function mergeIdentifiedParameters(declared: Record<string, string>, identity: TelemetryIdentification): Record<string, string> {
+  const result = { ...declared };
+  if (!identity.matched || !identity.reference) return result;
+  const keys = { cycle: "cycle", ambient_temperature_c: "ambient", cutoff_voltage_v: "cutoff",
+    measurement_level: "level", chemistry: "chemistry" } as const;
+  for (const [source, target] of Object.entries(keys)) {
+    const value = identity.context[source as keyof typeof keys];
+    if (value !== undefined) result[target] = String(value);
   }
   return result;
 }

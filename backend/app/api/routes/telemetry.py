@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
 from app.schemas.features import FeatureExtractionResponse
-from app.schemas.telemetry import TelemetryRequest
+from app.schemas.telemetry import TelemetryRequest, TelemetryIdentificationRequest
+from app.services.telemetry_identity import identify_samples, normalize_request
 from app.services.feature_engineering import (
     WINDOW_SECONDS,
     extract_features,
@@ -18,15 +19,22 @@ router = APIRouter(
 legacy_router = APIRouter(tags=["telemetry"])
 
 
+@router.post("/identify")
+def identify_telemetry(request: TelemetryIdentificationRequest):
+    return identify_samples(request.discharge_samples)
+
+
 @router.post("/compatibility")
 def check_compatibility(request: TelemetryRequest):
     try:
+        request, normalization, reference = normalize_request(request)
         features, _ = extract_features(request)
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
     try:
         model_service = select_model_service(features)
-        return assess_compatibility(request, features, model_service.model_dir)
+        return {**assess_compatibility(request, features, model_service.model_dir),
+                "input_normalization": normalization, "telemetry_reference": reference}
     except (OSError, RuntimeError, ValueError) as error:
         raise HTTPException(
             status_code=503,
@@ -51,6 +59,7 @@ def validate_telemetry(
     """
 
     try:
+        request, normalization, reference = normalize_request(request)
         features, samples_used = extract_features(
             request
         )
@@ -70,4 +79,6 @@ def validate_telemetry(
         ),
         samples_used=samples_used,
         features=features,
+        input_normalization=normalization,
+        telemetry_reference=reference,
     )

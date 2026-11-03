@@ -1,6 +1,7 @@
 import { validatePrediction } from "../utils/validatePrediction";
 import type { Compatibility } from "../types/prediction";
 import type { CsvData } from "../utils/parseTelemetryCsv";
+import type { TelemetryIdentification, TelemetrySample } from "../types/telemetry";
 
 export class CompatibilityError extends Error {
   report: Compatibility;
@@ -14,6 +15,15 @@ export async function importTelemetryFile(file: File, sheet?: string): Promise<C
   const data = await response.json();
   if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "No se pudo importar el archivo.");
   return data;
+}
+
+export async function identifyTelemetry(samples: TelemetrySample[]): Promise<TelemetryIdentification> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/telemetry/identify`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ discharge_samples: samples }),
+  });
+  if (!response.ok) throw new Error("No se pudo identificar el registro de referencia.");
+  return response.json() as Promise<TelemetryIdentification>;
 }
 import type {
   PredictionResponse,

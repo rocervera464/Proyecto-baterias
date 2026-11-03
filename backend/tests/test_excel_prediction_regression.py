@@ -51,6 +51,7 @@ def test_verified_workbook_is_detected_and_predicted(excel_request):
 
 def test_wrong_ambient_returns_a_specific_reason_and_logs_it(excel_request, caplog):
     excel_request["ambient_temperature_c"] = 25
+    excel_request["normalize_inputs"] = False  # strict opt-out keeps the original diagnostic path
     with caplog.at_level(logging.WARNING, logger="app.prediction"):
         response = TestClient(app).post("/api/v1/predict", json=excel_request)
     assert response.status_code == 422

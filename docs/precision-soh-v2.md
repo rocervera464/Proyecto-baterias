@@ -115,6 +115,13 @@ importación de CSV/TSV/TXT/JSON/XLSX/XLS/Parquet/MAT y la conversión de unidad
 la interfaz principal exige señales completas. La gráfica une puntos de la
 API por segmentos lineales y permite mostrar solo el estado actual.
 
+La carga puede recuperar automáticamente esos cinco campos mediante una
+coincidencia única de las señales con el catálogo de registros originales.
+También se corrigen unidades o contexto incorrectos cuando esa procedencia
+es verificable, dejando el cambio en `input_normalization`. Esto no recorta
+mediciones reales a rangos del modelo ni añade horizontes de producción.
+El comportamiento se detalla en [normalización](telemetry-normalization.md).
+
 La importación reconoce contadores como `cycle`, `Cycle_Index`, `cycle_count`,
 `discharge_cycle` y `Número de ciclo`, y permite asignar una columna personalizada.
 Los ciclos se separan por batería y el campo se completa con el ciclo del tramo

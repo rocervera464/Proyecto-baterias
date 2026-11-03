@@ -22,6 +22,8 @@ export interface FuturePrediction {
 
 
 export interface PredictionResponse {
+  input_normalization?: import("./telemetry").InputNormalization[];
+  telemetry_reference?: { battery_id: string; cycle: number; source_sha256: string } | null;
   production_horizons: number[];
   compatibility?: Compatibility;
   status: string;

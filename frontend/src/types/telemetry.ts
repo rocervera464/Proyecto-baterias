@@ -20,6 +20,7 @@ export interface PreviousCharge {
 
 
 export interface TelemetryRequest {
+  normalize_inputs?: boolean;
   measurement_level?: "unknown" | "cell" | "module" | "pack";
   chemistry?: "unknown" | "li-ion" | "LFP" | "lead-acid" | "other";
   analysis_mode?: "strict" | "exploratory";
@@ -34,4 +35,23 @@ export interface TelemetryRequest {
   previous_eis?: PreviousEIS | null;
 
   previous_charge?: PreviousCharge | null;
+}
+
+export interface InputNormalization {
+  field: string;
+  original_value?: string | number;
+  normalized_value?: string | number;
+  basis: "verified_reference";
+  operation: string;
+  factor?: number;
+  source_unit?: string;
+  target_unit?: string;
+}
+
+export interface TelemetryIdentification {
+  matched: boolean;
+  reference: { battery_id: string; cycle: number; source_sha256: string } | null;
+  context: Partial<Pick<TelemetryRequest, "cycle" | "ambient_temperature_c" | "cutoff_voltage_v" | "measurement_level" | "chemistry">>;
+  discharge_samples: TelemetrySample[];
+  adjustments: InputNormalization[];
 }

@@ -24,6 +24,10 @@ class PreviousCharge(TelemetryModel):
     temperature_delta_c: float | None = None
 
 
+class TelemetryIdentificationRequest(TelemetryModel):
+    discharge_samples: list[DischargeSample] = Field(min_length=2, max_length=100_000)
+
+
 class TelemetryUnits(TelemetryModel):
     time: Literal["s", "ms", "min", "h"] = "s"
     voltage: Literal["V", "mV"] = "V"
@@ -33,6 +37,7 @@ class TelemetryUnits(TelemetryModel):
 
 
 class TelemetryRequest(TelemetryModel):
+    normalize_inputs: bool = True
     units: TelemetryUnits = Field(default_factory=TelemetryUnits)
     source_units: TelemetryUnits | None = Field(default=None, exclude=True)
     measurement_level: Literal["unknown", "cell", "module", "pack"] = "unknown"
@@ -45,6 +50,7 @@ class TelemetryRequest(TelemetryModel):
     discharge_samples: list[DischargeSample] = Field(min_length=2)
     previous_eis: PreviousEIS | None = None
     previous_charge: PreviousCharge | None = None
+
 
     @model_validator(mode="before")
     @classmethod

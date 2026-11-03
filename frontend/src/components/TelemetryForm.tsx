@@ -1,6 +1,7 @@
-import { detectBatteryParameters } from "../utils/batteryParameters";
+import { detectBatteryParameters, mergeIdentifiedParameters } from "../utils/batteryParameters";
 import Icon from "./Icon";
-import { importTelemetryFile } from "../services/api";
+import { identifyTelemetry, importTelemetryFile } from "../services/api";
+import type { TelemetryIdentification } from "../types/telemetry";
 import TelemetryInformationGuide from "./TelemetryInformationGuide";
 import ManualTelemetryWizard from "./ManualTelemetryWizard";
 import { emptyManualRow, validateManualTelemetry } from "../utils/manualTelemetry";
@@ -151,26 +152,46 @@ export default function TelemetryForm({
   const [importOptions, setImportOptions] = useState<ImportOptions | null>(null);
   const [readingFile, setReadingFile] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const importRevision = useRef(0);
+  const [automaticSource, setAutomaticSource] = useState("");
+  const [referenceLookupError, setReferenceLookupError] = useState("");
   const telemetrySegments = useMemo(() => csvData ? getTelemetrySegments(csvData, importOptions ?? undefined) : [], [csvData, importOptions]);
   const importMetadata = useMemo(() => csvData && importOptions ? getImportMetadata(csvData, importOptions) : null, [csvData, importOptions]);
-  function applyImport(data: CsvData, options: ImportOptions, updateParameters = false) {
+  function applyBatteryParameters(detected: Record<string, string>, updateHistory = true) {
+    setDetectedParameters(detected);
+    setCycle(detected.cycle ?? ""); setAmbientTemperature(detected.ambient ?? ""); setCutoffVoltage(detected.cutoff ?? "");
+    setMeasurementLevel((detected.level ?? "unknown") as typeof measurementLevel);
+    setChemistry((detected.chemistry ?? "unknown") as typeof chemistry);
+    if (!updateHistory) return;
+    setHistoryFromFile(true);
+    setReValue(detected.re ?? ""); setRctValue(detected.rct ?? "");
+    setChargeTempStart(detected.chargeStart ?? ""); setChargeTempMax(detected.chargeMax ?? ""); setChargeTempDelta(detected.chargeDelta ?? "");
+  }
+  async function applyImport(data: CsvData, options: ImportOptions, updateParameters = false) {
+    const revision = ++importRevision.current;
+    setReadingFile(true);
     setImportOptions(options);
     setSamples([]);
     setCsvError(null);
-    if (updateParameters) {
-      const detected = detectBatteryParameters(data, options);
-      setDetectedParameters(detected);
-      setCycle(detected.cycle ?? ""); setAmbientTemperature(detected.ambient ?? ""); setCutoffVoltage(detected.cutoff ?? "");
-      setMeasurementLevel((detected.level ?? "unknown") as typeof measurementLevel);
-      setChemistry((detected.chemistry ?? "unknown") as typeof chemistry);
-      setHistoryFromFile(true);
-      setReValue(detected.re ?? ""); setRctValue(detected.rct ?? "");
-      setChargeTempStart(detected.chargeStart ?? ""); setChargeTempMax(detected.chargeMax ?? ""); setChargeTempDelta(detected.chargeDelta ?? "");
-    }
+    setAutomaticSource("");
+    setReferenceLookupError("");
+    const declared = detectBatteryParameters(data, options);
+    if (updateParameters) applyBatteryParameters(declared);
     try {
-      setSamples(convertTelemetryCsv(data, options));
+      const samples = convertTelemetryCsv(data, options);
+      let identity: TelemetryIdentification | null = null;
+      try { identity = await identifyTelemetry(samples); }
+      catch { if (revision === importRevision.current) setReferenceLookupError("La identificación automática no está disponible. Se conservan los datos declarados en el archivo."); }
+      if (revision !== importRevision.current) return;
+      if (identity?.matched) applyBatteryParameters(mergeIdentifiedParameters(declared, identity), updateParameters);
+      if (identity?.matched && identity.reference) {
+        setAutomaticSource(`Registro identificado: NASA ${identity.reference.battery_id}, ciclo ${identity.reference.cycle}. Datos de ensayo recuperados de la fuente verificada.${identity.adjustments.length ? " Unidades normalizadas automáticamente." : ""}`);
+      }
+      setSamples(identity?.matched ? identity.discharge_samples : samples);
     } catch (error) {
-      setCsvError(error instanceof Error ? error.message : "No fue posible procesar el archivo.");
+      if (revision === importRevision.current) setCsvError(error instanceof Error ? error.message : "No fue posible procesar el archivo.");
+    } finally {
+      if (revision === importRevision.current) setReadingFile(false);
     }
   }
 
@@ -187,6 +208,7 @@ export default function TelemetryForm({
     setCsvError(null);
     setSheets([]); setSelectedSheet(""); setFileWarnings([]); setBinaryFile(null);
     setCycle(""); setDetectedParameters({});
+    setAutomaticSource("");
     if (!file) return;
     setMeasurementLevel("unknown"); setChemistry("unknown");
     if (historyFromFile) {
@@ -199,7 +221,7 @@ export default function TelemetryForm({
         setBinaryFile(file);
         const imported = await importTelemetryFile(file);
         setSheets(imported.sheets); setSelectedSheet(imported.selected_sheet ?? ""); setFileWarnings(imported.warnings);
-        if (imported.rows.length) { setCsvData(imported); applyImport(imported, getDefaultImportOptions(imported), true); }
+        if (imported.rows.length) { setCsvData(imported); await applyImport(imported, getDefaultImportOptions(imported), true); }
         return;
       }
       if (!/\.(csv|tsv|txt|json)$/i.test(file.name)) throw new Error("Formato no soportado. Usa CSV, TSV, TXT, JSON, XLSX, XLS, MAT o Parquet.");
@@ -209,7 +231,7 @@ export default function TelemetryForm({
       const data = readTelemetryCsv(new TextDecoder(encoding).decode(buffer));
       if (data.rows.length > 100_000) throw new Error("El archivo supera 100 000 filas. Selecciona un tramo menor.");
       setCsvData(data);
-      applyImport(data, getDefaultImportOptions(data), true);
+      await applyImport(data, getDefaultImportOptions(data), true);
     } catch (error) {
       setCsvError(error instanceof Error ? error.message : "No fue posible leer el archivo.");
     } finally {
@@ -223,7 +245,7 @@ export default function TelemetryForm({
     try {
       const imported = await importTelemetryFile(binaryFile, sheet);
       setFileWarnings(imported.warnings); setCsvData(imported);
-      applyImport(imported, getDefaultImportOptions(imported), true);
+      await applyImport(imported, getDefaultImportOptions(imported), true);
     } catch (error) { setCsvError(error instanceof Error ? error.message : "No se pudo leer la hoja."); }
     finally { setReadingFile(false); }
   }
@@ -337,7 +359,7 @@ export default function TelemetryForm({
     submitting.current = true;
     try {
       await onSubmit(telemetry, { warnings: [
-        ...(inputMode === "manual" ? manual.warnings : [...fileWarnings, ...(csvData && importOptions ? getImportMetadata(csvData, importOptions).warnings : [])]),
+        ...(inputMode === "manual" ? manual.warnings : [...fileWarnings, ...(automaticSource ? [automaticSource] : importMetadata?.warnings ?? []), ...(referenceLookupError ? [referenceLookupError] : [])]),
         ...parameterWarnings,
       ] });
     } finally { submitting.current = false; }
@@ -548,7 +570,7 @@ export default function TelemetryForm({
             Si tu archivo empieza a mitad de la descarga, desactiva la opción anterior para conservar el tiempo original.</p>
         </fieldset>
         {batteryParameters}
-        {(fileWarnings.length > 0 || !!importMetadata?.warnings.length) && <div className="import-file-notes">{[...new Set([...fileWarnings, ...(importMetadata?.warnings ?? [])])].map(note => <p key={note}>{note}</p>)}</div>}
+        {(fileWarnings.length > 0 || !!importMetadata?.warnings.length || automaticSource || referenceLookupError) && <div className="import-file-notes">{[...new Set([...fileWarnings, ...(automaticSource ? [automaticSource] : importMetadata?.warnings ?? []), ...(referenceLookupError ? [referenceLookupError] : [])])].map(note => <p key={note}>{note}</p>)}</div>}
         </details>
         </div>
       )}

@@ -22,8 +22,35 @@ La conversión se realiza antes de validar límites y calcular las 29 caracterí
 
 La interfaz ya convierte las unidades seleccionadas en el importador antes de enviar las mediciones; debe seguir enviando esos valores en unidades canónicas, sin declarar de nuevo las unidades originales. El ingreso manual sigue usando las unidades indicadas en sus etiquetas.
 
-Los modelos actuales se entrenaron con magnitudes físicas. No se introduce escalado MinMax ni estandarización exclusiva en inferencia: requeriría volver a entrenar con la misma transformación. Tampoco se recortan mediciones extremas a mínimos/máximos del entrenamiento, pues eso ocultaría datos fuera de dominio y podría alterar indicios de degradación. Se mantienen la comprobación de compatibilidad y los modos estricto/exploratorio.
+Los modelos actuales se entrenaron con magnitudes físicas. No se introduce escalado MinMax ni estandarización exclusiva en inferencia: requeriría volver a entrenar con la misma transformación. Tampoco se recortan mediciones extremas a mínimos/máximos del entrenamiento, pues eso ocultaría datos fuera de dominio y podría alterar indicios de degradación. Se mantiene la comprobación de compatibilidad; la ruta de producción no omite esta validación por el indicador heredado exploratorio.
 
 El filtro EIS existente se conserva: valores fuera de `0 < Re < 1 Ω` o `0 < Rct < 2 Ω` se tratan como ausentes, ahora con aviso explícito. Esto no convierte una medición desconocida en una resistencia válida.
 
-Verificación: 43 pruebas backend aprobadas, incluidas equivalencia de características entre unidades, diferencias térmicas, conservación de valores extremos, serialización sin doble conversión y rechazo de unidades o valores inválidos.
+## Identificación y recuperación automática de contexto
+
+Al cargar un archivo, el frontend lee primero las columnas y metadatos declarados
+y consulta `POST /api/v1/telemetry/identify` con las mediciones. Si coinciden de
+forma única con una ventana original, recupera ciclo, ambiente, corte, nivel y
+química. Los campos dejan de pedir intervención manual cuando se han identificado.
+Se reconoce también contexto dentro de `metadata`, `context`, `parameters` o
+`battery` en JSON, y unidades explícitas como `ambient_temperature_f` o `2000 mV`.
+
+`normalize_inputs` es verdadero por defecto en `/predict`, `/compatibility` y
+`/validate`. Una referencia verificada puede restaurar contexto incorrecto
+(por ejemplo, ambiente 25 → 4 °C en B0045 ciclo 30) y corregir unidades de las
+señales. `input_normalization` registra valores previos/nuevos y operaciones;
+`telemetry_reference` identifica la fuente. Los clientes utilizan el ciclo
+restaurado únicamente cuando viene acompañado de este registro de procedencia.
+La interfaz muestra estos cambios dentro de los detalles, sin alertas repetidas.
+
+Se puede desactivar esta recuperación mediante `normalize_inputs: false`.
+Si las señales no tienen una coincidencia única, se conservan los datos
+declarados y se solicitan los campos ausentes. No se deduce el ciclo absoluto,
+el corte o la química a partir de una curva desconocida, ni se fuerza una
+predicción sobre medidas genuinamente incompatibles. Los horizontes de producción
+siguen determinados por el manifiesto; la normalización no habilita investigación.
+
+El catálogo reproducible y su alcance se documentan en
+`backend/reference_data/README.md`. Las pruebas cubren conversiones, fuente
+ambigua, señales desconocidas, conservación de datos, recuperación de los cinco
+campos y coherencia entre los endpoints y la predicción.
