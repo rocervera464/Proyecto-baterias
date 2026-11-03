@@ -32,8 +32,12 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
   const [analysisSequence, setAnalysisSequence] = useState(0);
   const [analysisTelemetry, setAnalysisTelemetry] = useState<TelemetryRequest | null>(null);
   const [forecastView, setForecastView] = useState<"chart" | "cards">("cards");
-  async function handlePrediction(telemetry: TelemetryRequest, context?: { warnings: string[] }) {
-    if (loading) return;
+  function clearPreviousAnalysis() {
+    setPrediction(null); setError(null); setCompatibility(null); setCompatibilityMessage("");
+    onResultsChange(false);
+  }
+  async function handlePrediction(telemetry: TelemetryRequest, context?: { warnings: string[] }): Promise<boolean> {
+    if (loading) return false;
     setAnalysisTelemetry(telemetry);
     setForecastView("cards");
     setAnalysisSequence((sequence) => sequence + 1);
@@ -49,6 +53,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
       if (remaining > 0) await new Promise<void>(resolve => window.setTimeout(resolve, remaining));
       setPrediction(result);
       onResultsChange(true);
+      return true;
     }
     catch (error) {
       if (error instanceof CompatibilityError) {
@@ -57,6 +62,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
       } else {
         setError(error instanceof TypeError ? "No se pudo conectar con el servicio de predicción. Comprueba que el backend esté disponible." : error instanceof Error ? error.message : "Ocurrió un error inesperado.");
       }
+      return false;
     }
     finally { setLoading(false); }
   }
@@ -67,7 +73,7 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
       onChangeCapture={() => setCompatibility(null)}
       onDropCapture={() => setCompatibility(null)}
       onClickCapture={(event) => { if ((event.target as Element).closest("button")) setCompatibility(null); }}>
-      <TelemetryForm onSubmit={handlePrediction} loading={loading} />
+      <TelemetryForm onSubmit={handlePrediction} loading={loading} onTelemetryChange={clearPreviousAnalysis} />
     </section>
     {loading && analysisTelemetry && <PredictionProgress key={analysisSequence} telemetry={analysisTelemetry} />}
     {error && <section ref={failurePanel} tabIndex={-1} className="error-card" role="alert"><strong>No se pudo completar el análisis</strong><p>{error}</p></section>}

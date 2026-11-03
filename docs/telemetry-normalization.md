@@ -28,10 +28,17 @@ El filtro EIS existente se conserva: valores fuera de `0 < Re < 1 Ω` o `0 < Rct
 
 ## Identificación y recuperación automática de contexto
 
-Al cargar un archivo, el frontend lee primero las columnas y metadatos declarados
-y consulta `POST /api/v1/telemetry/identify` con las mediciones. Si coinciden de
+Al cargar un archivo, el frontend prepara las columnas y las mediciones sin mostrar
+todavía el formulario de contexto ni consultar referencias. Al pulsar «Analizar
+batería», aparece «Datos de la batería», se leen los metadatos y se consulta
+`POST /api/v1/telemetry/identify` con las mediciones. Si coinciden de
 forma única con una ventana original, recupera ciclo, ambiente, corte, nivel y
 química. Los campos dejan de pedir intervención manual cuando se han identificado.
+La misma acción identifica los datos del ingreso manual. El request de predicción
+se construye con el resultado de esa consulta, sin depender de que React haya
+actualizado los campos: no requiere otro clic si se identificaron todos. Si faltan
+datos, los campos permanecen editables y se pausa la predicción hasta completarlos.
+Cambiar archivo, hoja, descarga, unidades o mediciones reinicia esta identificación.
 Se reconoce también contexto dentro de `metadata`, `context`, `parameters` o
 `battery` en JSON, y unidades explícitas como `ambient_temperature_f` o `2000 mV`.
 

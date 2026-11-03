@@ -14,6 +14,8 @@
 .compatibility-recovery > a { display: inline-block; padding: 12px 0; color: #087e70; text-underline-offset: 4px; }
 .battery-context { border: 1px solid #dce6e2; border-radius: 14px; margin: 24px 0; padding: 20px; min-width: 0; }
 .battery-context legend { padding: 0 8px; font-size: 14px; font-weight: 600; }
+.battery-context-analysis { animation: battery-context-appear .35s ease both; }
+@keyframes battery-context-appear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .battery-context select, .binary-sheet-select select { width: 100%; min-height: 44px; padding: 10px; border: 1px solid #c6d9cf; border-radius: 10px; background: white; color: #123c4b; }
 .battery-context .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 0; }
 .battery-context p, .binary-sheet-select p { font-size: 12px; color: #536875; margin: 12px 0 0; }

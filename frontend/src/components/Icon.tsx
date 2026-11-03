@@ -1,4 +1,4 @@
-type IconName = "battery" | "clock" | "layers" | "chart" | "solar" | "shield" | "grid" | "upload" | "edit" | "check" | "arrow";
+type IconName = "battery" | "clock" | "layers" | "chart" | "solar" | "shield" | "grid" | "upload" | "edit" | "check" | "arrow" | "file" | "close";
 const paths: Record<IconName, string> = {
   battery: "M3 7h16v10H3z M22 10v4 M7 10v4 M11 10v4 M15 10v4",
   clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18 M12 7v5l3 2",
@@ -11,6 +11,8 @@ const paths: Record<IconName, string> = {
   edit: "m15 5 4 4M4 20l4-1L20 7a2.12 2.12 0 0 0-3-3L5 16z",
   check: "m5 12 4 4L19 6",
   arrow: "M5 12h14m-6-6 6 6-6 6",
+  file: "M14 3H5v18h14V8z M14 3v5h5 M8 12h8 M8 16h6",
+  close: "m6 6 12 12M6 18 18 6",
 };
 export default function Icon({ name }: { name: IconName }) {
   return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>;

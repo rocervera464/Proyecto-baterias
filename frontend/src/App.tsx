@@ -8,6 +8,7 @@ import PredictionHeader from "./components/PredictionHeader";
 import "./App.css";
 import "./presentation.css";
 import "./interactions.css";
+import "./components/telemetryWorkspace.css";
 
 
 function App() {

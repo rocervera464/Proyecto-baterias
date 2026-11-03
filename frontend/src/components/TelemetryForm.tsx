@@ -1,7 +1,8 @@
-import { detectBatteryParameters, mergeIdentifiedParameters } from "../utils/batteryParameters";
+import { detectBatteryParameters } from "../utils/batteryParameters";
+import { buildTelemetryRequest, identifyBatteryData } from "../utils/prepareTelemetryAnalysis";
 import Icon from "./Icon";
+import TelemetryFileInsight from "./TelemetryFileInsight";
 import { identifyTelemetry, importTelemetryFile } from "../services/api";
-import type { TelemetryIdentification } from "../types/telemetry";
 import TelemetryInformationGuide from "./TelemetryInformationGuide";
 import ManualTelemetryWizard from "./ManualTelemetryWizard";
 import { emptyManualRow, validateManualTelemetry } from "../utils/manualTelemetry";
@@ -10,6 +11,7 @@ import {
   useState,
   useRef,
   useMemo,
+  useId,
 } from "react";
 
 import {
@@ -35,16 +37,26 @@ interface TelemetryFormProps {
   onSubmit: (
     telemetry: TelemetryRequest,
     context?: { warnings: string[] },
-  ) => Promise<void>;
+  ) => Promise<boolean>;
 
   loading: boolean;
+  onTelemetryChange?: () => void;
 }
 
 
 export default function TelemetryForm({
   onSubmit,
-  loading,
+  loading: predicting,
+  onTelemetryChange,
 }: TelemetryFormProps) {
+
+  const [identifying, setIdentifying] = useState(false);
+  const [analysisStarted, setAnalysisStarted] = useState(false);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [fileSize, setFileSize] = useState(0);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const fileInputId = useId();
+  const loading = predicting || identifying;
 
   const [
     cycle,
@@ -146,12 +158,10 @@ export default function TelemetryForm({
   const [sheets, setSheets] = useState<string[]>([]);
   const [selectedSheet, setSelectedSheet] = useState("");
   const [fileWarnings, setFileWarnings] = useState<string[]>([]);
-  const [historyFromFile, setHistoryFromFile] = useState(false);
   const [csvData, setCsvData] = useState<CsvData | null>(null);
   const [importOptions, setImportOptions] = useState<ImportOptions | null>(null);
   const [readingFile, setReadingFile] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const importRevision = useRef(0);
   const [automaticSource, setAutomaticSource] = useState("");
   const [referenceLookupError, setReferenceLookupError] = useState("");
   const telemetrySegments = useMemo(() => csvData ? getTelemetrySegments(csvData, importOptions ?? undefined) : [], [csvData, importOptions]);
@@ -161,57 +171,54 @@ export default function TelemetryForm({
     setMeasurementLevel((detected.level ?? "unknown") as typeof measurementLevel);
     setChemistry((detected.chemistry ?? "unknown") as typeof chemistry);
     if (!updateHistory) return;
-    setHistoryFromFile(true);
     setReValue(detected.re ?? ""); setRctValue(detected.rct ?? "");
     setChargeTempStart(detected.chargeStart ?? ""); setChargeTempMax(detected.chargeMax ?? ""); setChargeTempDelta(detected.chargeDelta ?? "");
   }
   async function applyImport(data: CsvData, options: ImportOptions, updateParameters = false) {
-    const revision = ++importRevision.current;
+    setAnalysisComplete(false);
+    onTelemetryChange?.();
     setReadingFile(true);
     setImportOptions(options);
     setSamples([]);
     setCsvError(null);
     setAutomaticSource("");
     setReferenceLookupError("");
-    const declared = detectBatteryParameters(data, options);
-    if (updateParameters) applyBatteryParameters(declared);
+    setAnalysisStarted(false);
+    setSubmitError(null);
+    applyBatteryParameters({}, updateParameters);
     try {
-      const samples = convertTelemetryCsv(data, options);
-      let identity: TelemetryIdentification | null = null;
-      try { identity = await identifyTelemetry(samples); }
-      catch { if (revision === importRevision.current) setReferenceLookupError("La identificación automática no está disponible. Se conservan los datos declarados en el archivo."); }
-      if (revision !== importRevision.current) return;
-      applyBatteryParameters(identity ? mergeIdentifiedParameters(declared, identity) : declared, updateParameters);
-      if (identity?.matched && identity.reference) {
-        setAutomaticSource(`Registro identificado: NASA ${identity.reference.battery_id}, ciclo ${identity.reference.cycle}. Datos de ensayo recuperados de la fuente verificada.${identity.adjustments.length ? " Unidades normalizadas automáticamente." : ""}`);
-      }
-      setSamples(identity?.matched ? identity.discharge_samples : samples);
+      setSamples(convertTelemetryCsv(data, options));
     } catch (error) {
-      if (revision === importRevision.current) setCsvError(error instanceof Error ? error.message : "No fue posible procesar el archivo.");
+      setCsvError(error instanceof Error ? error.message : "No fue posible procesar el archivo.");
     } finally {
-      if (revision === importRevision.current) setReadingFile(false);
+      setReadingFile(false);
     }
   }
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    await loadFile(event.target.files?.[0]);
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (file) await loadFile(file);
   }
 
   async function loadFile(file: File | undefined) {
     if (loading || readingFile) return;
+    setAnalysisComplete(false);
+    onTelemetryChange?.();
+    setFileSize(file?.size ?? 0);
     setSamples([]);
     setCsvData(null);
     setImportOptions(null);
     setFileName(file?.name ?? "");
     setCsvError(null);
     setSheets([]); setSelectedSheet(""); setFileWarnings([]); setBinaryFile(null);
-    applyBatteryParameters({}, false);
+    applyBatteryParameters({});
+    setAnalysisStarted(false);
+    setSubmitError(null);
     setAutomaticSource("");
+    setReferenceLookupError("");
     if (!file) return;
     setMeasurementLevel("unknown"); setChemistry("unknown");
-    if (historyFromFile) {
-      setReValue(""); setRctValue(""); setChargeTempStart(""); setChargeTempMax(""); setChargeTempDelta(""); setHistoryFromFile(false);
-    }
     setReadingFile(true);
     try {
       if (file.size > 40 * 1024 * 1024) throw new Error("El archivo supera 40 MB. Selecciona un tramo menor.");
@@ -231,7 +238,7 @@ export default function TelemetryForm({
       setCsvData(data);
       await applyImport(data, getDefaultImportOptions(data), true);
     } catch (error) {
-      setCsvError(error instanceof Error ? error.message : "No fue posible leer el archivo.");
+      setCsvError(error instanceof DOMException ? "No se pudo leer el archivo. Vuelve a seleccionarlo desde tu equipo." : error instanceof Error ? error.message : "No fue posible leer el archivo.");
     } finally {
       setReadingFile(false);
     }
@@ -248,47 +255,32 @@ export default function TelemetryForm({
     finally { setReadingFile(false); }
   }
 
-  async function changeManualStep(step: number, rows = manualRows) {
+  function changeManualStep(step: number) {
     setManualStep(step);
-    const telemetry = validateManualTelemetry(rows);
-    if (step !== 4 || telemetry.error || telemetry.samples.length < 2) return;
-    const revision = ++importRevision.current;
-    setReadingFile(true);
-    setAutomaticSource("");
-    setReferenceLookupError("");
-    try {
-      const identity = await identifyTelemetry(telemetry.samples);
-      if (revision !== importRevision.current || !identity.matched) return;
-      applyBatteryParameters(mergeIdentifiedParameters({}, identity), false);
-      // Keep the measurements displayed in the wizard in the same units sent to the model.
-      setManualRows(identity.discharge_samples.map(sample => ({
-        time_s: String(sample.time_s), voltage_v: String(sample.voltage_v),
-        current_a: String(sample.current_a), temperature_c: String(sample.temperature_c),
-      })));
-      if (identity.reference) setAutomaticSource(`Datos completados automáticamente: NASA ${identity.reference.battery_id}, ciclo ${identity.reference.cycle}.`);
-    } catch {
-      if (revision === importRevision.current) setReferenceLookupError("No se pudo consultar la identificación automática. Completa los datos del ensayo.");
-    } finally {
-      if (revision === importRevision.current) setReadingFile(false);
-    }
   }
 
   function changeManualRows(rows: ManualRow[]) {
+    setAnalysisComplete(false);
+    onTelemetryChange?.();
     setManualRows(rows);
-    if (automaticSource) {
-      applyBatteryParameters({}, false);
-      setAutomaticSource("");
-    }
+    applyBatteryParameters({}, false);
+    setAutomaticSource("");
+    setAnalysisStarted(false);
+    setSubmitError(null);
   }
 
   function changeInputMode(mode: "csv" | "manual") {
     if (mode === inputMode) return;
+    setAnalysisComplete(false);
+    onTelemetryChange?.();
     setInputMode(mode);
+    setCsvError(null);
     setSubmitError(null);
     setAutomaticSource("");
+    setReferenceLookupError("");
+    setAnalysisStarted(false);
     applyBatteryParameters({}, false);
     if (mode === "csv" && csvData && importOptions) void applyImport(csvData, importOptions, true);
-    if (mode === "manual" && manualStep >= 4) void changeManualStep(4);
   }
 
   async function handleSubmit(
@@ -314,96 +306,42 @@ export default function TelemetryForm({
     }
 
 
-    const telemetry:
-      TelemetryRequest = {
-
-        measurement_level: measurementLevel,
-        chemistry: chemistry,
-        analysis_mode: "strict",
-        cycle: Number(cycle),
-
-        ambient_temperature_c:
-          Number(ambientTemperature),
-
-        cutoff_voltage_v:
-          Number(cutoffVoltage),
-
-        discharge_samples:
-          activeSamples,
-      };
-
-
-    if (
-      inputMode === "csv" && (reValue !== ""
-      ||
-      rctValue !== "")
-    ) {
-
-      telemetry.previous_eis = {
-
-        re_ohm:
-          reValue === ""
-            ? null
-            : Number(
-                reValue,
-              ),
-
-        rct_ohm:
-          rctValue === ""
-            ? null
-            : Number(
-                rctValue,
-              ),
-      };
-    }
-
-
-    if (
-      inputMode === "csv" && (chargeTempStart !== ""
-      ||
-      chargeTempMax !== ""
-      ||
-      chargeTempDelta !== "")
-    ) {
-
-      telemetry.previous_charge = {
-
-        temperature_start_c:
-          chargeTempStart === ""
-            ? null
-            : Number(
-                chargeTempStart,
-              ),
-
-        temperature_max_c:
-          chargeTempMax === ""
-            ? null
-            : Number(
-                chargeTempMax,
-              ),
-
-        temperature_delta_c:
-          chargeTempDelta === ""
-            ? null
-            : Number(
-                chargeTempDelta,
-              ),
-      };
-    }
-
-
-    const numericValues = [telemetry.cycle, telemetry.ambient_temperature_c, telemetry.cutoff_voltage_v,
-      ...Object.values(telemetry.previous_eis ?? {}), ...Object.values(telemetry.previous_charge ?? {})];
-    if ([cycle, ambientTemperature, cutoffVoltage].some(value => !value.trim()) || !numericValues.every((value) => value == null || Number.isFinite(value)) || !Number.isInteger(telemetry.cycle) || telemetry.cycle < 1 || telemetry.cutoff_voltage_v <= 0) {
-      setSubmitError("Revisa los parámetros generales y opcionales: deben ser números finitos, con un ciclo entero positivo y un voltaje de corte mayor que cero."); return;
-    }
     submitting.current = true;
+    setAnalysisStarted(true);
+    setIdentifying(true);
+    setReferenceLookupError("");
     try {
-      await onSubmit(telemetry, { warnings: [
-        ...(inputMode === "manual" ? manual.warnings : [...fileWarnings, ...(automaticSource ? [automaticSource] : importMetadata?.warnings ?? []), ...(referenceLookupError ? [referenceLookupError] : [])]),
-        ...parameterWarnings,
+      const declared = inputMode === "csv" && csvData && importOptions ? detectBatteryParameters(csvData, importOptions) : {};
+      const edited = Object.fromEntries(Object.entries({
+        cycle, ambient: ambientTemperature, cutoff: cutoffVoltage, level: measurementLevel, chemistry,
+        ...(inputMode === "csv" ? { re: reValue, rct: rctValue, chargeStart: chargeTempStart, chargeMax: chargeTempMax, chargeDelta: chargeTempDelta } : {}),
+      }).filter(([, value]) => value.trim() && value !== "unknown"));
+      const resolved = await identifyBatteryData(activeSamples, { ...declared, ...edited }, identifyTelemetry);
+      applyBatteryParameters(resolved.parameters, inputMode === "csv");
+      let source = "";
+      if (resolved.identity?.matched && resolved.identity.reference) {
+        source = `Registro identificado: NASA ${resolved.identity.reference.battery_id}, ciclo ${resolved.identity.reference.cycle}. Datos del ensayo completados automáticamente.`;
+      } else if (Object.keys(declared).length) {
+        source = "Datos del ensayo identificados en el archivo.";
+      }
+      setAutomaticSource(source);
+      const lookupWarning = resolved.lookupFailed ? "La identificación de referencias no está disponible. Se conservan los datos declarados del ensayo." : "";
+      setReferenceLookupError(lookupWarning);
+      if (inputMode === "csv") setSamples(resolved.samples);
+      else if (resolved.identity?.matched) setManualRows(resolved.samples.map(sample => ({
+        time_s: String(sample.time_s), voltage_v: String(sample.voltage_v), current_a: String(sample.current_a), temperature_c: String(sample.temperature_c),
+      })));
+      // Build from this analysis result, without waiting for React state updates.
+      const telemetry = buildTelemetryRequest(resolved.parameters, resolved.samples);
+      const completed = await onSubmit(telemetry, { warnings: [
+        ...(inputMode === "manual" ? manual.warnings : [...fileWarnings, ...(source ? [source] : importMetadata?.warnings ?? [])]),
+        ...(lookupWarning ? [lookupWarning] : []),
       ] });
-    } finally { submitting.current = false; }
+      setAnalysisComplete(completed);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "No fue posible preparar los datos para el análisis.");
+      window.requestAnimationFrame(() => document.getElementById("parametros")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "center" }));
+    } finally { submitting.current = false; setIdentifying(false); }
   }
 
 
@@ -435,7 +373,6 @@ export default function TelemetryForm({
     ).length;
 
 
-  const parametersValid = ["cycle", "ambient", "cutoff", "level", "chemistry"].every(hasValidParameter);
   const parameterFields = (keys?: string[]) => <div className="form-grid">
     {(!keys || keys.includes("cycle")) && <label>Ciclo de descarga<input type="number" min="1" step="1" required placeholder="Ciclo actual" value={cycle} onChange={event => { setCycle(event.target.value); }} /></label>}
     {(!keys || keys.includes("ambient")) && <label>Temperatura ambiente (°C)<input type="number" step="any" required value={ambientTemperature} onChange={event => { setAmbientTemperature(event.target.value); }} /></label>}
@@ -444,18 +381,38 @@ export default function TelemetryForm({
     {(!keys || keys.includes("chemistry")) && <label>Química<select value={chemistry} onChange={event => { setChemistry(event.target.value as typeof chemistry); }}><option value="unknown">Selecciona una opción</option><option value="li-ion">Ion litio</option><option value="LFP">LFP</option><option value="lead-acid">Plomo ácido</option><option value="other">Otra</option></select></label>}
   </div>;
   const batteryParameters = (
-      <fieldset className="battery-context" id="parametros" disabled={loading || readingFile}>
+      <fieldset className="battery-context battery-context-analysis" id="parametros" disabled={loading || readingFile} aria-busy={identifying && !predicting}>
         <legend>Datos de la batería</legend>
-        {readingFile && <p role="status">Identificando los datos del ensayo…</p>}
+        {identifying && !predicting && <p role="status">Identificando los datos del ensayo…</p>}
         {automaticSource && <p role="status">{automaticSource}</p>}
         {referenceLookupError && <p>{referenceLookupError}</p>}
         {parameterFields()}
       </fieldset>
   );
 
+  const readyToAnalyze = activeSamples.length >= 2 && !csvError;
+  const needsContext = analysisStarted && !loading && !["cycle", "ambient", "cutoff", "level", "chemistry"].every(hasValidParameter);
+  const stage = analysisComplete || predicting ? 2 : analysisStarted ? 1 : 0;
+  const analysisActions = (inputMode === "csv" || manualStep === 5) && <div className="analysis-submit">
+    {submitError && <p className="form-error analysis-feedback" role="alert">{submitError}</p>}
+    <div className="analysis-next-step" role="status">
+      <span className="analysis-next-icon"><Icon name={loading ? "clock" : needsContext ? "edit" : readyToAnalyze ? "check" : "upload"} /></span>
+      <div><strong>{identifying && !predicting ? "Identificando los datos de la batería" : predicting ? "Analizando tus mediciones" : analysisComplete ? "Tu análisis está disponible" : needsContext ? "Completa los datos de la batería" : readyToAnalyze ? "Todo listo para empezar" : "Carga tu telemetría para continuar"}</strong>
+        <p>{loading ? "Conserva esta página abierta mientras termina el análisis." : needsContext ? "Tus mediciones se conservan. Solo faltan los datos indicados arriba." : readyToAnalyze ? "Identificaremos la batería y comprobaremos el modelo antes de predecir." : "Selecciona un archivo o arrástralo al área de carga."}</p>
+      </div>
+    </div>
+    <button type="submit" aria-busy={loading} disabled={loading || readingFile || !readyToAnalyze || (inputMode === "manual" && !!manual.error)}>
+      <span className="analysis-submit-icon">{loading ? <span className="analysis-submit-spinner" /> : <Icon name="battery" />}</span>
+      <span className="analysis-submit-copy"><strong>{loading ? "Analizando batería…" : analysisComplete ? "Analizar de nuevo" : "Analizar batería"}</strong><span>{loading ? "Procesando la telemetría" : "Estimar la salud de la batería"}</span></span>
+      <span className="analysis-submit-arrow"><Icon name="arrow" /></span>
+    </button>
+  </div>;
+
   return (
     <form
-      className="telemetry-form"
+      className="telemetry-form telemetry-workspace"
+      noValidate
+      onChangeCapture={() => { if (submitError) setSubmitError(null); if (analysisComplete) { setAnalysisComplete(false); onTelemetryChange?.(); } }}
       aria-busy={loading || readingFile}
       onSubmit={
         handleSubmit
@@ -465,53 +422,56 @@ export default function TelemetryForm({
       <div className="analysis-columns">
 <section data-reveal id="telemetria" className="telemetry-import" aria-labelledby="telemetry-import-title">
       <div className="telemetry-import-heading">
-        <span className="telemetry-import-icon" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 16V4m-4 4 4-4 4 4M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" />
-          </svg>
-        </span>
         <div>
-          <h3 id="telemetry-import-title">Carga la telemetría</h3>
-          <p>Elige cómo ingresar tus mediciones y prepara los datos de la predicción.</p>
+          <p className="telemetry-eyebrow">ANÁLISIS DE BATERÍA</p>
+          <h3 id="telemetry-import-title">Carga tus datos. Conoce tu batería.</h3>
+          <p>De tus mediciones a una estimación de salud, paso a paso.</p>
         </div>
-        <span className="csv-format-badge">{inputMode === "csv" ? "ARCHIVO" : "INGRESO MANUAL"}</span>
+        <span className={`telemetry-status-pill${csvError || needsContext ? " has-error" : readyToAnalyze ? " is-ready" : ""}`}><span />{loading ? "Análisis en curso" : readingFile ? "Leyendo archivo" : csvError ? "Revisa el archivo" : analysisComplete ? "Análisis completo" : needsContext ? "Datos por completar" : readyToAnalyze ? "Telemetría lista" : "Esperando telemetría"}</span>
       </div>
-
+      <ol className="telemetry-flow" aria-label="Etapas del análisis">{["Cargar telemetría", "Identificar batería", "Obtener predicción"].map((label, index) => <li key={label} className={`${index === stage ? "is-current" : ""}${index < stage || analysisComplete ? " is-complete" : ""}`} aria-current={index === stage && !analysisComplete ? "step" : undefined}><span>{index < stage || analysisComplete ? <Icon name="check" /> : index + 1}</span><strong>{label}</strong></li>)}</ol>
 
       <div className="telemetry-source-selector" role="group" aria-label="Método de ingreso de telemetría">
         <button type="button" aria-pressed={inputMode === "csv"} disabled={loading || readingFile} onClick={() => changeInputMode("csv")}>
           <span className="source-option-icon"><Icon name="upload" /></span>
-          <span className="source-option-copy"><strong>Cargar archivo</strong><span>Importa tu telemetría</span></span>
+          <span className="source-option-copy"><strong>Subir archivo</strong><span>CSV, Excel y otros formatos</span></span>
           <span className="source-option-check" aria-hidden="true"><Icon name="check" /></span>
         </button>
         <button type="button" aria-pressed={inputMode === "manual"} disabled={loading || readingFile} onClick={() => changeInputMode("manual")}>
           <span className="source-option-icon"><Icon name="edit" /></span>
-          <span className="source-option-copy"><strong>Ingresar datos manualmente</strong><span>Sigue una guía paso a paso</span></span>
+          <span className="source-option-copy"><strong>Ingreso manual</strong><span>Escribe o pega tus mediciones</span></span>
           <span className="source-option-check" aria-hidden="true"><Icon name="check" /></span>
         </button>
       </div>
       {inputMode === "manual" && <TelemetryInformationGuide />}
-      {inputMode === "manual" && <ManualTelemetryWizard rows={manualRows} onChange={changeManualRows} disabled={loading || readingFile} step={manualStep} onStepChange={changeManualStep} parameters={batteryParameters} parametersValid={parametersValid} parameterWarnings={parameterWarnings} parameterSummary={[
+      {inputMode === "manual" && <ManualTelemetryWizard rows={manualRows} onChange={changeManualRows} disabled={loading || readingFile} step={manualStep} onStepChange={changeManualStep} parameters={<p>Al pulsar «Analizar batería», se identificarán los datos del ensayo y se completarán los campos disponibles.</p>} parametersValid={true} parameterWarnings={analysisStarted ? parameterWarnings : []} parameterSummary={analysisStarted ? [
         { label: "Ciclo", value: cycle },
         { label: "Temperatura ambiente", value: `${ambientTemperature} \u00b0C` },
         { label: "Voltaje de corte", value: `${cutoffVoltage} V` },
         { label: "Nivel", value: ({ unknown: "Desconocido", cell: "Celda", module: "M\u00f3dulo", pack: "Paquete" })[measurementLevel] },
         { label: "Qu\u00edmica", value: ({ unknown: "Desconocida", "li-ion": "Ion litio", LFP: "LFP", "lead-acid": "Plomo \u00e1cido", other: "Otra" })[chemistry] },
 
-      ]} />}
+      ] : []} />}
       <div hidden={inputMode !== "csv"}>
       <fieldset className="csv-source-fields" disabled={inputMode !== "csv"}>
+      <div className="telemetry-upload-layout"><div className="telemetry-upload-area">
       {sheets.length > 1 && <div className="form-grid binary-sheet-select"><label>Hoja o batería del archivo<select value={selectedSheet} disabled={readingFile || loading} onChange={(event) => void changeSheet(event.target.value)}><option value="" disabled>Selecciona una tabla</option>{sheets.map((sheet) => <option key={sheet} value={sheet}>{sheet}</option>)}</select></label></div>}
-      <label className={`file-upload${dragging ? " is-dragging" : ""}`}
+      <label htmlFor={fileInputId} className={`file-upload${dragging ? " is-dragging" : ""}${fileName ? " has-file" : ""}${loading || readingFile ? " is-busy" : ""}`}
         onDragOver={(event) => { event.preventDefault(); if (!loading && !readingFile) setDragging(true); }}
         onDragLeave={() => setDragging(false)}
-        onDrop={(event) => { event.preventDefault(); setDragging(false); void loadFile(event.dataTransfer.files[0]); }}>
-
-        <span className="csv-upload-title">Arrastra tu telemetría o selecciona un archivo</span>
-        <span className="csv-upload-description">CSV, Excel, MAT, Parquet, TSV, TXT o JSON.</span>
+        onDrop={(event) => { event.preventDefault(); setDragging(false); if (event.dataTransfer.files.length > 1) { setCsvError("Carga un solo archivo a la vez para no mezclar baterías o ensayos."); return; } void loadFile(event.dataTransfer.files[0]); }}>
+        <span className="telemetry-upload-glyph"><Icon name={fileName ? "file" : "upload"} /></span>
+        <span className="csv-upload-title">{readingFile ? "Preparando tu archivo…" : fileName ? fileName : dragging ? "Suelta tu archivo aquí" : "Arrastra aquí tu telemetría"}</span>
+        <span className="csv-upload-description">{fileName ? `${(fileSize / 1024).toLocaleString("es", { maximumFractionDigits: 1 })} KB · ${samples.length ? `${samples.length.toLocaleString("es")} muestras leídas` : "Archivo seleccionado"}` : "o selecciónala desde tu equipo"}</span>
+        <span className="telemetry-select-file"><Icon name={fileName ? "upload" : "file"} />{fileName ? "Reemplazar archivo" : "Seleccionar archivo"}</span>
+        <span className="telemetry-upload-formats">CSV · Excel · MAT · Parquet · TSV · TXT · JSON <span>Hasta 40 MB</span></span>
 
         <input
           type="file"
+          ref={fileInput}
+          id={fileInputId}
+          className="telemetry-file-input"
+          aria-label="Seleccionar archivo de telemetría"
           accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.mat,.parquet"
           aria-describedby="csv-status"
           aria-invalid={!!csvError}
@@ -522,9 +482,10 @@ export default function TelemetryForm({
         />
 
       </label>
-
-
+      {fileName && <div className="telemetry-file-toolbar"><span>{csvError ? "Comprueba el formato o reemplaza el archivo." : samples.length ? "Archivo preparado para el análisis" : sheets.length > 1 ? "Selecciona la hoja que quieres analizar" : "Esperando mediciones válidas"}</span><button type="button" disabled={loading || readingFile} onClick={() => { if (fileInput.current) fileInput.current.value = ""; void loadFile(undefined); }}><Icon name="close" />Quitar archivo</button></div>}
       <p id="csv-status" className="csv-status" role="status">{readingFile ? "Leyendo archivo…" : ""}</p>
+      {csvError && <p className="form-error telemetry-file-error" role="alert">{csvError}</p>}
+      </div><TelemetryFileInsight samples={samples} reading={readingFile} complete={analysisComplete} /></div>
 
       {inputMode === "csv" && csvData && importOptions && (
         <div className="csv-configuration">
@@ -617,88 +578,19 @@ export default function TelemetryForm({
         </div>
       )}
 
-      {
-        fileName
-        && samples.length > 0
-        &&
-        (
-          <div className="file-summary">
-
-            <strong>
-              {fileName}
-            </strong>
-
-            <span>
-              {
-                samples.length
-              }
-              {" "}
-              muestras del tramo seleccionado
-            </span>
-
-            <span>
-              {
-                samplesInWindow
-              }
-              {" "}
-              muestras utilizadas
-              en 0–300 s
-            </span>
-
-          </div>
-        )
-      }
-
-
-      {
-        csvError
-        &&
-        (
-          <p className="form-error" role="alert">
-            {csvError}
-          </p>
-        )
-      }
-
-
       </fieldset>
       </div>
-      {inputMode === "csv" && samples.length > 0 && batteryParameters}
-      </section>
-
-
-
-
-      </div>
+      {analysisStarted && batteryParameters}
       {inputMode === "csv" && samples.length > 0 && <details className="csv-preview"><summary>Ver mediciones del archivo</summary>
-        <div className="preview-heading"><h3 id="preview-title">Vista previa de telemetría</h3><span>Primeras {Math.min(5, samples.length)} muestras · unidades normalizadas</span></div>
+        <div className="preview-heading"><h3 id="preview-title">Vista previa de telemetría</h3><span>{samplesInWindow} muestras para el análisis · primeras {Math.min(5, samples.length)} filas</span></div>
         <div className="table-scroll" tabIndex={0} role="region" aria-label="Vista previa del CSV. Desplázate para ver todas las columnas.">
           <table><thead><tr>{TELEMETRY_FIELDS.map((field) => <th key={field} scope="col">{field}</th>)}</tr></thead>
           <tbody>{samples.slice(0, 5).map((sample, index) => <tr key={index}>{TELEMETRY_FIELDS.map((field) => <td key={field}>{Number(sample[field].toFixed(4))}</td>)}</tr>)}</tbody></table>
         </div>
       </details>}
-      {(inputMode === "csv" || manualStep === 5) && <div className="analysis-submit">
-      {submitError && <p className="form-error" role="alert">{submitError}</p>}
-      <button
-        type="submit"
-        aria-busy={loading}
-        disabled={
-          loading
-          || readingFile
-          ||
-          activeSamples.length < 2
-          || !parametersValid
-        }
-      >
-
-        <span className="analysis-submit-icon" aria-hidden="true">{loading ? <span className="analysis-submit-spinner" /> : <Icon name="battery" />}</span>
-        <span className="analysis-submit-copy"><strong>{loading ? "Analizando la batería…" : "Analizar batería"}</strong><span>{loading ? "Preparando el resultado" : "Salud y proyecciones"}</span></span>
-        <span className="analysis-submit-arrow" aria-hidden="true"><Icon name="arrow" /></span>
-
-      </button>
-      {loading && <p role="status">Análisis en curso…</p>}
-      </div>}
-
+      {analysisActions}
+      </section>
+      </div>
     </form>
   );
 }
