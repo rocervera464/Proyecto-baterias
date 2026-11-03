@@ -1,0 +1,226 @@
+{
+  "production_window_seconds": 300,
+  "method": "Outer battery holdouts; 300s-selected training-only feature/config per outer fold; exploratory comparison, no window selection on test.",
+  "folds": [
+    {
+      "battery_id": "B0045",
+      "window_seconds": 60,
+      "minimum_samples": 5,
+      "n_samples": 70,
+      "mae": 6.443534188288295,
+      "rmse": 7.247184363296855,
+      "r2": 0.41124582016937683,
+      "median_absolute_error": 6.352442155340505,
+      "mean_error": 5.373316184143388
+    },
+    {
+      "battery_id": "B0045",
+      "window_seconds": 120,
+      "minimum_samples": 9,
+      "n_samples": 70,
+      "mae": 5.262297913645192,
+      "rmse": 6.94419062820011,
+      "r2": 0.4594465383265669,
+      "median_absolute_error": 4.959770696620467,
+      "mean_error": 2.8191608889076196
+    },
+    {
+      "battery_id": "B0045",
+      "window_seconds": 180,
+      "minimum_samples": 13,
+      "n_samples": 70,
+      "mae": 6.455744078381882,
+      "rmse": 8.732221777262158,
+      "r2": 0.14523860614404038,
+      "median_absolute_error": 6.00468380615321,
+      "mean_error": 0.335089538809963
+    },
+    {
+      "battery_id": "B0045",
+      "window_seconds": 300,
+      "minimum_samples": 21,
+      "n_samples": 70,
+      "mae": 6.161559805247678,
+      "rmse": 8.48991976823527,
+      "r2": 0.19201638038383828,
+      "median_absolute_error": 5.731328791616718,
+      "mean_error": 0.07706428769389159
+    },
+    {
+      "battery_id": "B0045",
+      "window_seconds": 600,
+      "minimum_samples": 40,
+      "n_samples": 70,
+      "mae": 6.826802681573013,
+      "rmse": 9.337543638564973,
+      "r2": 0.022626244487153113,
+      "median_absolute_error": 6.00646665694331,
+      "mean_error": -0.55582428826872
+    },
+    {
+      "battery_id": "B0046",
+      "window_seconds": 60,
+      "minimum_samples": 5,
+      "n_samples": 69,
+      "mae": 2.9945963774998052,
+      "rmse": 3.7141639018758537,
+      "r2": 0.7990885723752058,
+      "median_absolute_error": 2.80815411143719,
+      "mean_error": -1.3979160376323123
+    },
+    {
+      "battery_id": "B0046",
+      "window_seconds": 120,
+      "minimum_samples": 9,
+      "n_samples": 69,
+      "mae": 3.0578020512529815,
+      "rmse": 3.639976429112816,
+      "r2": 0.8070345072232025,
+      "median_absolute_error": 2.99219145196588,
+      "mean_error": 0.8899006596403891
+    },
+    {
+      "battery_id": "B0046",
+      "window_seconds": 180,
+      "minimum_samples": 13,
+      "n_samples": 69,
+      "mae": 3.508594462290199,
+      "rmse": 4.1574391194008715,
+      "r2": 0.7482703878943804,
+      "median_absolute_error": 3.464788641218803,
+      "mean_error": -0.011952265978100453
+    },
+    {
+      "battery_id": "B0046",
+      "window_seconds": 300,
+      "minimum_samples": 21,
+      "n_samples": 69,
+      "mae": 2.4676105472648184,
+      "rmse": 3.1584683949722763,
+      "r2": 0.8547100477064923,
+      "median_absolute_error": 2.1626322644129488,
+      "mean_error": 0.8793936565196351
+    },
+    {
+      "battery_id": "B0046",
+      "window_seconds": 600,
+      "minimum_samples": 40,
+      "n_samples": 69,
+      "mae": 2.6574257354559054,
+      "rmse": 3.4772963706358606,
+      "r2": 0.8238973364681763,
+      "median_absolute_error": 1.7814233598823677,
+      "mean_error": -1.0076455280506775
+    },
+    {
+      "battery_id": "B0047",
+      "window_seconds": 60,
+      "minimum_samples": 5,
+      "n_samples": 69,
+      "mae": 5.39141401424235,
+      "rmse": 5.798614461540706,
+      "r2": 0.4802630258270765,
+      "median_absolute_error": 5.451196096630042,
+      "mean_error": 5.14351695555706
+    },
+    {
+      "battery_id": "B0047",
+      "window_seconds": 120,
+      "minimum_samples": 9,
+      "n_samples": 69,
+      "mae": 6.49978948292942,
+      "rmse": 7.262560289446586,
+      "r2": 0.18470524878255135,
+      "median_absolute_error": 6.670873330891752,
+      "mean_error": 6.015527780893904
+    },
+    {
+      "battery_id": "B0047",
+      "window_seconds": 180,
+      "minimum_samples": 13,
+      "n_samples": 69,
+      "mae": 6.021124753595585,
+      "rmse": 6.792167790427543,
+      "r2": 0.28689750329866515,
+      "median_absolute_error": 5.717909170864814,
+      "mean_error": 5.5475460277519195
+    },
+    {
+      "battery_id": "B0047",
+      "window_seconds": 300,
+      "minimum_samples": 21,
+      "n_samples": 69,
+      "mae": 5.578527949395224,
+      "rmse": 6.361165202423373,
+      "r2": 0.3745271050464276,
+      "median_absolute_error": 5.127513074110823,
+      "mean_error": 5.160346404754581
+    },
+    {
+      "battery_id": "B0047",
+      "window_seconds": 600,
+      "minimum_samples": 40,
+      "n_samples": 69,
+      "mae": 4.606877354467217,
+      "rmse": 5.099662680886432,
+      "r2": 0.5980074115966474,
+      "median_absolute_error": 4.544670946851269,
+      "mean_error": 4.062009811790077
+    },
+    {
+      "battery_id": "B0048",
+      "window_seconds": 60,
+      "minimum_samples": 5,
+      "n_samples": 69,
+      "mae": 5.739867916947184,
+      "rmse": 6.860858222032281,
+      "r2": -0.08432508038838216,
+      "median_absolute_error": 5.2879486083984375,
+      "mean_error": -5.027101624785542
+    },
+    {
+      "battery_id": "B0048",
+      "window_seconds": 120,
+      "minimum_samples": 9,
+      "n_samples": 69,
+      "mae": 3.7623719528453594,
+      "rmse": 4.309947783667368,
+      "r2": 0.5720957198175957,
+      "median_absolute_error": 3.603500057139584,
+      "mean_error": -3.5923190160898892
+    },
+    {
+      "battery_id": "B0048",
+      "window_seconds": 180,
+      "minimum_samples": 13,
+      "n_samples": 69,
+      "mae": 3.7547268616572076,
+      "rmse": 4.273369825782133,
+      "r2": 0.5793280334635114,
+      "median_absolute_error": 3.9976641550599084,
+      "mean_error": -3.055581159432281
+    },
+    {
+      "battery_id": "B0048",
+      "window_seconds": 300,
+      "minimum_samples": 21,
+      "n_samples": 69,
+      "mae": 3.236909393104953,
+      "rmse": 3.547065612250051,
+      "r2": 0.7101715212198927,
+      "median_absolute_error": 3.2302775476345005,
+      "mean_error": -3.0917534457561597
+    },
+    {
+      "battery_id": "B0048",
+      "window_seconds": 600,
+      "minimum_samples": 40,
+      "n_samples": 69,
+      "mae": 2.673539183163885,
+      "rmse": 3.2520097355511672,
+      "r2": 0.7563837310403684,
+      "median_absolute_error": 2.8052802966939367,
+      "mean_error": -2.142009483813791
+    }
+  ]
+}

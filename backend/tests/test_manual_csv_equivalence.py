@@ -7,7 +7,8 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+# Historical contract remains available under /legacy. V4 is tested separately.
+from app.legacy import legacy_app as app
 from app.schemas.telemetry import TelemetryRequest
 from app.services.feature_engineering import extract_features
 

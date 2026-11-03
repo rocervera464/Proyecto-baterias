@@ -1,108 +1,104 @@
-﻿# Proyecto de Predicción de Baterías EV
+# Batería: XGBoost de telemetría v4
 
-Plataforma web para estimar el Estado de Salud (SoH) y la evolución futura de baterías a partir de datos de telemetría.
-
-## Objetivo
-
-Integrar un modelo predictivo XGBoost dentro de una aplicación web que permita procesar datos de telemetría de baterías y generar predicciones sobre su estado de salud.
+La aplicación estima la capacidad relativa (SoH) usando exclusivamente tiempo, voltaje, corriente y temperatura de los primeros 300 segundos de descarga. No exige ciclo, temperatura ambiente, voltaje de corte, EIS, carga anterior ni capacidad real.
 
 ## Ejecutar en Windows
 
-La instalación reproducible utiliza **Python 3.12**. Para preparar el entorno por primera vez, desde la raíz del proyecto:
+Entorno verificado: Python 3.12 y Node.js 24. Desde la raíz:
 
 ```powershell
 .\backend\setup.ps1
-```
-
-El script crea `backend/.venv` si falta, instala las versiones de `requirements.txt` y comprueba dependencias y modelos. Puedes indicar el ejecutable con `-Python 'C:\ruta\python.exe'`.
-
-Desde la carpeta `backend`, usa el iniciador del proyecto:
-
-```powershell
-.\start.ps1
-```
-
-También funciona desde la raíz con `.\backend\start.ps1`, sin activar el entorno virtual. Usa rutas absolutas, verifica los modelos y el catálogo de telemetría antes del arranque y activa la recarga del código y los artefactos. Para ejecutar sin recarga, añade `-NoReload`.
-
-Para diagnosticar la instalación sin abrir un servidor:
-
-```powershell
 .\backend\start.ps1 -Check
+.\backend\start.ps1
 ```
 
-Si el puerto 8000 está ocupado, el iniciador lo indica sin detener otros procesos. Puedes usar `-Port 8001`; en ese caso configura `VITE_API_URL=http://127.0.0.1:8001` en `frontend/.env` y reinicia Vite.
-
-Si prefieres ejecutar Uvicorn directamente desde `backend`:
+En otra terminal:
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+npm --prefix frontend install
+npm --prefix frontend run dev
 ```
 
-El módulo es `app.main` y la instancia se llama `app`: se separan con **un solo** `:`. La opción `--reload` utiliza **dos guiones**. `app:main:app`, `app:main` y `-reload` no son los comandos correctos. Antes de iniciar, detén con Ctrl+C cualquier instancia anterior que use el puerto 8000.
+Abre la URL que imprima Vite. El backend escucha en http://127.0.0.1:8000 y su documentación en http://127.0.0.1:8000/docs. No es necesario activar el entorno virtual. `-NoReload` desactiva la recarga; `-Port 8001` cambia el puerto. Si lo cambias, establece `VITE_API_URL=http://127.0.0.1:8001` en `frontend/.env` y reinicia Vite.
 
-Desde la raíz `Proyecto-baterias`, ejecuta sin activar el entorno virtual:
+`/health` indica disponibilidad HTTP; `/health/ready` verifica la carga de los dos conjuntos de artefactos v4. El arranque valida integridad, nombres/orden de features y contratos. `backend/.env.example` documenta CORS; los puertos locales de Vite se aceptan en desarrollo.
 
-```powershell
-.\backend\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --reload
+## Uso
+
+1. Carga CSV, TSV, TXT, JSON, XLSX, XLS, Parquet o MAT, o pega las cuatro columnas en el ingreso manual.
+2. Revisa formato, muestras, variables y ventana disponible. El lector selecciona automáticamente la hoja compatible; puedes cambiar hoja o descarga si existen varias.
+3. Pulsa **Analizar y predecir**. Se comprueban calidad, cobertura y familia compatible; se muestran el SoH y las proyecciones de +5, +10, +20 y +30 ciclos, con una nota breve sobre su precisión limitada.
+
+Las unidades canónicas son s, V, A y grados Celsius. Se reconocen unidades explícitas en columnas (ms, mV, mA, Fahrenheit, kelvin), nombres comunes en inglés/español y fechas ISO. Los datasets NASA usan descarga negativa. No se cambia el signo ni se adivinan unidades por magnitud de voltaje/corriente. El lector normaliza automáticamente las unidades declaradas. Las corrientes conservan el signo: no se infiere la convención de un equipo desconocido.
+
+Se analiza una sola descarga. Filas invalidas aisladas solo se eliminan con una proporción <=5%; los bloques corruptos se rechazan. Duplicados idénticos se eliminan y tiempos con mediciones contradictorias se rechazan. No se interpolan huecos ni se inventan variables. El muestreo productivo debe respetar cantidades, cobertura y huecos observados: 21 muestras para la familia de 1 A o 17 para la de 2 A, con aproximadamente 286-300 segundos disponibles. Un CSV con tres filas no permite predecir.
+
+## API
+
+`POST /api/v1/predict` recibe como entrada mínima:
+
+```json
+{"discharge_samples":[{"time_s":0,"voltage_v":4.1,"current_a":-1,"temperature_c":5}]}
 ```
 
-Abre http://127.0.0.1:8000/docs para probar la API y
-`POST /api/v1/predict`. `/health` indica que el servidor responde y `/health/ready` comprueba que los modelos y referencias están disponibles. El arranque se detiene con un mensaje de diagnóstico si faltan modelos obligatorios.
+El objeto ilustra el esquema; una sola fila no alcanza el muestreo requerido. `cycle` puede declararse como etiqueta opcional; no entra al modelo. Nivel de medición y química declarados restringen el dominio, sin ser features. No se atribuye un ciclo absoluto a registros que no lo declaran.
 
-En desarrollo se aceptan los orígenes `localhost` y `127.0.0.1`, incluido el puerto alternativo que seleccione Vite. Para otros orígenes, copia `backend/.env.example` a `backend/.env` y configura `BATTERY_CORS_ORIGINS`. `BATTERY_ALLOW_LOCAL_ORIGINS=false` restringe CORS a la lista explícita. Reinicia el backend después de cambiar la configuración.
-
-Si deseas activar el entorno desde la raíz:
+`POST /api/v1/predict-file?filename=datos.csv` acepta el contenido binario del archivo en el cuerpo (Content-Type `application/octet-stream`). Parámetros opcionales: `sheet` y `segment`. No requiere multipart. Ejemplo:
 
 ```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\backend\.venv\Scripts\Activate.ps1
+curl.exe --data-binary "@data/samples/pruebas_telemetria/B0045_ciclo_030_solo_senales.csv" -H "Content-Type: application/octet-stream" "http://127.0.0.1:8000/api/v1/predict-file?filename=datos.csv"
 ```
 
-Para ejecutar las pruebas desde la raíz:
+`POST /api/v1/telemetry/import` prepara una vista previa canonica para todos los formatos. `/api/v1/telemetry/compatibility` aplica el mismo modelo y validación que la predicción. `/api/v1/telemetry/validate` expone las features de señales calculadas por la implementacion compartida.
+
+La respuesta incluye `current_soh_percent`, `telemetry`, `production_horizons` y `future_predictions`. Sin ciclo declarado, `current_cycle` y `target_cycle` son null; los horizontes se representan relativos al presente. Los porcentajes no se recalculan ni ajustan en React.
+
+## Entrenamiento y evaluación reproducibles
+
+Se necesitan los MAT originales locales, excluidos de Git:
+
+- `data/raw/nasa_45_48/B0045.mat` a `B0048.mat`: 1 A, 4 grados Celsius, 277 descargas con capacidad positiva.
+- `data/raw/nasa_room_2a/B0005.mat`, `B0006.mat`, `B0007.mat`, `B0018.mat`: 2 A, 24 grados Celsius, 636 descargas validas.
+
+Se entrenan como familias separadas por protocolo. La capacidad solo crea targets: SoH = capacidad / mediana de las primeras cinco capacidades positivas y finitas de cada celda * 100.
 
 ```powershell
-.\backend\.venv\Scripts\python.exe -m pytest -q
+.\backend\.venv\Scripts\python.exe scripts/evaluate_models.py --retrain
 ```
 
-## Estructura
-
-El proyecto está dividido en:
-
-- `frontend/`: interfaz web.
-- `backend/`: API y lógica de negocio.
-- `backend/model_artifacts/`: modelos predictivos y metadatos.
-- `data/`: archivos pequeños de ejemplo.
-- `docs/`: documentación técnica.
-
-## Modelo predictivo
-
-La arquitectura y validación actuales se documentan en
-[SoH v2](docs/precision-soh-v2.md). La API ejecuta únicamente los horizontes
-habilitados en el manifiesto, que pueden ser ninguno. El ciclo se recupera de los datos declarados o de una referencia verificada; si no se identifica, se debe declarar;
-no se supone ciclo 1 y no se entregan predicciones fuera del dominio compatible.
-Los informes anteriores se conservan como evidencia histórica, no como métricas
-de la arquitectura v2.
-
-Durante la fase experimental se compararon:
-
-- XGBoost
-- GRU
-- Gaussian Process Regression
-
-XGBoost presentó el mejor rendimiento global en la cohorte piloto y será utilizado inicialmente como modelo principal del sistema.
-
-## Importación de telemetría CSV
-
-El frontend admite archivos con encabezados, separados por coma, punto y coma o tabulación. Reconoce nombres comunes en español e inglés (por ejemplo, `tiempo`, `voltaje`, `corriente`, `temperatura`, o los nombres originales `time_s`, `voltage_v`, `current_a`, `temperature_c`). Si los encabezados son diferentes o ambiguos, se pueden asignar manualmente en el formulario. Las columnas adicionales se ignoran.
-
-Selecciona las unidades del archivo: segundos, milisegundos, minutos, horas o fecha y hora ISO; V/mV; A/mA; y °C/°F/K. Se admiten decimales con coma cuando el separador permite distinguirlos. Las fechas se convierten en segundos desde la primera medición. Para tiempos numéricos, desmarca la opción de contar desde la primera muestra si el archivo ya contiene el tiempo transcurrido desde el inicio de la descarga.
-
-Selecciona la descarga si el archivo contiene varias y pulsa **Analizar batería**. En ese momento aparece «Datos de la batería» y se identifican ciclo, temperatura ambiente, voltaje de corte, nivel y química a partir de los metadatos declarados o de una coincidencia verificada con el catálogo NASA. Si se identifican todos, la predicción continúa en ese mismo intento. Si faltan datos, completa los campos indicados y vuelve a analizar. La identificación también se inicia con el botón final del ingreso manual, incluidas las tablas pegadas. Se requieren tiempo, voltaje, corriente y temperatura, con al menos dos instantes distintos dentro de los primeros 300 segundos. Los valores faltantes o inválidos se señalan; no se reemplazan por cero. El voltaje de corte no se obtiene del último voltaje medido ni del rango del modelo.
-
-Aceptar distintos formatos no amplía el alcance del modelo: los modelos actuales se entrenaron con las baterías NASA B0045–B0048 y una ventana de descarga de 300 segundos. Los archivos que solo contienen SoC, capacidad o SoH no proporcionan las señales necesarias para estos modelos.
-
-Pruebas del importador (Node.js 24):
+Ese comando repite preparación, selección anidada, entrenamiento y exportacion. Para regenerar informes desde las predicciones fuera de muestra guardadas, sin reevaluar los modelos sobre sus propias filas de entrenamiento:
 
 ```powershell
+.\backend\.venv\Scripts\python.exe scripts/evaluate_models.py
+```
+
+`--refresh-legacy` recalcula la comparación histórica mediante refits por batería. La generacion directa de candidatos esta en `backend/scripts/train_telemetry_v4.py`; `evaluate_models.py` finaliza los informes y controles de publicacion.
+
+La validación es Leave-One-Battery-Out anidada. Features, hiperparametros y early stopping se seleccionan dentro del train de cada fold. No hay particiones aleatorias por filas. Se comparan conjuntos A/B/C/D y ventanas 60/120/180/300/600 s; producción conserva 300 s. Hay un XGBoost actual y un unico XGBoost de degradacion acumulada por familia, con variantes libres/monotonicas evaluadas.
+
+## Evidencia y límites
+
+| Familia | Features seleccionadas | MAE actual LOBO (pp) | RMSE actual LOBO (pp) | MAE baseline media |
+|---|---:|---:|---:|---:|
+| 1 A / 4 grados Celsius | 21, conjunto A | 4.3612 | 5.3892 | 6.9422 |
+| 2 A / 24 grados Celsius | 30, conjunto D | 4.1898 | 5.0178 | 9.6129 |
+
+Son promedios por batería, de la evaluación anidada del procedimiento; no una prueba externa independiente de los artefactos finales. La versión anterior con contexto obtiene menor MAE actual (2.9708 y 2.8468 pp). V4 reduce la información requerida; no se presenta como una mejora de precisión respecto del modelo con contexto.
+
+**Las cuatro proyecciones están habilitadas por petición del usuario.** Se calculan con los modelos futuros entrenados y se identifican como estimaciones de precisión limitada. La evaluación sigue registrando `production_horizons=[]` y `research_horizons=[5,10,20,30]`: habilitarlas en la aplicación no las convierte en horizontes aprobados. `forecast_horizons` indica los que devuelve la API y cada salida incluye `validation_status`. Con `include_research_forecasts=false` se solicitan únicamente horizontes aprobados, sin cambiar el SoH actual (campo del JSON o query de `/predict-file`). Las métricas y los umbrales de validación se conservan.
+
+Los modelos se evaluaron con celdas NASA, no con cualquier paquete EV. Estar dentro de rangos individuales no prueba equivalencia de química/protocolo. No se fuerzan valores fuera de dominio para obtener una salida. La referencia inicial permite SoH relativo por encima de 100%; la API limita las salidas al intervalo 0-120%. SoH no certifica seguridad ni calcula vida util restante; la segunda vida sigue siendo orientativa.
+
+Informes completos, hiperparametros, sesgos, R2, ventanas, baselines e importancia de features: [comparación v4](docs/telemetry-v4/comparison.md), [método y límites](docs/telemetry-v4/README.md). Artefactos por familia: `backend/model_artifacts_v4/`.
+
+## Compatibilidad histórica y pruebas
+
+Los modelos/notebook anteriores permanecen intactos. La API contextual anterior se conserva bajo `/legacy` (por ejemplo `/legacy/api/v1/predict`). Sus pruebas siguen ejercitando ese contrato; las pruebas v4 verifican la ruta principal sin parámetros obligatorios.
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m pytest -v
 npm --prefix frontend test
+npm --prefix frontend run build
 ```
+
+Las pruebas incluyen todos los formatos, XLS BIFF8 real, aliases, fechas/unidades, filas corruptas, ausencia de variables, muestreo insuficiente, separacion de descargas, integridad de artefactos y ausencia de contexto en los inputs. No se ejecuta entrenamiento completo dentro de pytest.

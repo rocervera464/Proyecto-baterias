@@ -111,3 +111,12 @@ class TelemetryRequest(TelemetryModel):
         result["source_units"] = units
         result["units"] = TelemetryUnits()
         return result
+
+
+class TelemetryOnlyRequest(TelemetryRequest):
+    """V4 needs only the four measured signals; context is optional metadata."""
+    cycle: int | None = Field(default=None, ge=1)
+    ambient_temperature_c: float | None = None
+    cutoff_voltage_v: float | None = Field(default=None, gt=0)
+    discharge_samples: list[DischargeSample] = Field(min_length=2, max_length=100_000)
+    include_research_forecasts: bool = True

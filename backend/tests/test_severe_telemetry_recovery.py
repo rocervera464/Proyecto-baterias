@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+# Historical contract remains available under /legacy. V4 is tested separately.
+from app.legacy import legacy_app as app
 
 
 def test_severe_csv_can_be_explored_without_masking_domain_deviations():

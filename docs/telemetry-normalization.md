@@ -1,5 +1,8 @@
 # Normalización de unidades de telemetría
 
+> Documento histórico del contrato contextual, conservado bajo `/legacy`.
+> La API principal utiliza ahora [telemetría v4](telemetry-v4/README.md): el backend interpreta los archivos, normaliza las unidades declaradas y predice con cuatro señales. No muestra un formulario de contexto ni depende de `/identify`. Las 29 características y la recuperación de parámetros descritas aquí corresponden al sistema anterior.
+
 La API de predicción y la evaluación de compatibilidad utilizan el mismo esquema de entrada. Ahora aceptan un objeto opcional `units`:
 
 ```json

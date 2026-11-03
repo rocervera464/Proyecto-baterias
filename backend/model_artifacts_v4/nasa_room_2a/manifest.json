@@ -1,0 +1,23 @@
+{
+  "version": "4.0",
+  "model_family": "XGBoost",
+  "input_type": "telemetry_only",
+  "window_seconds": 300,
+  "production_horizons": [],
+  "research_horizons": [
+    5,
+    10,
+    20,
+    30
+  ],
+  "future_monotonic": true,
+  "artifact_sha256": {
+    "xgboost_soh_current.json": "3cf3e43be592bcc62889cfdacf94cc3947d8dffcb868484575db8fcbd2956257",
+    "xgboost_soh_degradation.json": "a4b9c899108a48ad4371d76d8f75ad79a030d0e8cec6f4c9739c775ef5a655df",
+    "features.json": "4954383034b63a445fa97bd0f8c054e7a46b013a668e9a4ba6fc3b0d5717e219",
+    "future_features.json": "2b2223b549904702f97ac084d40c96fe29eb1be40fc47ec3bab8fec4614e7093",
+    "domain_profile.json": "1917c0e614e9e3f81cae21a9797af7b6303a6ccd9644b8d5ed6f02489ff184ee",
+    "validation_metrics.json": "47754d26ed64ad9a217318f619ffb3cb0b11db882bd554c44d896538a17810e5"
+  },
+  "current_approved": true
+}

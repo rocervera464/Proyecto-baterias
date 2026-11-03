@@ -1,5 +1,6 @@
 import json
 import hashlib
+import logging
 from functools import lru_cache
 from pathlib import Path
 
@@ -7,6 +8,7 @@ import numpy as np
 import pandas as pd
 from xgboost import XGBRegressor
 from sklearn.isotonic import IsotonicRegression
+from app.services.feature_engineering import TELEMETRY_ALL_FEATURES, extract_telemetry_features
 
 from app.services.feature_engineering import (
     MODEL_FEATURES,
@@ -501,3 +503,119 @@ def get_model_service() -> ModelService:
     """
 
     return ModelService()
+
+
+class TelemetryModelService:
+    """V4 does not read cycle, ambient, cutoff, EIS, capacity or prior charge."""
+    def __init__(self, model_dir):
+        self.model_dir = Path(model_dir)
+        read = lambda name: json.loads((self.model_dir / name).read_text(encoding="utf-8"))
+        self.manifest, self.metadata = read("manifest.json"), read("metadata.json")
+        self.features, self.future_features = read("features.json"), read("future_features.json")
+        self.profile = read("domain_profile.json")
+        self.production_horizons = self.manifest["production_horizons"]
+        self.research_horizons = self.manifest["research_horizons"]
+        if self.manifest.get("version") != "4.0" or self.manifest.get("input_type") != "telemetry_only" or self.manifest.get("window_seconds") != 300:
+            raise RuntimeError("Contrato de telemetría v4 incompatible.")
+        if not self.features or len(set(self.features)) != len(self.features) or not set(self.features) <= set(TELEMETRY_ALL_FEATURES):
+            raise RuntimeError("Features v4 incompatibles o con contexto no permitido.")
+        if self.future_features != self.features + ["horizon_cycles"]:
+            raise RuntimeError("El orden de features futuras no coincide con el contrato.")
+        for values in (self.production_horizons, self.research_horizons):
+            if values != sorted(set(values)) or any(type(horizon) is not int or horizon not in {5, 10, 20, 30} for horizon in values):
+                raise RuntimeError("Horizontes v4 inválidos.")
+        if set(self.production_horizons) & set(self.research_horizons) or set(self.production_horizons + self.research_horizons) != {5, 10, 20, 30}:
+            raise RuntimeError("Contrato de horizontes incompleto.")
+        for name, expected in self.manifest["artifact_sha256"].items():
+            artifact = (self.model_dir / name).resolve()
+            if artifact.parent != self.model_dir.resolve() or hashlib.sha256(artifact.read_bytes()).hexdigest() != expected:
+                raise RuntimeError("Falló la verificación de integridad del modelo v4.")
+        validation = read("validation_metrics.json")
+        score = next(item for item in validation["summary"]["selected"]["horizons"] if item["horizon"] == 0)
+        baseline = validation["summary"]["mean_baseline"]["horizons"][0]
+        if score["macro_mae"] >= baseline["macro_mae"] or score["macro_rmse"] >= baseline["macro_rmse"]:
+            raise RuntimeError("El SoH actual no mejora el baseline evaluado.")
+        if validation["production_horizons"] != self.production_horizons or self.metadata["production_horizons"] != self.production_horizons:
+            raise RuntimeError("La evaluación y el manifiesto no coinciden.")
+        if any(not validation["production_decisions"][str(horizon)]["production"] for horizon in self.production_horizons):
+            raise RuntimeError("Un horizonte no tiene aprobación de validación.")
+        self.current_model, self.future_model = XGBRegressor(n_jobs=1), XGBRegressor(n_jobs=1)
+        self.current_model.load_model(self.model_dir / "xgboost_soh_current.json")
+        self.future_model.load_model(self.model_dir / "xgboost_soh_degradation.json")
+        if self.current_model.get_booster().feature_names != self.features or self.future_model.get_booster().feature_names != self.future_features:
+            raise RuntimeError("Las columnas de los modelos no coinciden con los artefactos.")
+        if self.current_model.get_booster().attr("prediction_target") != "soh_percent" or self.future_model.get_booster().attr("prediction_target") != "soh_degradation":
+            raise RuntimeError("El objetivo del modelo no coincide con su contrato.")
+        logging.getLogger("app.models").info("model_loaded version=4.0 cohort=%s features=%s window=300 horizons=%s", self.metadata["cohort"], len(self.features), self.production_horizons)
+
+    def assess(self, samples, measurement_level="unknown", chemistry="unknown"):
+        features, telemetry = extract_telemetry_features(samples)
+        deviations, reasons = [], []
+        minimum = self.profile["minimum_window_samples"]
+        if telemetry["samples_used"] < minimum:
+            reasons.append(f"La telemetría no contiene suficientes muestras dentro de la ventana analizada para realizar una predicción confiable: {telemetry['samples_used']} disponibles; se requieren {minimum}.")
+        if telemetry["available_seconds"] + 1e-6 < self.profile["minimum_available_seconds"]:
+            reasons.append("La ventana de medición es más corta que las ventanas evaluadas con este modelo.")
+        if telemetry["maximum_gap_seconds"] > self.profile.get("maximum_gap_seconds", float("inf")) + 1e-6:
+            reasons.append("Hay intervalos sin mediciones más largos que los evaluados con este modelo.")
+        if measurement_level in {"pack", "module"} or chemistry not in {"unknown", "li-ion"}:
+            reasons.append("Los modelos disponibles se evaluaron con celdas de ion-litio; las mediciones declaradas no pertenecen a ese dominio.")
+        for name in self.features:
+            limits = self.profile["ranges"][name]; value = features[name]
+            tolerance = max(1e-6, (limits["max"] - limits["min"]) * 1e-6)
+            if value < limits["min"] - tolerance or value > limits["max"] + tolerance:
+                deviations.append({"feature": name, "value": value, "observed_min": limits["min"], "observed_max": limits["max"]})
+        if deviations: reasons.append("Las señales están fuera de los rangos observados para las familias de modelos disponibles.")
+        status = "within_observed_ranges" if not reasons else "out_of_range"
+        report = dict(status=status, model_id=self.metadata["cohort"], model_description=self.metadata["model_family"],
+                      can_estimate_in_strict_mode=not reasons, reasons=reasons, feature_deviations=deviations,
+                      quality_warnings=["Los modelos se evaluaron con celdas NASA. La ausencia de química o nivel declarado no demuestra equivalencia con otra batería."],
+                      limitation="La pertenencia a rangos observados no garantiza precisión ni certifica seguridad. La evaluación disponible incluye cuatro baterías por protocolo.",
+                      message=reasons[0] if reasons else None)
+        return features, telemetry, report
+
+    def distance(self, features):
+        distance = 0.
+        for name in self.profile["routing_features"]:
+            limits = self.profile["ranges"][name]
+            span = max(limits["max"] - limits["min"], abs(limits["min"]) * .05, .05)
+            distance += max(limits["min"] - features[name], features[name] - limits["max"], 0) / span
+        return distance
+
+    def predict(self, features, include_research_forecasts=False):
+        frame = pd.DataFrame([{name: features[name] for name in self.features}], columns=self.features, dtype=float)
+        current = float(np.clip(self.current_model.predict(frame)[0], 0, 120))
+        if not np.isfinite(current):
+            raise RuntimeError("El modelo produjo una salida no finita.")
+        future = []
+        horizons = sorted(set(self.production_horizons + (self.research_horizons if include_research_forecasts else [])))
+        if horizons:
+            rows = [{**{name: features[name] for name in self.features}, "horizon_cycles": horizon} for horizon in horizons]
+            losses = self.future_model.predict(pd.DataFrame(rows, columns=self.future_features))
+            if not np.isfinite(losses).all():
+                raise RuntimeError("El modelo futuro produjo una salida no finita.")
+            previous = current
+            for horizon, loss in zip(horizons, losses):
+                value = float(np.clip(current - max(0., float(loss)), 0., current))
+                if self.manifest["future_monotonic"] and value > previous + 1e-6:
+                    raise RuntimeError("Incoherencia temporal: no se modifican las salidas del modelo.")
+                future.append({"horizon_cycles": horizon, "predicted_soh_percent": value,
+                               "validation_status": "production" if horizon in self.production_horizons else "research"})
+                previous = value
+        if not np.isfinite(current) or any(not np.isfinite(item["predicted_soh_percent"]) for item in future):
+            raise RuntimeError("El modelo produjo una salida no finita.")
+        return current, future
+
+
+@lru_cache(maxsize=1)
+def get_telemetry_model_services():
+    return [TelemetryModelService(BACKEND_DIR / "model_artifacts_v4" / name) for name in ("nasa_cold_1a", "nasa_room_2a")]
+
+
+def select_telemetry_model(samples, measurement_level="unknown", chemistry="unknown"):
+    candidates = []
+    for service in get_telemetry_model_services():
+        features, telemetry, report = service.assess(samples, measurement_level, chemistry)
+        candidates.append((not report["can_estimate_in_strict_mode"], service.distance(features), service, features, telemetry, report))
+    _, _, service, features, telemetry, report = min(candidates, key=lambda item: (item[0], item[1]))
+    return service, features, telemetry, report

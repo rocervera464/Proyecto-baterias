@@ -13,12 +13,13 @@ export interface Compatibility {
 export interface FuturePrediction {
   horizon_cycles: number;
 
-  target_cycle: number;
+  target_cycle: number | null;
 
   predicted_soh_percent: number;
 
   // Rejected by validation if an older server tries to expose research.
   experimental?: boolean;
+  validation_status?: "production" | "research";
 }
 
 
@@ -26,6 +27,9 @@ export interface PredictionResponse {
   input_normalization?: import("./telemetry").InputNormalization[];
   telemetry_reference?: { battery_id: string; cycle: number; source_sha256: string } | null;
   production_horizons: number[];
+  research_horizons?: number[];
+  forecast_horizons?: number[];
+  forecast_note?: string | null;
   compatibility?: Compatibility;
   status: string;
 
@@ -33,7 +37,10 @@ export interface PredictionResponse {
 
   forecast_method?: string;
 
-  current_cycle: number;
+  current_cycle: number | null;
+  model_id?: string;
+  telemetry?: { samples_detected: number; samples_valid: number; samples_used: number; window_seconds: number;
+    variables_detected: string[]; available_seconds: number; aliases_applied?: Record<string, string> };
 
   current_soh_percent: number;
 

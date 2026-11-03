@@ -37,7 +37,7 @@ export function validateManualTelemetry(rows: ManualRow[]) {
   const warnings: string[] = [];
   if (preview.length && preview[0].time_s > 0) warnings.push("La primera medición no está en el segundo 0. El tiempo se conserva como tiempo desde el inicio de la descarga; no se desplaza ni se completa la señal.");
   if (preview.length && preview[preview.length - 1].time_s < 300) warnings.push("No se alcanza el segundo 300. El sistema puede aceptar las mediciones disponibles, pero no garantiza que representen la descarga adecuadamente.");
-  if (new Set(preview.map((row) => row.time_s)).size < preview.length) warnings.push("Hay tiempos repetidos. Se conservan, como en el CSV, y cada fila cuenta en las estadísticas. Se requieren al menos dos instantes distintos dentro de la ventana.");
+  if (new Set(preview.map((row) => row.time_s)).size < preview.length) warnings.push("Hay tiempos repetidos. El servicio elimina duplicados idénticos y rechaza mediciones contradictorias para un mismo instante antes de calcular las características.");
   if (preview.some((row) => row.current_a > 0)) warnings.push("Hay corriente positiva. Comprueba el signo: el entrenamiento usa descarga negativa. En modo manual se conserva el signo que ingresas.");
   if (preview.some((row) => row.time_s > 300)) warnings.push("Las mediciones posteriores al segundo 300 se muestran en la vista previa, pero quedan fuera de la predicción.");
   return { samples, preview, errors, error, warnings, inWindow: preview.filter((row) => row.time_s <= 300).length };

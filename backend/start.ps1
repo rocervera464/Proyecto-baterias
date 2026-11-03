@@ -35,7 +35,7 @@ $uvicornArguments = @(
 )
 if (-not $NoReload) {
     $uvicornArguments += '--reload'
-    foreach ($sourceDirectory in @('app', 'model_artifacts', 'model_families', 'reference_data')) {
+    foreach ($sourceDirectory in @('app', 'model_artifacts', 'model_artifacts_v4', 'model_families', 'reference_data')) {
         $uvicornArguments += @('--reload-dir', (Join-Path $PSScriptRoot $sourceDirectory))
     }
     $uvicornArguments += @('--reload-include', '*.py', '--reload-include', '*.json')

@@ -5,10 +5,15 @@ import { featureGroups } from '../src/data/methodologyFeatures.ts';
 import { predictionSteps, trainingSteps } from '../src/data/methodologyData.ts';
 import { getMethodologyResults } from '../src/utils/methodologyResults.ts';
 
-test('feature explorer documents the exact 29 backend inputs in order', () => {
-  const actual = JSON.parse(readFileSync(new URL('../../backend/model_artifacts/features.json', import.meta.url), 'utf8'));
-  assert.deepEqual(featureGroups.flatMap(group => group.features.map(([name]) => name)), actual);
-  assert.equal(new Set(actual).size, 29);
+test('feature explorer documents both telemetry-only v4 contracts without context', () => {
+  const documented = featureGroups.flatMap(group => group.features.map(([name]) => name));
+  for (const family of ['nasa_cold_1a', 'nasa_room_2a']) {
+    const actual = JSON.parse(readFileSync(new URL(`../../backend/model_artifacts_v4/${family}/features.json`, import.meta.url), 'utf8'));
+    assert.ok(actual.every(name => documented.includes(name)));
+    assert.ok(actual.length >= 21);
+  }
+  assert.equal(new Set(documented).size, 30);
+  assert.ok(!documented.some(name => ['cycle', 'capacity', 'ambient_temperature', 'cutoff_voltage', 'Re_prev'].includes(name)));
 });
 
 test('both journeys have six complete stages and evaluation does not invent metrics', () => {

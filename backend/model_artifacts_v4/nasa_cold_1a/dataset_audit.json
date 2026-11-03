@@ -1,0 +1,118 @@
+{
+  "protocols_pooled": false,
+  "cohort": "nasa_cold_1a",
+  "batteries": [
+    {
+      "battery_id": "B0045",
+      "source": "data/raw/nasa_45_48/B0045.mat",
+      "sha256": "dc8e4cc149fe87f4ff855f30f0d31155ada6f467d06f5365550bab9370670fe3",
+      "discharge_cycles": 72,
+      "valid_capacity_cycles": 70,
+      "reference_capacity": 0.885193608411576,
+      "ambient_temperatures": [
+        4.0
+      ],
+      "discharge_current_median": -1.0056141271197823,
+      "cutoff_voltage": 2.0,
+      "samples_300s_min": 21,
+      "samples_300s_max": 24,
+      "rejected": [
+        {
+          "cycle": 20,
+          "reason": "invalid_capacity_target"
+        },
+        {
+          "cycle": 66,
+          "reason": "invalid_capacity_target"
+        }
+      ]
+    },
+    {
+      "battery_id": "B0046",
+      "source": "data/raw/nasa_45_48/B0046.mat",
+      "sha256": "fe62dffc7079f6131e591415c740f6863364b23e728fe2aa7286a9c749dcdebc",
+      "discharge_cycles": 72,
+      "valid_capacity_cycles": 69,
+      "reference_capacity": 1.503121190703977,
+      "ambient_temperatures": [
+        4.0
+      ],
+      "discharge_current_median": -1.0061980599225722,
+      "cutoff_voltage": 2.2,
+      "samples_300s_min": 21,
+      "samples_300s_max": 24,
+      "rejected": [
+        {
+          "cycle": 20,
+          "reason": "invalid_capacity_target"
+        },
+        {
+          "cycle": 54,
+          "reason": "invalid_capacity_target"
+        },
+        {
+          "cycle": 66,
+          "reason": "invalid_capacity_target"
+        }
+      ]
+    },
+    {
+      "battery_id": "B0047",
+      "source": "data/raw/nasa_45_48/B0047.mat",
+      "sha256": "8089a9180cf353704642c457c844d83dd2e83aa2fc43fe4f7c05322f86fd0648",
+      "discharge_cycles": 72,
+      "valid_capacity_cycles": 69,
+      "reference_capacity": 1.5080762969973425,
+      "ambient_temperatures": [
+        4.0
+      ],
+      "discharge_current_median": -0.9950994162136197,
+      "cutoff_voltage": 2.5,
+      "samples_300s_min": 21,
+      "samples_300s_max": 24,
+      "rejected": [
+        {
+          "cycle": 20,
+          "reason": "invalid_capacity_target"
+        },
+        {
+          "cycle": 54,
+          "reason": "invalid_capacity_target"
+        },
+        {
+          "cycle": 66,
+          "reason": "invalid_capacity_target"
+        }
+      ]
+    },
+    {
+      "battery_id": "B0048",
+      "source": "data/raw/nasa_45_48/B0048.mat",
+      "sha256": "341219d38d8531e0a89ecaa18736b79e1547d22edea4a1d45357bb5bfeb7757d",
+      "discharge_cycles": 72,
+      "valid_capacity_cycles": 69,
+      "reference_capacity": 1.4989223343608031,
+      "ambient_temperatures": [
+        4.0
+      ],
+      "discharge_current_median": -0.996578840617491,
+      "cutoff_voltage": 2.7,
+      "samples_300s_min": 21,
+      "samples_300s_max": 24,
+      "rejected": [
+        {
+          "cycle": 20,
+          "reason": "invalid_capacity_target"
+        },
+        {
+          "cycle": 54,
+          "reason": "invalid_capacity_target"
+        },
+        {
+          "cycle": 66,
+          "reason": "invalid_capacity_target"
+        }
+      ]
+    }
+  ]
+}

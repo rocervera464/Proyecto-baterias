@@ -1,4 +1,5 @@
 from statistics import mean, pstdev
+import numpy as np
 
 from app.schemas.telemetry import TelemetryRequest
 
@@ -431,3 +432,83 @@ def extract_features(
         ordered_features,
         len(window_samples),
     )
+
+
+# V4: the sole telemetry-only implementation, shared by fitting and serving.
+TELEMETRY_BASE_FEATURES = [f"{signal}_{stat}" for signal in ("voltage", "current", "temperature")
+                           for stat in ("start", "mean", "std", "min", "max", "end", "delta")]
+TELEMETRY_SLOPES = [f"{signal}_slope" for signal in ("voltage", "current", "temperature")]
+TELEMETRY_AUCS = [f"{signal}_auc" for signal in ("voltage", "current", "temperature")]
+TELEMETRY_FEATURE_SETS = {
+    "A": TELEMETRY_BASE_FEATURES,
+    "B": TELEMETRY_BASE_FEATURES + TELEMETRY_SLOPES,
+    "C": TELEMETRY_BASE_FEATURES + TELEMETRY_SLOPES + TELEMETRY_AUCS,
+    "D": TELEMETRY_BASE_FEATURES + TELEMETRY_SLOPES + [
+        "voltage_half_delta", "temperature_half_delta", "power_mean", "power_std", "power_delta", "energy_proxy"],
+}
+TELEMETRY_ALL_FEATURES = list(dict.fromkeys(name for names in TELEMETRY_FEATURE_SETS.values() for name in names))
+
+
+def clean_telemetry(samples, window_seconds=300, minimum_samples=4):
+    """Reject ambiguous repetitions; discard isolated invalid rows, never fill signals."""
+    rows, invalid_positions, eligible = [], [], 0
+    for index, sample in enumerate(samples):
+        try:
+            time = float(sample["time_s"] if isinstance(sample, dict) else sample.time_s)
+            if np.isfinite(time) and time > window_seconds:
+                continue
+        except (ValueError, TypeError, KeyError, AttributeError):
+            pass
+        eligible += 1
+        try:
+            row = [float(sample[name] if isinstance(sample, dict) else getattr(sample, name))
+                   for name in ("time_s", "voltage_v", "current_a", "temperature_c")]
+            if not np.isfinite(row).all() or row[0] < 0 or row[1] <= 0:
+                raise ValueError("Invalid measurement")
+            rows.append(row)
+        except (ValueError, TypeError, KeyError, AttributeError):
+            invalid_positions.append(index)
+    if invalid_positions and (len(invalid_positions) / max(eligible, 1) > .05
+                              or any(b == a + 1 for a, b in zip(invalid_positions, invalid_positions[1:]))):
+        raise ValueError("El archivo contiene demasiadas filas inválidas o un bloque de mediciones ausentes. No se inventan señales para completarlo.")
+    values = np.asarray(rows, dtype=float).reshape(-1, 4)
+    values = values[np.argsort(values[:, 0], kind="stable")]
+    unique = []
+    duplicates = 0
+    for row in values:
+        if unique and row[0] == unique[-1][0]:
+            if not np.array_equal(row, unique[-1]):
+                raise ValueError("Hay mediciones diferentes con el mismo tiempo. Selecciona una sola descarga o corrige los registros repetidos.")
+            duplicates += 1
+        else:
+            unique.append(row)
+    values = np.asarray(unique, dtype=float).reshape(-1, 4)
+    window = values[(values[:, 0] >= 0) & (values[:, 0] <= window_seconds)]
+    if len(window) < minimum_samples:
+        raise ValueError(f"La telemetría no contiene suficientes muestras dentro de la ventana analizada para realizar una predicción confiable: {len(window)} disponibles; se requieren {minimum_samples}.")
+    if np.ptp(window[:, 0]) <= 0:
+        raise ValueError("Se necesitan marcas de tiempo distintas.")
+    return window, {"samples_detected": len(samples), "samples_valid": len(values), "samples_used": len(window),
+                    "invalid_rows_removed": len(invalid_positions), "duplicate_rows_removed": duplicates,
+                    "window_seconds": window_seconds, "available_seconds": float(np.ptp(window[:, 0])),
+                    "maximum_gap_seconds": float(np.diff(window[:, 0]).max()),
+                    "variables_detected": ["time_s", "voltage_v", "current_a", "temperature_c"]}
+
+
+def extract_telemetry_features(samples, window_seconds=300, minimum_samples=4):
+    values, report = clean_telemetry(samples, window_seconds, minimum_samples)
+    t = values[:, 0]
+    duration = np.ptp(t)
+    centered = t - t.mean()
+    result = {}
+    for column, signal in enumerate(("voltage", "current", "temperature"), 1):
+        x = values[:, column]
+        result.update(summarize_signal(x.tolist(), signal))
+        result[f"{signal}_slope"] = float(np.dot(centered, x - x.mean()) / np.dot(centered, centered))
+        result[f"{signal}_auc"] = float(np.trapezoid(x, t))
+        first, second = x[t <= t[0] + duration / 2], x[t > t[0] + duration / 2]
+        result[f"{signal}_half_delta"] = float(second.mean() - first.mean()) if len(second) else 0.
+    power = values[:, 1] * values[:, 2]
+    result.update(power_mean=float(power.mean()), power_std=float(power.std()),
+                  power_delta=float(power[-1] - power[0]), energy_proxy=float(np.trapezoid(power, t)))
+    return {name: result[name] for name in TELEMETRY_ALL_FEATURES}, report

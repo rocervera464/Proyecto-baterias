@@ -8,9 +8,10 @@ export class CompatibilityError extends Error {
   constructor(message: string, report: Compatibility) { super(message); this.report = report; this.name = "CompatibilityError"; }
 }
 
-export async function importTelemetryFile(file: File, sheet?: string): Promise<CsvData & { sheets: string[]; selected_sheet: string | null; warnings: string[] }> {
+export async function importTelemetryFile(file: File, sheet?: string, segment?: string): Promise<CsvData & { sheets: string[]; selected_sheet: string | null; warnings: string[]; segments?: { id: string; label: string; samples: number }[]; selected_segment?: string; telemetry?: { samples_detected: number; declared_context?: Partial<Pick<TelemetryRequest, "cycle" | "measurement_level" | "chemistry">> } }> {
   const query = new URLSearchParams({ filename: file.name });
   if (sheet) query.set("sheet", sheet);
+  if (segment !== undefined) query.set("segment", segment);
   const response = await fetch(`${API_BASE_URL}/api/v1/telemetry/import?${query}`, { method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: file });
   const data = await response.json();
   if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "No se pudo importar el archivo.");

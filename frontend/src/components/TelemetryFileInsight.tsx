@@ -26,7 +26,8 @@ export default function TelemetryFileInsight({ samples, reading, complete }: {
           <polyline points={points} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
         </svg><div className="telemetry-signal-axis"><span>{format(start, 1)} s</span><span>{format(end, 1)} s</span></div>
       </figure>
-      <p className="telemetry-insight-note">{complete ? "Consulta la estimación y sus detalles en los resultados." : "Al analizar, identificaremos los datos de la batería y comprobaremos su compatibilidad."}</p>
+      <div className="telemetry-detected-signals" aria-label="Variables detectadas">{["Tiempo", "Voltaje", "Corriente", "Temperatura"].map(name => <span key={name}><Icon name="check" />{name}</span>)}</div>
+      <p className="telemetry-insight-note">{complete ? "Consulta la estimación y sus detalles en los resultados." : "Al analizar, comprobaremos las señales y seleccionaremos el modelo compatible."}</p>
       {complete && <a className="telemetry-results-link" href="#resultados">Ver resultados <Icon name="arrow" /></a>}
     </> : <>
       <p className="telemetry-insight-intro">Usa mediciones de una misma batería y descarga.</p>

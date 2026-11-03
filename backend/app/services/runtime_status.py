@@ -1,5 +1,5 @@
 """Warm shared assets and expose actionable readiness without running training."""
-from app.services.model_registry import get_registered_services
+from app.services.model_service import get_telemetry_model_services as get_registered_services
 from app.services.telemetry_identity import CATALOG, load_catalog
 
 
@@ -18,7 +18,7 @@ def check_runtime():
         references = load_catalog()
         catalog = {"available": CATALOG.is_file(), "references": sum(len(records) for records in references.values())}
         if not catalog["available"]:
-            warnings.append("Falta el catálogo de identificación automática; se requieren los datos declarados del ensayo.")
+            warnings.append("Falta el catálogo histórico. La predicción v4 utiliza únicamente señales y no depende de ese catálogo.")
     except (OSError, RuntimeError, ValueError, KeyError, TypeError) as error:
         errors.append(f"No se pudo cargar el catálogo de telemetría: {error}")
     return {"status": "ready" if not errors else "unavailable", "models": models,

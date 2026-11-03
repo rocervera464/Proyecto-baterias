@@ -12,12 +12,12 @@ const steps = [
   "Preparar los resultados",
 ];
 
-const format = (value: number, digits = 2) => value.toLocaleString("es-CO", { maximumFractionDigits: digits });
+const format = (value: number | null | undefined, digits = 2) => value == null ? "No declarado" : value.toLocaleString("es-CO", { maximumFractionDigits: digits });
 
 const activity = [
   ["Leyendo marcas de tiempo", "Localizando voltaje y corriente", "Identificando registros de temperatura", "Reuniendo las muestras recibidas"],
   ["Calculando rangos de las mediciones", "Resumiendo la corriente registrada", "Revisando la variación térmica", "Midiendo la duración registrada"],
-  ["Revisando el nivel de medición", "Consultando la química declarada", "Reuniendo las condiciones de descarga", "Esperando la evaluación de compatibilidad"],
+  ["Revisando las cuatro señales", "Comprobando el muestreo", "Comparando perfiles de descarga", "Esperando la evaluación de compatibilidad"],
   ["Mediciones enviadas al servicio", "Consulta de salud de la batería", "Consulta de horizontes futuros", "Esperando la respuesta de los modelos"],
   ["Organizando la vista de salud actual", "Preparando las tarjetas de proyección", "Preparando la gráfica de resultados", "Esperando el informe del servicio"],
 ];
@@ -126,12 +126,12 @@ export default function PredictionProgress({ telemetry }: { telemetry: Telemetry
             </>}
             {active === 1 && <div className="telemetry-variable-grid">{variables.map((variable, index) => <article key={variable.label} className="telemetry-variable is-discovered" style={{ animationDelay: `${index * 120}ms` }}><span className="telemetry-variable-symbol" aria-hidden="true">{variable.symbol}</span><span className="telemetry-variable-label">{variable.label}</span><strong>{variable.value}</strong><small>{variable.detail}</small></article>)}</div>}
             {active === 2 && <>
-              <div className="analysis-facts"><div><span>Nivel de medición</span><strong>{{ unknown: "Sin especificar", cell: "Celda", module: "Módulo", pack: "Pack" }[telemetry.measurement_level ?? "unknown"]}</strong></div><div><span>Química declarada</span><strong>{{ unknown: "Sin especificar", "li-ion": "Ion de litio", LFP: "LFP", "lead-acid": "Plomo-ácido", other: "Otra" }[telemetry.chemistry ?? "unknown"]}</strong></div><div><span>Modo de análisis</span><strong>{telemetry.analysis_mode === "exploratory" ? "Exploratorio" : "Estricto"}</strong></div><div><span>Voltaje de corte</span><strong>{format(telemetry.cutoff_voltage_v)} V</strong></div></div>
+              <div className="analysis-facts"><div><span>Entrada del modelo</span><strong>Solo telemetría</strong></div><div><span>Ventana</span><strong>0–300 segundos</strong></div><div><span>Variables medidas</span><strong>Tiempo, voltaje, corriente y temperatura</strong></div><div><span>Selección del modelo</span><strong>Según el perfil de las señales</strong></div></div>
               <p className="analysis-window-hint">La respuesta del modelo confirmará la compatibilidad de estas condiciones.</p>
             </>}
             {active === 3 && <>
               <div className="analysis-model-flow"><span><Icon name="layers" />Tus mediciones</span><span className="analysis-flow-line" aria-hidden="true" /><span><Icon name="battery" />Modelo de salud</span><span className="analysis-flow-line" aria-hidden="true" /><span><Icon name="chart" />Estimación SoH</span></div>
-              <div className="telemetry-context"><span>Ciclo <b>{format(telemetry.cycle, 0)}</b></span><span>Ambiente <b>{format(telemetry.ambient_temperature_c)} °C</b></span><span>Datos EIS <b>{telemetry.previous_eis && Object.values(telemetry.previous_eis).some(value => value != null) ? "Incluidos" : "No incluidos"}</b></span></div>
+              <div className="telemetry-context"><span>Modelo <b>XGBoost de telemetría</b></span><span>Entrada <b>Mediciones tempranas</b></span><span>Proyección <b>Degradación acumulada</b></span></div>
             </>}
             {active === 4 && <>
               <div className="analysis-window-highlight"><span className="analysis-waiting-ring" aria-hidden="true" /><div><strong>Preparando tu informe</strong><span>La estimación se mostrará al terminar el análisis.</span></div></div>

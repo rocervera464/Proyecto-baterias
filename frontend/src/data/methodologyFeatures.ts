@@ -1,28 +1,9 @@
 export interface FeatureGroup { label: string; description: string; features: [string, string][]; }
-
-// Documented from backend/model_artifacts/features.json in its exact order.
+// Telemetry-only v4: common statistics and evaluated derived signals.
 export const featureGroups: FeatureGroup[] = [
   {
-    "label": "Contexto",
-    "description": "Condiciones del ciclo analizado.",
-    "features": [
-      [
-        "cycle",
-        "Ciclo actual"
-      ],
-      [
-        "ambient_temperature",
-        "Temperatura ambiente"
-      ],
-      [
-        "cutoff_voltage",
-        "Voltaje de corte"
-      ]
-    ]
-  },
-  {
     "label": "Voltaje",
-    "description": "Siete estadísticas de las muestras de 0 a 300 s. Unidad: V.",
+    "description": "Estad\u00edsticas de las muestras de 0 a 300 segundos. Unidad: V",
     "features": [
       [
         "voltage_start",
@@ -30,19 +11,19 @@ export const featureGroups: FeatureGroup[] = [
       ],
       [
         "voltage_mean",
-        "Media aritmética"
+        "Media aritm\u00e9tica"
       ],
       [
         "voltage_std",
-        "Desviación estándar poblacional"
+        "Desviaci\u00f3n est\u00e1ndar poblacional"
       ],
       [
         "voltage_min",
-        "Valor mínimo"
+        "Valor m\u00ednimo"
       ],
       [
         "voltage_max",
-        "Valor máximo"
+        "Valor m\u00e1ximo"
       ],
       [
         "voltage_end",
@@ -50,13 +31,13 @@ export const featureGroups: FeatureGroup[] = [
       ],
       [
         "voltage_delta",
-        "Cambio: final menos inicial"
+        "Cambio final menos inicial"
       ]
     ]
   },
   {
     "label": "Corriente",
-    "description": "Siete estadísticas de las muestras de 0 a 300 s. Unidad: A.",
+    "description": "Estad\u00edsticas de las muestras de 0 a 300 segundos. Unidad: A",
     "features": [
       [
         "current_start",
@@ -64,19 +45,19 @@ export const featureGroups: FeatureGroup[] = [
       ],
       [
         "current_mean",
-        "Media aritmética"
+        "Media aritm\u00e9tica"
       ],
       [
         "current_std",
-        "Desviación estándar poblacional"
+        "Desviaci\u00f3n est\u00e1ndar poblacional"
       ],
       [
         "current_min",
-        "Valor mínimo"
+        "Valor m\u00ednimo"
       ],
       [
         "current_max",
-        "Valor máximo"
+        "Valor m\u00e1ximo"
       ],
       [
         "current_end",
@@ -84,13 +65,13 @@ export const featureGroups: FeatureGroup[] = [
       ],
       [
         "current_delta",
-        "Cambio: final menos inicial"
+        "Cambio final menos inicial"
       ]
     ]
   },
   {
     "label": "Temperatura",
-    "description": "Siete estadísticas de las muestras de 0 a 300 s. Unidad: °C.",
+    "description": "Estad\u00edsticas de las muestras de 0 a 300 segundos. Unidad: \u00b0C",
     "features": [
       [
         "temperature_start",
@@ -98,19 +79,19 @@ export const featureGroups: FeatureGroup[] = [
       ],
       [
         "temperature_mean",
-        "Media aritmética"
+        "Media aritm\u00e9tica"
       ],
       [
         "temperature_std",
-        "Desviación estándar poblacional"
+        "Desviaci\u00f3n est\u00e1ndar poblacional"
       ],
       [
         "temperature_min",
-        "Valor mínimo"
+        "Valor m\u00ednimo"
       ],
       [
         "temperature_max",
-        "Valor máximo"
+        "Valor m\u00e1ximo"
       ],
       [
         "temperature_end",
@@ -118,39 +99,49 @@ export const featureGroups: FeatureGroup[] = [
       ],
       [
         "temperature_delta",
-        "Cambio: final menos inicial"
+        "Cambio final menos inicial"
       ]
     ]
   },
   {
-    "label": "EIS previo",
-    "description": "Impedancias opcionales de una medición anterior. Si faltan, se representan como NaN.",
+    "label": "Variables derivadas de telemetr\u00eda",
+    "description": "Seleccionadas para la familia de 2 A; la familia de 1 A utiliza las 21 estad\u00edsticas anteriores.",
     "features": [
       [
-        "Re_prev",
-        "Resistencia del electrolito (Ω)"
+        "voltage_slope",
+        "Pendiente de voltaje"
       ],
       [
-        "Rct_prev",
-        "Resistencia de transferencia de carga (Ω)"
-      ]
-    ]
-  },
-  {
-    "label": "Carga previa",
-    "description": "Temperaturas opcionales de la carga anterior (°C). El backend conserva los valores enviados.",
-    "features": [
-      [
-        "charge_temp_start_prev",
-        "Temperatura inicial"
+        "current_slope",
+        "Pendiente de corriente"
       ],
       [
-        "charge_temp_max_prev",
-        "Temperatura máxima"
+        "temperature_slope",
+        "Pendiente de temperatura"
       ],
       [
-        "charge_temp_delta_prev",
-        "Cambio de temperatura"
+        "voltage_half_delta",
+        "Cambio entre mitades de voltaje"
+      ],
+      [
+        "temperature_half_delta",
+        "Cambio entre mitades de temperatura"
+      ],
+      [
+        "power_mean",
+        "Potencia media"
+      ],
+      [
+        "power_std",
+        "Variabilidad de potencia"
+      ],
+      [
+        "power_delta",
+        "Cambio de potencia"
+      ],
+      [
+        "energy_proxy",
+        "Integral de voltaje por corriente"
       ]
     ]
   }

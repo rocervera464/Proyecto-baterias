@@ -1,65 +1,174 @@
 export type VisualKind = "dataset" | "cleaning" | "features" | "trees" | "metrics" | "integration" | "telemetry" | "window" | "models" | "results" | "soh";
-export interface JourneyStep {
-  short: string; title: string; description: string; points: string[];
-  evidenceTitle: string; evidence: string; technical: string; visual: VisualKind;
-}
+export interface JourneyStep { short: string; title: string; description: string; points: string[]; evidenceTitle: string; evidence: string; technical: string; visual: VisualKind; }
 export const trainingSteps: JourneyStep[] = [
-  { short: "Datos", title: "Aprender de baterías observadas", visual: "dataset",
-    description: "Partimos de mediciones experimentales de baterías con una capacidad conocida. Al relacionar su comportamiento con su estado de salud, el modelo aprende patrones que puede aplicar a nuevas mediciones.",
-    points: ["Se estudian ciclos de descarga en distintas condiciones.", "La capacidad medida sirve como referencia para calcular el SoH.", "Cargar tu archivo ejecuta el análisis; no vuelve a entrenar la IA."],
-    evidenceTitle: "Datos originales reproducidos", evidence: "La familia inicial tiene 277 descargas válidas y la adicional, 636. No son tamaños de una partición de prueba. Los rangos escasos o anómalos no se completaron con etiquetas inventadas.",
-    technical: "SoH = capacidad / mediana de las primeras cinco capacidades válidas × 100. Se conservaron scripts de preparación y comparación; las familias no representan todo el intervalo 0–100 % ni cualquier química o paquete." },
-  { short: "Preparación", title: "Preparar datos consistentes", visual: "cleaning",
-    description: "Organizamos las mediciones para que el modelo reciba datos comparables. Se revisan los valores, las unidades y el orden temporal, manteniendo separados los ciclos y las baterías.",
-    points: ["Se identifican las columnas y se normalizan las unidades.", "Se selecciona un solo tramo de descarga para cada análisis.", "Los datos reconstruidos o supuestos se señalan para revisar su alcance."],
-    evidenceTitle: "Preparación trazable", evidence: "El notebook original y los scripts documentan el procesamiento. Los archivos con capacidades bajas de causa no analizada se mantienen fuera de la nueva familia; no se inventan datos para rellenar rangos.",
-    technical: "El backend admite 0 < Re < 1 Ω y 0 < Rct < 2 Ω; fuera del intervalo usa None. prepare_input convierte None en NaN, admitido por XGBoost. Las muestras principales incompletas se rechazan al importar." },
-  { short: "Variables", title: "De señales a 29 características", visual: "features",
-    description: "Convertimos las señales de descarga en 29 características numéricas. Este resumen describe tanto la respuesta eléctrica y térmica como las condiciones en las que se midió la batería.",
-    points: ["Voltaje, corriente y temperatura: valores iniciales, finales, promedios y variaciones.", "Contexto: número de ciclo, temperatura ambiente y voltaje de corte.", "Historial opcional: resistencias y temperaturas de la carga anterior."],
-    evidenceTitle: "Orden verificado", evidence: "Los nombres y el orden de las 29 entradas coinciden con features.json. El backend comprueba su compatibilidad antes de inferir.",
-    technical: "summarize_signal usa media aritmética, desviación estándar poblacional (ddof=0) y delta = final − inicial. Este visor documenta el cálculo sin volver a implementarlo en el navegador." },
-  { short: "XGBoost", title: "Árboles que aprenden a corregir errores", visual: "trees",
-    description: "Utilizamos XGBoost, una técnica que combina muchos árboles de decisión. Durante el entrenamiento, cada árbol aporta correcciones para reducir los errores del conjunto.",
-    points: ["Aprende relaciones entre las características y la salud de la batería.", "Se conserva un modelo para el SoH actual.", "Un único modelo futuro recibe también el horizonte y estima la degradación acumulada."],
-    evidenceTitle: "Diagrama conceptual", evidence: "Los árboles dibujados son didácticos: no representan umbrales reales ni explican una predicción concreta.",
-    technical: "El manifiesto separa horizontes de producción e investigación. Se comparan modelos con y sin restricción sobre el horizonte y ablaciones de ciclo y voltaje de corte; no se selecciona por error de entrenamiento." },
-  { short: "Evaluación", title: "Medir el error antes de confiar", visual: "metrics",
-    description: "Comparamos las estimaciones con mediciones conocidas que se mantienen fuera del entrenamiento. Así comprobamos si un cambio mejora el resultado también en otras baterías y en ciclos posteriores.",
-    points: ["El error medio indica cuánto se aleja la estimación de la referencia.", "Se revisan los resultados por batería y por horizonte futuro.", "Se descartan cambios que mejoran el promedio pero empeoran demasiado otros casos."],
-    evidenceTitle: "Evaluación piloto por batería", evidence: "Los informes registran particiones por batería, selección interna de parámetros y comparación con persistencia y degradación media histórica. No constituye una prueba externa de todo el sistema.",
-    technical: "La batería externa no participa en la selección ni en early stopping. La promoción exige mejorar MAE y RMSE por batería frente a las referencias, además de coherencia temporal." },
-  { short: "Integración", title: "Del modelo entrenado a BaterIA", visual: "integration",
-    description: "Una vez evaluados, los modelos se incorporan a BaterIA. El sistema prepara tus datos, ejecuta el análisis y presenta los resultados en una interfaz que permite revisarlos y compararlos.",
-    points: ["El servicio de predicción procesa las mediciones enviadas.", "La interfaz muestra salud actual, proyecciones y posibles usos.", "Los avisos permiten consultar la compatibilidad y los supuestos del análisis."],
-    evidenceTitle: "Integración existente", evidence: "POST /api/v1/predict devuelve el SoH actual y únicamente los horizontes de producción disponibles, que pueden ser ninguno.",
-    technical: "get_model_service utiliza caché. El backend valida los contratos de 29 y 30 columnas y respeta production_horizons. React muestra los valores recibidos sin recalcularlos." },
+  {
+    "short": "Datos",
+    "title": "Aprender de mediciones reales",
+    "visual": "dataset",
+    "description": "Se estudian ocho celdas NASA en dos protocolos, evaluados por separado.",
+    "points": [
+      "Se conservan los archivos MAT originales y sus huellas SHA-256.",
+      "La capacidad medida crea la referencia de SoH, no una entrada del modelo.",
+      "Cargar un archivo realiza inferencia; no vuelve a entrenar."
+    ],
+    "evidenceTitle": "Fuentes trazables",
+    "evidence": "277 descargas con capacidad positiva en la familia de 1 A y 636 en la familia de 2 A. Son datos de desarrollo, no una prueba externa independiente.",
+    "technical": "SoH = capacidad / mediana de las primeras cinco capacidades positivas y finitas de la misma celda por 100. Los protocolos no se mezclan."
+  },
+  {
+    "short": "Preparaci\u00f3n",
+    "title": "Interpretar y ordenar las se\u00f1ales",
+    "visual": "cleaning",
+    "description": "Una sola ruta prepara archivos de texto, hojas de c\u00e1lculo y datos MATLAB.",
+    "points": [
+      "Se reconocen aliases y unidades declaradas.",
+      "Se selecciona una sola descarga y se ordena por tiempo.",
+      "Se eliminan duplicados id\u00e9nticos; las mediciones contradictorias se rechazan."
+    ],
+    "evidenceTitle": "Limpieza compartida",
+    "evidence": "El entrenamiento y la API reutilizan clean_telemetry y extract_telemetry_features. No se inventan variables ausentes.",
+    "technical": "Se analiza 0 <= time_s <= 300. Filas inv\u00e1lidas aisladas se descartan solo con una proporci\u00f3n <= 5%; los bloques incompletos se rechazan."
+  },
+  {
+    "short": "Variables",
+    "title": "Caracter\u00edsticas solo de telemetr\u00eda",
+    "visual": "features",
+    "description": "La entrada del modelo procede exclusivamente de tiempo, voltaje, corriente y temperatura.",
+    "points": [
+      "Las 21 estad\u00edsticas base describen voltaje, corriente y temperatura.",
+      "Se compararon pendientes, integrales, potencia y cambios entre mitades.",
+      "La selecci\u00f3n se realiza por bater\u00eda; no por error de entrenamiento."
+    ],
+    "evidenceTitle": "Contratos v4",
+    "evidence": "La familia de 1 A seleccion\u00f3 21 variables; la familia de 2 A, 30. No se utilizan ciclo, ambiente, corte, EIS ni carga previa.",
+    "technical": "Conjuntos A/B/C/D comparados en validaci\u00f3n interna. El manifiesto y los modelos verifican nombres y orden exacto."
+  },
+  {
+    "short": "XGBoost",
+    "title": "Salud actual y degradaci\u00f3n acumulada",
+    "visual": "trees",
+    "description": "Cada familia contiene un XGBoost de SoH actual y un \u00fanico XGBoost para la degradaci\u00f3n futura.",
+    "points": [
+      "El modelo actual aprende la capacidad relativa de referencia.",
+      "El modelo futuro recibe adem\u00e1s horizon_cycles.",
+      "Se compararon variantes libres y monot\u00f3nicas."
+    ],
+    "evidenceTitle": "Modelos entrenados",
+    "evidence": "Los artefactos JSON contienen \u00e1rboles ajustados con los datos NASA, no salidas simuladas.",
+    "technical": "Degradaci\u00f3n objetivo = max(0, SoH real actual - SoH real futuro). SoH futuro = SoH actual estimado - degradaci\u00f3n estimada, con l\u00edmites documentados."
+  },
+  {
+    "short": "Evaluaci\u00f3n",
+    "title": "Medir la generalizaci\u00f3n por bater\u00eda",
+    "visual": "metrics",
+    "description": "Cada bater\u00eda se reserva una vez para prueba y se mantiene fuera de las decisiones de ajuste.",
+    "points": [
+      "Leave-One-Battery-Out externo e interno.",
+      "MAE, RMSE, R\u00b2, error mediano y sesgo por bater\u00eda y horizonte.",
+      "Baselines de media, persistencia y degradaci\u00f3n hist\u00f3rica."
+    ],
+    "evidenceTitle": "Evaluaci\u00f3n reproducible",
+    "evidence": "Los informes registran particiones por bater\u00eda y selecciones internas. No hay validaci\u00f3n externa de veh\u00edculos ni paquetes.",
+    "technical": "La bater\u00eda externa no interviene en early stopping ni en la selecci\u00f3n. La coherencia temporal no sustituye las m\u00e9tricas de precisi\u00f3n."
+  },
+  {
+    "short": "Integraci\u00f3n",
+    "title": "De los artefactos a los resultados",
+    "visual": "integration",
+    "description": "FastAPI verifica los modelos, transforma las se\u00f1ales y devuelve sus predicciones.",
+    "points": [
+      "La carga de modelos se reutiliza mediante cach\u00e9.",
+      "Cada horizonte conserva el estado de validaci\u00f3n del manifiesto.",
+      "React conserva los valores num\u00e9ricos recibidos."
+    ],
+    "evidenceTitle": "Contrato de producci\u00f3n",
+    "evidence": "POST /api/v1/predict acepta solo discharge_samples; POST /api/v1/predict-file interpreta el archivo completo.",
+    "technical": "Se comprueban contratos de features, objetivos, evaluaci\u00f3n e integridad SHA-256. El ciclo puede estar ausente y la gr\u00e1fica utiliza horizontes relativos."
+  }
 ];
 export const predictionSteps: JourneyStep[] = [
-  { short: "Telemetría", title: "Cargar mediciones de descarga", visual: "telemetry",
-    description: "El análisis empieza con mediciones de tiempo, voltaje, corriente y temperatura durante una descarga. Puedes cargar un archivo o introducir los valores manualmente.",
-    points: ["El sistema reconoce columnas y datos de la batería cuando están declarados.", "Puedes corregir el ciclo, la temperatura ambiente y el voltaje de corte.", "Las mediciones deben pertenecer a la misma batería y al tramo seleccionado."],
-    evidenceTitle: "Ejemplo educativo", evidence: "La tabla ilustrativa no procede del archivo cargado. Ciclo, ambiente y voltaje de corte se completan en el formulario.",
-    technical: "El frontend valida y adapta CSV/JSON, convierte unidades y ajusta el origen temporal seleccionado. No se unen ciclos o baterías diferentes. SoC y SoH importados no sustituyen la predicción." },
-  { short: "Ventana", title: "Seleccionar los primeros 300 segundos", visual: "window",
-    description: "Ordenamos las mediciones y analizamos los primeros 300 segundos de la descarga. Esta ventana coincide con el tipo de señales utilizado para preparar los modelos.",
-    points: ["Se necesitan al menos dos instantes distintos dentro de la ventana.", "El origen del tiempo se puede revisar al importar el archivo.", "Las muestras posteriores a 300 segundos quedan fuera del resumen del modelo."],
-    evidenceTitle: "Implementación real", evidence: "WINDOW_SECONDS = 300 y filtro time_s <= 300 en feature_engineering.py. La curva del diagrama es didáctica.",
-    technical: "No se interpola ni se exige una muestra por segundo. Se resumen las mediciones disponibles; su cantidad, calidad y representatividad pueden afectar la estimación." },
-  trainingSteps[2],
-  { short: "Inferencia", title: "Salud actual y degradación acumulada", visual: "models",
-    description: "Se comprueba la compatibilidad de las mediciones con la familia disponible. El SoH actual se estima con XGBoost y las proyecciones solo se ejecutan para horizontes habilitados.",
-    points: ["El modelo futuro recibe las 29 variables y el horizonte.", "Estima pérdida acumulada respecto al presente.", "Los horizontes sin respaldo permanecen fuera de la interfaz operacional."],
-    evidenceTitle: "Precisión antes que apariencia", evidence: "Las predicciones se contrastan con mediciones reales. No se inventa una pérdida mínima ni se reparan errores con una curva artificial.",
-    technical: "SoH futuro = SoH actual − degradación no negativa, con límites físicos. La restricción monotónica se compara por validación; una incoherencia grande detiene la respuesta." },
-  { short: "Resultados", title: "Mostrar estimaciones discretas", visual: "results",
-    description: "Presentamos el porcentaje de salud actual y las proyecciones habilitadas en tarjetas y una gráfica de segmentos lineales.",
-    points: ["Cada proyección corresponde a un ciclo futuro concreto.", "La interfaz muestra predicted_soh_percent tal como lo recibe.", "Una curva plana no demuestra que la batería deje de degradarse."],
-    evidenceTitle: "Coherencia no equivale a precisión", evidence: "Una tendencia descendente no demuestra exactitud. El informe guarda errores por batería y horizonte y compara modelos y baselines.",
-    technical: "La lista de future_predictions coincide con production_horizons. Las líneas unen puntos discretos y no predicen ciclos intermedios." },
-  { short: "Interpretación", title: "Entender la salud y orientar la evaluación", visual: "soh",
-    description: "El SoH expresa la capacidad relativa de la batería frente a una referencia. Lo utilizamos para orientar su clasificación y explorar posibles aplicaciones dentro del alcance de los datos disponibles.",
-    points: ["La salud de la batería es distinta de la carga disponible en ese momento.", "Los posibles usos son orientativos y requieren una evaluación técnica.", "El porcentaje no indica por sí solo cuántos ciclos de vida quedan."],
-    evidenceTitle: "Sin estimación de RUL", evidence: "No se calcula cuántos ciclos quedan. Fuera del dominio de entrenamiento se necesita evaluación específica.",
-    technical: "El indicador y las categorías reutilizan la clasificación existente. La viabilidad requiere evaluar resistencia interna, respuesta térmica, BMS y compatibilidad de la instalación." },
+  {
+    "short": "Telemetr\u00eda",
+    "title": "Cargar las cuatro se\u00f1ales",
+    "visual": "telemetry",
+    "description": "Carga un archivo o pega las mediciones de una sola descarga.",
+    "points": [
+      "Tiempo, voltaje, corriente y temperatura.",
+      "No necesitas proporcionar el ciclo, el voltaje de corte ni el ambiente.",
+      "Se aceptan CSV, TSV, TXT, JSON, XLSX, XLS, Parquet y MAT."
+    ],
+    "evidenceTitle": "Importaci\u00f3n autom\u00e1tica",
+    "evidence": "La vista previa muestra el archivo, su formato, las muestras y las variables reconocidas.",
+    "technical": "Los aliases se comparan de forma determinista; las columnas ambiguas se rechazan."
+  },
+  {
+    "short": "Ventana",
+    "title": "Utilizar los primeros 300 segundos",
+    "visual": "window",
+    "description": "Las mediciones se ordenan y se conserva la ventana temprana de descarga.",
+    "points": [
+      "El segundo 300 est\u00e1 incluido.",
+      "Las muestras posteriores no participan en las features.",
+      "La cantidad y cobertura se contrastan con el entrenamiento."
+    ],
+    "evidenceTitle": "Muestreo observado",
+    "evidence": "Se requieren al menos 21 muestras para la familia de 1 A y 17 para la de 2 A, adem\u00e1s de cobertura temporal suficiente.",
+    "technical": "Se compararon ventanas de 60, 120, 180, 300 y 600 s. La ruta productiva conserva 300 s."
+  },
+  {
+    "short": "Variables",
+    "title": "Caracter\u00edsticas solo de telemetr\u00eda",
+    "visual": "features",
+    "description": "La entrada del modelo procede exclusivamente de tiempo, voltaje, corriente y temperatura.",
+    "points": [
+      "Las 21 estad\u00edsticas base describen voltaje, corriente y temperatura.",
+      "Se compararon pendientes, integrales, potencia y cambios entre mitades.",
+      "La selecci\u00f3n se realiza por bater\u00eda; no por error de entrenamiento."
+    ],
+    "evidenceTitle": "Contratos v4",
+    "evidence": "La familia de 1 A seleccion\u00f3 21 variables; la familia de 2 A, 30. No se utilizan ciclo, ambiente, corte, EIS ni carga previa.",
+    "technical": "Conjuntos A/B/C/D comparados en validaci\u00f3n interna. El manifiesto y los modelos verifican nombres y orden exacto."
+  },
+  {
+    "short": "Inferencia",
+    "title": "Ejecutar XGBoost con las se\u00f1ales",
+    "visual": "models",
+    "description": "El perfil observado selecciona la familia compatible y el modelo estima SoH.",
+    "points": [
+      "No se inventan metadatos para forzar la compatibilidad.",
+      "La capacidad real no se solicita ni entra al modelo.",
+      "Las proyecciones solo se ejecutan si est\u00e1n habilitadas."
+    ],
+    "evidenceTitle": "Sin ajustes visuales",
+    "evidence": "La API devuelve la predicci\u00f3n del modelo y sus detalles de compatibilidad. React no recalcula el resultado.",
+    "technical": "La degradaci\u00f3n futura recibe las features seleccionadas y el horizonte; nunca el SoH futuro real."
+  },
+  {
+    "short": "Resultados",
+    "title": "Consultar salud y horizontes habilitados",
+    "visual": "results",
+    "description": "La interfaz muestra el estado actual y las proyecciones, indicando sus l\u00edmites de precisi\u00f3n.",
+    "points": [
+      "Los porcentajes proceden de FastAPI.",
+      "Los segmentos de la gr\u00e1fica conectan horizontes discretos.",
+      "Una curva plana no demuestra ausencia de degradaci\u00f3n."
+    ],
+    "evidenceTitle": "Estado de validaci\u00f3n visible",
+    "evidence": "Las cuatro proyecciones est\u00e1n habilitadas como estimaciones de precisi\u00f3n limitada. Sus m\u00e9tricas de evaluaci\u00f3n se conservan.",
+    "technical": "future_predictions coincide con forecast_horizons; production_horizons y validation_status conservan la aprobaci\u00f3n cient\u00edfica. No se inventan valores."
+  },
+  {
+    "short": "Interpretaci\u00f3n",
+    "title": "Interpretar capacidad relativa",
+    "visual": "soh",
+    "description": "El porcentaje compara la capacidad con la referencia inicial de la celda.",
+    "points": [
+      "SoH y carga disponible son magnitudes distintas.",
+      "La clasificaci\u00f3n es orientativa.",
+      "La segunda vida requiere una evaluaci\u00f3n adicional."
+    ],
+    "evidenceTitle": "Alcance limitado",
+    "evidence": "Un porcentaje de SoH no certifica seguridad ni estima los ciclos de vida restantes.",
+    "technical": "La evaluaci\u00f3n disponible se limita a cuatro celdas por protocolo; no demuestra generalizaci\u00f3n a cualquier bater\u00eda EV."
+  }
 ];

@@ -1,0 +1,70 @@
+{
+  "protocols_pooled": false,
+  "cohort": "nasa_room_2a",
+  "batteries": [
+    {
+      "battery_id": "B0005",
+      "source": "data/raw/nasa_room_2a/B0005.mat",
+      "sha256": "0eae4585baf3f200c09fe24c5ab884f1889679fc75206ca1aa19da704104f0b0",
+      "discharge_cycles": 168,
+      "valid_capacity_cycles": 168,
+      "reference_capacity": 1.8353491942234077,
+      "ambient_temperatures": [
+        24.0
+      ],
+      "discharge_current_median": -2.012381586872153,
+      "cutoff_voltage": 2.7,
+      "samples_300s_min": 17,
+      "samples_300s_max": 32,
+      "rejected": []
+    },
+    {
+      "battery_id": "B0006",
+      "source": "data/raw/nasa_room_2a/B0006.mat",
+      "sha256": "fa818ab4db5db8ab21e910b6dd6c3e20d3761bb9672089e1a4de8f96074616c5",
+      "discharge_cycles": 168,
+      "valid_capacity_cycles": 168,
+      "reference_capacity": 2.013326371345464,
+      "ambient_temperatures": [
+        24.0
+      ],
+      "discharge_current_median": -2.010106910095628,
+      "cutoff_voltage": 2.5,
+      "samples_300s_min": 17,
+      "samples_300s_max": 32,
+      "rejected": []
+    },
+    {
+      "battery_id": "B0007",
+      "source": "data/raw/nasa_room_2a/B0007.mat",
+      "sha256": "d022afa086efaf54ab5b63f05220f5be178c8027e2fa8d68589db0e85a441a3b",
+      "discharge_cycles": 168,
+      "valid_capacity_cycles": 168,
+      "reference_capacity": 1.8806626717011388,
+      "ambient_temperatures": [
+        24.0
+      ],
+      "discharge_current_median": -1.9894565572651808,
+      "cutoff_voltage": 2.2,
+      "samples_300s_min": 17,
+      "samples_300s_max": 32,
+      "rejected": []
+    },
+    {
+      "battery_id": "B0018",
+      "source": "data/raw/nasa_room_2a/B0018.mat",
+      "sha256": "d1e6c923a43ea1c9666b3a90bbb521757a067fd60b4d17dbfaa49c50b179da69",
+      "discharge_cycles": 132,
+      "valid_capacity_cycles": 132,
+      "reference_capacity": 1.8396018424355423,
+      "ambient_temperatures": [
+        24.0
+      ],
+      "discharge_current_median": -2.0082404763338166,
+      "cutoff_voltage": 2.5,
+      "samples_300s_min": 22,
+      "samples_300s_max": 32,
+      "rejected": []
+    }
+  ]
+}

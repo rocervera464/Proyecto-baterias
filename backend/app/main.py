@@ -1,24 +1,16 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.exception_handlers import request_validation_exception_handler
 import logging
 from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 from app.core.settings import get_settings, LOCAL_ORIGIN_PATTERN
 from app.services.runtime_status import check_runtime
-from app.api.routes.file_import import router as import_router
+from app.api.routes.telemetry_v4 import router as telemetry_v4_router
+from app.legacy import legacy_app
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes.prediction import (
-    router as prediction_router,
-)
-
-from app.api.routes.telemetry import (
-    legacy_router as legacy_telemetry_router,
-    router as telemetry_router,
-)
 
 
 @asynccontextmanager
@@ -51,22 +43,19 @@ async def log_prediction_validation_failure(request: Request, error: RequestVali
     if request.url.path == "/api/v1/predict":
         fields = "; ".join(f"{'.'.join(map(str, item['loc']))}: {item['msg']}" for item in error.errors())
         logging.getLogger("app.prediction").warning("prediction_rejected code=invalid_request fields=%s", fields)
-    return await request_validation_exception_handler(request, error)
+    # Do not echo raw telemetry or non-finite input values in JSON error bodies.
+    return JSONResponse(status_code=422, content={"detail": [
+        {"loc": list(item["loc"]), "msg": item["msg"], "type": item["type"]}
+        for item in error.errors()
+    ]})
 
 
 # ============================================================
 # ROUTERS
 # ============================================================
 
-app.include_router(
-    telemetry_router
-)
-app.include_router(legacy_telemetry_router)
-app.include_router(import_router)
-
-app.include_router(
-    prediction_router
-)
+app.include_router(telemetry_v4_router)
+app.mount("/legacy", legacy_app)
 
 
 # ============================================================

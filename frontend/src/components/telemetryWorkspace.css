@@ -66,6 +66,9 @@
 .telemetry-signal-preview figcaption strong { color: #536e60; font-weight: 550; }
 .telemetry-signal-preview svg { display: block; width: 100%; height: 66px; margin-top: 6px; }
 .telemetry-signal-axis { display: flex; justify-content: space-between; padding: 0 10px; font-size: 9px; color: #8b9b91; }
+.telemetry-detected-signals { display: flex; flex-wrap: wrap; gap: 7px 12px; margin-top: 13px; font-size: 10px; color: #536e60; }
+.telemetry-detected-signals span { display: inline-flex; align-items: center; gap: 4px; }
+.telemetry-detected-signals svg { width: 12px; height: 12px; color: #178b78; }
 .telemetry-results-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; text-decoration: none; color: #126c5e; font-size: 12px; font-weight: 650; }
 .telemetry-results-link svg { width: 15px; height: 15px; }
 .telemetry-workspace .csv-configuration { margin-top: 18px; }

@@ -20,15 +20,16 @@ export interface PreviousCharge {
 
 
 export interface TelemetryRequest {
+  include_research_forecasts?: boolean;
   normalize_inputs?: boolean;
   measurement_level?: "unknown" | "cell" | "module" | "pack";
   chemistry?: "unknown" | "li-ion" | "LFP" | "lead-acid" | "other";
   analysis_mode?: "strict" | "exploratory";
-  cycle: number;
+  cycle?: number | null;
 
-  ambient_temperature_c: number;
+  ambient_temperature_c?: number | null;
 
-  cutoff_voltage_v: number;
+  cutoff_voltage_v?: number | null;
 
   discharge_samples: TelemetrySample[];
 

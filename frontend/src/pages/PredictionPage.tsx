@@ -81,29 +81,29 @@ export default function PredictionPage({ onResultsChange }: { onResultsChange: (
       <h3 id="compatibility-recovery-title">{compatibility.status === "out_of_range" ? "Archivo leído · mediciones fuera del alcance del modelo" : "Revisa los datos del ensayo"}</h3>
       <p>{compatibilityMessage}</p>
       <details><summary>Ver detalles</summary><ModelCompatibility report={compatibility} hasPrediction={false} /></details>
-      <a href="#parametros">Revisar los parámetros de la batería</a>
+      <a href="#telemetria">Revisar la telemetría cargada</a>
     </section>}
     <section id="resultados" className="results" aria-labelledby="results-title" aria-busy={loading}>
-      <div data-reveal className="results-heading"><div><p className="section-kicker">RESULTADOS DEL ANÁLISIS</p><h2 id="results-title">Salud actual y proyección</h2></div>{prediction && <span className="badge">Ciclo {prediction.current_cycle} analizado</span>}</div>
+      <div data-reveal className="results-heading"><div><p className="section-kicker">RESULTADOS DEL ANÁLISIS</p><h2 id="results-title">Salud actual y proyección</h2></div>{prediction && <span className="badge">{prediction.current_cycle == null ? `${prediction.telemetry?.samples_used ?? ""} muestras analizadas` : `Ciclo ${prediction.current_cycle} analizado`}</span>}</div>
       {prediction ? <>
         {(prediction.compatibility || importWarnings.length > 0 || prediction.input_normalization?.length) && <details className="analysis-notes"><summary>Detalles del análisis</summary>{prediction.telemetry_reference && <p>Registro verificado: NASA {prediction.telemetry_reference.battery_id}, ciclo {prediction.telemetry_reference.cycle}.</p>}{prediction.input_normalization?.map((change, index) => <p key={index}>Normalización automática · {({ cycle: "Ciclo", ambient_temperature_c: "Temperatura ambiente", cutoff_voltage_v: "Voltaje de corte", measurement_level: "Nivel de medición", chemistry: "Química", time_s: "Tiempo", voltage_v: "Voltaje", current_a: "Corriente", temperature_c: "Temperatura" } as Record<string, string>)[change.field] ?? change.field}: {change.original_value !== undefined ? `${change.original_value} → ${change.normalized_value}` : "unidades corregidas"}.</p>)}{prediction.compatibility && <ModelCompatibility report={prediction.compatibility} />}{[...new Set(importWarnings)].map(note => <p key={note}>{note}</p>)}</details>}
         <div className="results-overview">
           <BatteryHealthCard key={analysisSequence} soh={soh} cycle={prediction.current_cycle} />
           <section id="proyecciones" className="forecast-section" aria-labelledby="forecast-title">
-            <div className="forecast-results-heading"><div><h3 id="forecast-title">Proyecciones futuras</h3><p className="panel-description">Horizontes habilitados según la validación del modelo.</p></div><div className="forecast-results-switch" role="group" aria-label="Vista de las proyecciones"><button type="button" aria-pressed={forecastView === "cards"} aria-controls="forecast-results-view" onClick={() => setForecastView("cards")}><Icon name="grid" />Tarjetas</button><button type="button" aria-pressed={forecastView === "chart"} aria-controls="forecast-results-view" onClick={() => setForecastView("chart")}><Icon name="chart" />Gráfica</button></div></div>
+            <div className="forecast-results-heading"><div><h3 id="forecast-title">Proyecciones futuras</h3><p className="panel-description">{prediction.forecast_note ?? "Estimaciones a partir de tu telemetría."}</p></div><div className="forecast-results-switch" role="group" aria-label="Vista de las proyecciones"><button type="button" aria-pressed={forecastView === "cards"} aria-controls="forecast-results-view" onClick={() => setForecastView("cards")}><Icon name="grid" />Tarjetas</button><button type="button" aria-pressed={forecastView === "chart"} aria-controls="forecast-results-view" onClick={() => setForecastView("chart")}><Icon name="chart" />Gráfica</button></div></div>
             <div id="forecast-results-view">
             {forecastView === "chart" ? <PredictionChart prediction={prediction} embedded /> : prediction.future_predictions.length === 0 ? <div className="empty-results"><h3>Sin proyecciones habilitadas</h3><p>La validación disponible no respalda todavía horizontes futuros para este modelo. Se muestra únicamente el SoH actual.</p></div> : <div className="prediction-grid">{prediction.future_predictions.map(item => {
               return <article data-reveal key={item.horizon_cycles} className="prediction-card">
                 <span>+{item.horizon_cycles} ciclos</span><strong>{item.predicted_soh_percent.toFixed(2)} %</strong>
-                <small>Ciclo {item.target_cycle}</small>
-                <span className="forecast-label">Horizonte habilitado</span>
+                <small>{item.target_cycle == null ? `Dentro de ${item.horizon_cycles} ciclos` : `Ciclo ${item.target_cycle}`}</small>
+                <span className="forecast-label">{item.validation_status === "research" ? "Proyección estimada" : "Horizonte validado"}</span>
               </article>;
             })}</div>}
             </div>
           </section>
         </div>
         <BatteryUsageCard key={analysisSequence} soh={soh} />
-        <section data-reveal className="interpretation" aria-labelledby="interpretation-title"><Icon name="chart" /><div><h3 id="interpretation-title">Interpretación del resultado</h3><p>{usage ? `${usage.state} · rango orientativo ${usage.range}.` : "El resultado no se encuentra en el intervalo orientativo de 0–100 %. Revisa la predicción."} {validSoh(soh) && soh < 60 ? "Se recomienda una evaluación especializada antes de considerar reutilización o reciclaje." : "Estas categorías son orientativas y requieren evaluación técnica adicional."}</p></div></section>
+        <section data-reveal className="interpretation" aria-labelledby="interpretation-title"><Icon name="chart" /><div><h3 id="interpretation-title">Interpretación del resultado</h3><p>{usage ? `${usage.state} · rango orientativo ${usage.range}.` : soh > 100 ? "La estimación supera la capacidad de referencia inicial usada para definir el SoH. No representa el nivel de carga disponible." : "El resultado no se encuentra en el intervalo orientativo de clasificación."} {validSoh(soh) && soh < 60 ? "Se recomienda una evaluación especializada antes de considerar reutilización o reciclaje." : "Estas categorías son orientativas y requieren evaluación técnica adicional."}</p></div></section>
       </> : <div data-reveal className="empty-results" role="status"><span className="empty-icon"><Icon name="chart" /></span><h3>{loading ? "Analizando la batería…" : "Tu análisis comienza con los datos"}</h3><p>{loading ? "Procesando la telemetría mediante los modelos predictivos." : "Carga la telemetría y ejecuta el análisis para ver el SoH actual y las proyecciones disponibles."}</p></div>}
     </section>
     <MethodologySection prediction={prediction} />

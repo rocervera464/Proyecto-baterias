@@ -1,0 +1,436 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "file": "B0045_ciclo_030.csv",
+      "battery_id": "B0045",
+      "cycle": 30,
+      "samples": 22,
+      "ambient_temperature_c": 4.0,
+      "cutoff_voltage_v": 2.0,
+      "source": "data/raw/nasa_45_48/B0045.mat",
+      "source_sha256": "dc8e4cc149fe87f4ff855f30f0d31155ada6f467d06f5365550bab9370670fe3",
+      "csv_sha256": "fa82a8caa86e72071140c1cc8c2b1040f3f84ac2d10cf480e7b66173dee0aa03",
+      "window_seconds": [
+        0,
+        300
+      ],
+      "prediction_http_status": 200,
+      "model_id": "nasa_cells_45_48"
+    },
+    {
+      "file": "B0046_ciclo_025.csv",
+      "battery_id": "B0046",
+      "cycle": 25,
+      "samples": 22,
+      "ambient_temperature_c": 4.0,
+      "cutoff_voltage_v": 2.2,
+      "source": "data/raw/nasa_45_48/B0046.mat",
+      "source_sha256": "fe62dffc7079f6131e591415c740f6863364b23e728fe2aa7286a9c749dcdebc",
+      "csv_sha256": "62ee84aee808cf0bc9d13bf9ab3cddf15e2f31b9b40362ad30155794f8927cca",
+      "window_seconds": [
+        0,
+        300
+      ],
+      "prediction_http_status": 200,
+      "model_id": "nasa_cells_45_48"
+    },
+    {
+      "file": "B0047_ciclo_040.csv",
+      "battery_id": "B0047",
+      "cycle": 40,
+      "samples": 22,
+      "ambient_temperature_c": 4.0,
+      "cutoff_voltage_v": 2.5,
+      "source": "data/raw/nasa_45_48/B0047.mat",
+      "source_sha256": "8089a9180cf353704642c457c844d83dd2e83aa2fc43fe4f7c05322f86fd0648",
+      "csv_sha256": "bc58498ab88175b0179f6d305aad655d8fff911643e280be9d3c0232fce9439c",
+      "window_seconds": [
+        0,
+        300
+      ],
+      "prediction_http_status": 200,
+      "model_id": "nasa_cells_45_48"
+    },
+    {
+      "file": "B0048_ciclo_050.csv",
+      "battery_id": "B0048",
+      "cycle": 50,
+      "samples": 21,
+      "ambient_temperature_c": 4.0,
+      "cutoff_voltage_v": 2.7,
+      "source": "data/raw/nasa_45_48/B0048.mat",
+      "source_sha256": "341219d38d8531e0a89ecaa18736b79e1547d22edea4a1d45357bb5bfeb7757d",
+      "csv_sha256": "df3f554e25665060ccb9ac47d5fe9227b0b029f1cba7771c04c087b416a98f31",
+      "window_seconds": [
+        0,
+        300
+      ],
+      "prediction_http_status": 200,
+      "model_id": "nasa_cells_45_48"
+    },
+    {
+      "file": "B0005_ciclo_030.csv",
+      "battery_id": "B0005",
+      "cycle": 30,
+      "samples": 17,
+      "ambient_temperature_c": 24.0,
+      "cutoff_voltage_v": 2.7,
+      "source": "data/raw/nasa_room_2a/B0005.mat",
+      "source_sha256": "0eae4585baf3f200c09fe24c5ab884f1889679fc75206ca1aa19da704104f0b0",
+      "csv_sha256": "e3374baaa14fa32eaf297388cca73562e8613cd9d2ec576715d344b1f175a59d",
+      "window_seconds": [
+        0,
+        300
+      ],
+      "prediction_http_status": 200,
+      "model_id": "nasa_room_2a"
+    },
+    {
+      "file": "B0006_ciclo_168.csv",
+      "battery_id": "B0006",
+      "cycle": 168,
+      "samples": 32,
+      "ambient_temperature_c": 24.0,
+      "cutoff_voltage_v": 2.5,
+      "source": "data/raw/nasa_room_2a/B0006.mat",
+      "source_sha256": "fa818ab4db5db8ab21e910b6dd6c3e20d3761bb9672089e1a4de8f96074616c5",
+      "csv_sha256": "1fe0489913a025ca99bad66771d1cd35c0f53f2ff68a184884386fe85513a2a1",
+      "window_seconds": [
+        0,
+        300
+      ],
+      "prediction_http_status": 200,
+      "model_id": "nasa_room_2a"
+    }
+  ],
+  "signals_only_variant": {
+    "file": "B0045_ciclo_030_solo_senales.csv",
+    "source_record": "B0045_ciclo_030.csv",
+    "omitted": "context columns only"
+  },
+  "verification_v4": {
+    "B0005_ciclo_030.csv": {
+      "current_soh_percent": 98.82914733886719,
+      "model_id": "nasa_room_2a",
+      "production_horizons": [],
+      "forecast_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "research_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "future_predictions": [
+        {
+          "horizon_cycles": 5,
+          "target_cycle": 35,
+          "predicted_soh_percent": 97.33294916152954,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 10,
+          "target_cycle": 40,
+          "predicted_soh_percent": 96.9625415802002,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 20,
+          "target_cycle": 50,
+          "predicted_soh_percent": 95.71223640441895,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 30,
+          "target_cycle": 60,
+          "predicted_soh_percent": 94.36937618255615,
+          "validation_status": "research"
+        }
+      ],
+      "http_status": 200,
+      "samples_used": 17,
+      "csv_sha256": "e3374baaa14fa32eaf297388cca73562e8613cd9d2ec576715d344b1f175a59d"
+    },
+    "B0006_ciclo_168.csv": {
+      "current_soh_percent": 59.913246154785156,
+      "model_id": "nasa_room_2a",
+      "production_horizons": [],
+      "forecast_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "research_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "future_predictions": [
+        {
+          "horizon_cycles": 5,
+          "target_cycle": 173,
+          "predicted_soh_percent": 58.373201966285706,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 10,
+          "target_cycle": 178,
+          "predicted_soh_percent": 58.00279438495636,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 20,
+          "target_cycle": 188,
+          "predicted_soh_percent": 56.7524893283844,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 30,
+          "target_cycle": 198,
+          "predicted_soh_percent": 55.48349046707153,
+          "validation_status": "research"
+        }
+      ],
+      "http_status": 200,
+      "samples_used": 32,
+      "csv_sha256": "1fe0489913a025ca99bad66771d1cd35c0f53f2ff68a184884386fe85513a2a1"
+    },
+    "B0045_ciclo_030.csv": {
+      "current_soh_percent": 78.6406478881836,
+      "model_id": "nasa_cold_1a",
+      "production_horizons": [],
+      "forecast_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "research_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "future_predictions": [
+        {
+          "horizon_cycles": 5,
+          "target_cycle": 35,
+          "predicted_soh_percent": 75.67988109588623,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 10,
+          "target_cycle": 40,
+          "predicted_soh_percent": 75.3382318019867,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 20,
+          "target_cycle": 50,
+          "predicted_soh_percent": 73.47709560394287,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 30,
+          "target_cycle": 60,
+          "predicted_soh_percent": 72.99239253997803,
+          "validation_status": "research"
+        }
+      ],
+      "http_status": 200,
+      "samples_used": 22,
+      "csv_sha256": "fa82a8caa86e72071140c1cc8c2b1040f3f84ac2d10cf480e7b66173dee0aa03"
+    },
+    "B0045_ciclo_030_solo_senales.csv": {
+      "current_soh_percent": 78.6406478881836,
+      "model_id": "nasa_cold_1a",
+      "production_horizons": [],
+      "forecast_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "research_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "future_predictions": [
+        {
+          "horizon_cycles": 5,
+          "target_cycle": null,
+          "predicted_soh_percent": 75.67988109588623,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 10,
+          "target_cycle": null,
+          "predicted_soh_percent": 75.3382318019867,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 20,
+          "target_cycle": null,
+          "predicted_soh_percent": 73.47709560394287,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 30,
+          "target_cycle": null,
+          "predicted_soh_percent": 72.99239253997803,
+          "validation_status": "research"
+        }
+      ],
+      "http_status": 200,
+      "samples_used": 22,
+      "csv_sha256": "554fd19b87b0f0bd00afd3210cbbc7b85110f2b5ad59774d0a652f133409d57e"
+    },
+    "B0046_ciclo_025.csv": {
+      "current_soh_percent": 85.38806915283203,
+      "model_id": "nasa_cold_1a",
+      "production_horizons": [],
+      "forecast_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "research_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "future_predictions": [
+        {
+          "horizon_cycles": 5,
+          "target_cycle": 30,
+          "predicted_soh_percent": 82.085444688797,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 10,
+          "target_cycle": 35,
+          "predicted_soh_percent": 81.76777839660645,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 20,
+          "target_cycle": 45,
+          "predicted_soh_percent": 79.45574283599854,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 30,
+          "target_cycle": 55,
+          "predicted_soh_percent": 78.88826417922974,
+          "validation_status": "research"
+        }
+      ],
+      "http_status": 200,
+      "samples_used": 22,
+      "csv_sha256": "62ee84aee808cf0bc9d13bf9ab3cddf15e2f31b9b40362ad30155794f8927cca"
+    },
+    "B0047_ciclo_040.csv": {
+      "current_soh_percent": 81.21212005615234,
+      "model_id": "nasa_cold_1a",
+      "production_horizons": [],
+      "forecast_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "research_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "future_predictions": [
+        {
+          "horizon_cycles": 5,
+          "target_cycle": 45,
+          "predicted_soh_percent": 79.11086320877075,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 10,
+          "target_cycle": 50,
+          "predicted_soh_percent": 78.80857300758362,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 20,
+          "target_cycle": 60,
+          "predicted_soh_percent": 77.78150129318237,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 30,
+          "target_cycle": 70,
+          "predicted_soh_percent": 77.51285862922668,
+          "validation_status": "research"
+        }
+      ],
+      "http_status": 200,
+      "samples_used": 22,
+      "csv_sha256": "bc58498ab88175b0179f6d305aad655d8fff911643e280be9d3c0232fce9439c"
+    },
+    "B0048_ciclo_050.csv": {
+      "current_soh_percent": 80.88592529296875,
+      "model_id": "nasa_cold_1a",
+      "production_horizons": [],
+      "forecast_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "research_horizons": [
+        5,
+        10,
+        20,
+        30
+      ],
+      "future_predictions": [
+        {
+          "horizon_cycles": 5,
+          "target_cycle": 55,
+          "predicted_soh_percent": 79.476438164711,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 10,
+          "target_cycle": 60,
+          "predicted_soh_percent": 79.22573351860046,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 20,
+          "target_cycle": 70,
+          "predicted_soh_percent": 78.71721529960632,
+          "validation_status": "research"
+        },
+        {
+          "horizon_cycles": 30,
+          "target_cycle": 80,
+          "predicted_soh_percent": 78.24862265586853,
+          "validation_status": "research"
+        }
+      ],
+      "http_status": 200,
+      "samples_used": 21,
+      "csv_sha256": "df3f554e25665060ccb9ac47d5fe9227b0b029f1cba7771c04c087b416a98f31"
+    }
+  }
+}

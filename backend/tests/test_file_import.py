@@ -5,7 +5,8 @@ import pandas as pd
 from fastapi.testclient import TestClient
 from scipy.io import savemat
 
-from app.main import app
+# Historical contract remains available under /legacy. V4 is tested separately.
+from app.legacy import legacy_app as app
 
 client = TestClient(app)
 
